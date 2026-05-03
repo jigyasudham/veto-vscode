@@ -1,14 +1,16 @@
 import * as vscode from 'vscode';
-import type { VetoPattern } from '../types';
+import type { VetoRateEntry } from '../types';
 import { makeItem } from '../utils';
 
-export class RouterProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
+const KNOWN_PLATFORMS = ['claude', 'gemini', 'codex'];
+
+export class RateProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _onDidChangeTreeData = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
-  private data: VetoPattern[] | null = null;
+  private data: VetoRateEntry[] | null = null;
   private notInstalled = false;
 
-  refresh(data: VetoPattern[] | null, notInstalled = false): void {
+  refresh(data: VetoRateEntry[] | null, notInstalled = false): void {
     this.data = data;
     this.notInstalled = notInstalled;
     this._onDidChangeTreeData.fire();
@@ -22,14 +24,12 @@ export class RouterProvider implements vscode.TreeDataProvider<vscode.TreeItem> 
     if (this.notInstalled) {
       return [makeItem('Veto not installed — run: npm i -g @jigyasudham/veto', undefined, 'veto.openInstallDocs')];
     }
-    if (!this.data || this.data.length === 0) {
-      return [makeItem('No routing data yet — use veto_record_outcome to teach the router')];
-    }
-    return this.data.map(p => {
-      const t = new vscode.TreeItem(p.pattern_key);
-      t.description = `${p.pattern_val} · ${Math.round(p.confidence * 100)}% (${p.seen_count}x)`;
-      t.tooltip = p.pattern_val;
-      return t;
+    const map = new Map<string, number>();
+    (this.data ?? []).forEach(r => map.set(r.platform, r.request_count));
+    return KNOWN_PLATFORMS.map(p => {
+      const count = map.get(p) ?? 0;
+      const label = p.charAt(0).toUpperCase() + p.slice(1);
+      return makeItem(label, `${count} requests today`);
     });
   }
 }

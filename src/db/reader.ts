@@ -2,15 +2,32 @@ import { DatabaseSync } from 'node:sqlite';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { existsSync } from 'node:fs';
-import type { VetoSession, VetoMemoryData, VetoMemoryEntry, VetoCouncilOutcome, VetoPattern } from '../types';
+import type { VetoSession, VetoMemoryData, VetoMemoryEntry, VetoCouncilOutcome, VetoPattern, VetoRateEntry } from '../types';
 
-const DB_PATH = join(homedir(), '.veto', 'veto.db');
+let dbPath = join(homedir(), '.veto', 'veto.db');
+let logger: ((msg: string) => void) | undefined;
+
+export function setDbPath(p: string): void {
+  dbPath = p || join(homedir(), '.veto', 'veto.db');
+}
+
+export function getDbPath(): string {
+  return dbPath;
+}
+
+export function setLogger(fn: (msg: string) => void): void {
+  logger = fn;
+}
 
 function openDb(): DatabaseSync | null {
-  if (!existsSync(DB_PATH)) return null;
+  if (!existsSync(dbPath)) {
+    logger?.(`Veto DB not found at ${dbPath}`);
+    return null;
+  }
   try {
-    return new DatabaseSync(DB_PATH, { open: true });
-  } catch {
+    return new DatabaseSync(dbPath, { open: true });
+  } catch (e) {
+    logger?.(`Veto DB open error: ${e instanceof Error ? e.message : String(e)}`);
     return null;
   }
 }
@@ -20,7 +37,8 @@ export function getLatestSession(): VetoSession | null {
   if (!db) return null;
   try {
     return (db.prepare('SELECT * FROM sessions ORDER BY created_at DESC LIMIT 1').get() as VetoSession | undefined) ?? null;
-  } catch {
+  } catch (e) {
+    logger?.(`getLatestSession error: ${e instanceof Error ? e.message : String(e)}`);
     return null;
   } finally {
     db.close();
@@ -51,7 +69,8 @@ export function getMemoryEntries(projectDir?: string): VetoMemoryData | null {
     }));
 
     return { totalCount: countRow.count, entries, scoped: !!projectDir };
-  } catch {
+  } catch (e) {
+    logger?.(`getMemoryEntries error: ${e instanceof Error ? e.message : String(e)}`);
     return null;
   } finally {
     db.close();
@@ -63,7 +82,8 @@ export function getLastCouncilOutcome(): VetoCouncilOutcome | null {
   if (!db) return null;
   try {
     return (db.prepare('SELECT * FROM council_outcomes ORDER BY debated_at DESC LIMIT 1').get() as VetoCouncilOutcome | undefined) ?? null;
-  } catch {
+  } catch (e) {
+    logger?.(`getLastCouncilOutcome error: ${e instanceof Error ? e.message : String(e)}`);
     return null;
   } finally {
     db.close();
@@ -75,7 +95,22 @@ export function getTopPatterns(): VetoPattern[] | null {
   if (!db) return null;
   try {
     return db.prepare('SELECT * FROM patterns ORDER BY confidence DESC, seen_count DESC LIMIT 10').all() as VetoPattern[];
-  } catch {
+  } catch (e) {
+    logger?.(`getTopPatterns error: ${e instanceof Error ? e.message : String(e)}`);
+    return null;
+  } finally {
+    db.close();
+  }
+}
+
+export function getRateStatus(): VetoRateEntry[] | null {
+  const db = openDb();
+  if (!db) return null;
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    return db.prepare('SELECT platform, date_key, request_count, updated_at FROM rate_usage WHERE date_key = ?').all(today) as VetoRateEntry[];
+  } catch (e) {
+    logger?.(`getRateStatus error: ${e instanceof Error ? e.message : String(e)}`);
     return null;
   } finally {
     db.close();

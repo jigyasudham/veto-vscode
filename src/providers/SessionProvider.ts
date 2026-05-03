@@ -1,28 +1,16 @@
 import * as vscode from 'vscode';
 import type { VetoSession } from '../types';
-
-function relativeTime(iso: string): string {
-  const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  return `${Math.floor(hrs / 24)}d ago`;
-}
-
-function item(label: string, description?: string): vscode.TreeItem {
-  const t = new vscode.TreeItem(label);
-  if (description) t.description = description;
-  return t;
-}
+import { relativeTime, makeItem } from '../utils';
 
 export class SessionProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _onDidChangeTreeData = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
   private data: VetoSession | null = null;
+  private notInstalled = false;
 
-  refresh(data: VetoSession | null): void {
+  refresh(data: VetoSession | null, notInstalled = false): void {
     this.data = data;
+    this.notInstalled = notInstalled;
     this._onDidChangeTreeData.fire();
   }
 
@@ -31,18 +19,33 @@ export class SessionProvider implements vscode.TreeDataProvider<vscode.TreeItem>
   }
 
   getChildren(): vscode.TreeItem[] {
+    if (this.notInstalled) {
+      return [makeItem('Veto not installed — run: npm i -g @jigyasudham/veto', undefined, 'veto.openInstallDocs')];
+    }
     if (!this.data) {
-      return [item('No active session — run veto_session_save first')];
+      return [makeItem('No active session — run veto_session_save first')];
     }
     const s = this.data;
-    const items = [
-      item('Session', `${s.id.slice(0, 8)}…`),
-      item('Created by', s.platform),
-      item('Active in', s.active_client ?? s.platform),
-      item('Started', relativeTime(s.started_at)),
-      item('Tokens', s.token_count.toLocaleString()),
+
+    const sessionItem = new vscode.TreeItem(`${s.id.slice(0, 8)}…`);
+    sessionItem.description = 'Session ID';
+    sessionItem.tooltip = s.id;
+    sessionItem.command = { command: 'veto.copySessionId', title: 'Copy Session ID', arguments: [s.id] };
+
+    const items: vscode.TreeItem[] = [
+      sessionItem,
+      makeItem('Created by', s.platform),
+      makeItem('Active in', s.active_client ?? s.platform),
+      makeItem('Started', relativeTime(s.started_at)),
+      makeItem('Tokens', s.token_count.toLocaleString()),
     ];
-    if (s.summary) items.push(item('Summary', s.summary.slice(0, 60)));
+
+    if (s.summary) {
+      const summaryItem = makeItem('Summary', s.summary.slice(0, 60));
+      summaryItem.tooltip = s.summary;
+      items.push(summaryItem);
+    }
+
     return items;
   }
 }

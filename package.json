@@ -22,10 +22,59 @@
     "views": {
       "veto-sidebar": [
         { "id": "veto-session", "name": "Session" },
-        { "id": "veto-memory", "name": "Memory" },
+        { "id": "veto-memory",  "name": "Memory" },
         { "id": "veto-council", "name": "Last Council" },
-        { "id": "veto-router", "name": "Router Stats" }
+        { "id": "veto-router",  "name": "Router Stats" },
+        { "id": "veto-rate",    "name": "Rate Status" }
       ]
+    },
+    "commands": [
+      {
+        "command": "veto.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "veto.copySessionId",
+        "title": "Copy Session ID",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "veto.openInstallDocs",
+        "title": "Open Veto Install Docs",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "veto.focusSidebar",
+        "title": "Focus Veto Sidebar"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        { "command": "veto.refresh", "when": "view == veto-session", "group": "navigation" },
+        { "command": "veto.refresh", "when": "view == veto-memory",  "group": "navigation" },
+        { "command": "veto.refresh", "when": "view == veto-council", "group": "navigation" },
+        { "command": "veto.refresh", "when": "view == veto-router",  "group": "navigation" },
+        { "command": "veto.refresh", "when": "view == veto-rate",    "group": "navigation" }
+      ]
+    },
+    "configuration": {
+      "title": "Veto",
+      "properties": {
+        "veto.pollInterval": {
+          "type": "number",
+          "default": 5000,
+          "minimum": 1000,
+          "description": "How often (in milliseconds) the Veto dashboard polls the database. Minimum 1000ms.",
+          "scope": "window"
+        },
+        "veto.dbPath": {
+          "type": "string",
+          "default": "",
+          "description": "Override the Veto database path. Leave empty to use the default ~/.veto/veto.db.",
+          "scope": "machine"
+        }
+      }
     }
   },
   "scripts": {

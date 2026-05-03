@@ -1,74 +1,83 @@
 import * as vscode from 'vscode';
-import type { VetoCouncilOutcome } from '../types';
-
-function relativeTime(iso: string): string {
-  const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  return `${Math.floor(hrs / 24)}d ago`;
-}
+import type { VetoCouncilOutcome, CouncilNode } from '../types';
+import { relativeTime, makeItem } from '../utils';
 
 function verdictIcon(verdict: string): vscode.ThemeIcon {
-  if (verdict === 'GREEN') return new vscode.ThemeIcon('check', new vscode.ThemeColor('testing.iconPassed'));
-  if (verdict === 'RED')   return new vscode.ThemeIcon('error', new vscode.ThemeColor('testing.iconFailed'));
-  return new vscode.ThemeIcon('warning', new vscode.ThemeColor('testing.iconQueued'));
+  if (verdict === 'GREEN') return new vscode.ThemeIcon('check',   new vscode.ThemeColor('testing.iconPassed'));
+  if (verdict === 'RED')   return new vscode.ThemeIcon('error',   new vscode.ThemeColor('testing.iconFailed'));
+  return                          new vscode.ThemeIcon('warning', new vscode.ThemeColor('testing.iconQueued'));
 }
 
-function agentItem(name: string, raw: string | null): vscode.TreeItem {
+function agentTreeItem(name: string, raw: string | null): vscode.TreeItem {
   const t = new vscode.TreeItem(name);
   t.description = raw?.slice(0, 40) ?? '—';
+  t.tooltip = raw ?? undefined;
   const isApprove = raw?.toLowerCase().includes('approve') ?? false;
   t.iconPath = isApprove
-    ? new vscode.ThemeIcon('pass', new vscode.ThemeColor('testing.iconPassed'))
+    ? new vscode.ThemeIcon('pass',   new vscode.ThemeColor('testing.iconPassed'))
     : new vscode.ThemeIcon('issues', new vscode.ThemeColor('testing.iconQueued'));
   return t;
 }
 
-export class CouncilProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
+export class CouncilProvider implements vscode.TreeDataProvider<CouncilNode> {
   private _onDidChangeTreeData = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
   private data: VetoCouncilOutcome | null = null;
+  private notInstalled = false;
 
-  refresh(data: VetoCouncilOutcome | null): void {
+  refresh(data: VetoCouncilOutcome | null, notInstalled = false): void {
     this.data = data;
+    this.notInstalled = notInstalled;
     this._onDidChangeTreeData.fire();
   }
 
-  getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
-    return element;
+  getTreeItem(node: CouncilNode): vscode.TreeItem {
+    switch (node.kind) {
+      case 'empty':
+        return makeItem(this.notInstalled
+          ? 'Veto not installed — run: npm i -g @jigyasudham/veto'
+          : 'No council verdict yet',
+          undefined,
+          this.notInstalled ? 'veto.openInstallDocs' : undefined
+        );
+      case 'verdict': {
+        const t = new vscode.TreeItem(node.data.verdict, vscode.TreeItemCollapsibleState.Collapsed);
+        t.id = node.data.id;
+        t.iconPath = verdictIcon(node.data.verdict);
+        return t;
+      }
+      case 'agent':
+        return agentTreeItem(node.name, node.raw);
+      case 'recommended': {
+        const t = makeItem('Recommended', node.text.slice(0, 80));
+        t.tooltip = node.text;
+        return t;
+      }
+      case 'debated':
+        return makeItem('Debated', relativeTime(node.iso));
+    }
   }
 
-  getChildren(): vscode.TreeItem[] {
-    if (!this.data) {
-      return [new vscode.TreeItem('No council verdict yet')];
+  getChildren(node?: CouncilNode): CouncilNode[] {
+    if (!node) {
+      if (this.notInstalled || !this.data) return [{ kind: 'empty' }];
+      return [{ kind: 'verdict', data: this.data }];
     }
-    const d = this.data;
-    const verdictItem = new vscode.TreeItem(d.verdict);
-    verdictItem.iconPath = verdictIcon(d.verdict);
-
-    const items: vscode.TreeItem[] = [
-      verdictItem,
-      agentItem('Lead Dev', d.lead_dev),
-      agentItem('PM', d.pm),
-      agentItem('Architect', d.architect),
-      agentItem('UX', d.ux),
-      agentItem('Devil', d.devil),
-      agentItem('Legal', d.legal),
-      agentItem('Security', d.security),
-    ];
-
-    if (d.recommended) {
-      const rec = new vscode.TreeItem('Recommended');
-      rec.description = d.recommended.slice(0, 80);
-      items.push(rec);
+    if (node.kind === 'verdict') {
+      const d = node.data;
+      const children: CouncilNode[] = [
+        { kind: 'agent', name: 'Lead Dev',  raw: d.lead_dev },
+        { kind: 'agent', name: 'PM',        raw: d.pm },
+        { kind: 'agent', name: 'Architect', raw: d.architect },
+        { kind: 'agent', name: 'UX',        raw: d.ux },
+        { kind: 'agent', name: 'Devil',     raw: d.devil },
+        { kind: 'agent', name: 'Legal',     raw: d.legal },
+        { kind: 'agent', name: 'Security',  raw: d.security },
+        { kind: 'debated', iso: d.debated_at },
+      ];
+      if (d.recommended) children.splice(7, 0, { kind: 'recommended', text: d.recommended });
+      return children;
     }
-
-    const debated = new vscode.TreeItem('Debated');
-    debated.description = relativeTime(d.debated_at);
-    items.push(debated);
-
-    return items;
+    return [];
   }
 }

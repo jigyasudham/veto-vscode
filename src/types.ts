@@ -45,3 +45,17 @@ export interface VetoPattern {
   seen_count: number;
   updated_at: string;
 }
+
+export interface VetoRateEntry {
+  platform: string;
+  date_key: string;
+  request_count: number;
+  updated_at: string;
+}
+
+export type CouncilNode =
+  | { kind: 'verdict';     data: VetoCouncilOutcome }
+  | { kind: 'agent';       name: string; raw: string | null }
+  | { kind: 'recommended'; text: string }
+  | { kind: 'debated';     iso: string }
+  | { kind: 'empty' };
