@@ -1,0 +1,44 @@
+{
+  "name": "veto-vscode",
+  "displayName": "Veto",
+  "description": "Live dashboard for the Veto MCP server",
+  "version": "0.1.0",
+  "publisher": "jigyasudham",
+  "engines": { "vscode": "^1.97.0" },
+  "categories": ["Other"],
+  "keywords": ["veto", "mcp", "ai", "claude", "gemini", "dashboard"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "veto-sidebar",
+          "title": "Veto",
+          "icon": "icons/veto.svg"
+        }
+      ]
+    },
+    "views": {
+      "veto-sidebar": [
+        { "id": "veto-session", "name": "Session" },
+        { "id": "veto-memory", "name": "Memory" },
+        { "id": "veto-council", "name": "Last Council" },
+        { "id": "veto-router", "name": "Router Stats" }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "npm run build && vsce package",
+    "publish": "npm run build && vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.97.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.20.0",
+    "typescript": "^5.3.0"
+  }
+}
