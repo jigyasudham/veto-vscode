@@ -2,7 +2,7 @@
   "name": "veto-vscode",
   "displayName": "Veto",
   "description": "Live dashboard for the Veto MCP server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "jigyasudham",
   "engines": { "vscode": "^1.97.0" },
   "categories": ["Other"],
@@ -25,7 +25,8 @@
         { "id": "veto-memory",  "name": "Memory" },
         { "id": "veto-council", "name": "Last Council" },
         { "id": "veto-router",  "name": "Router Stats" },
-        { "id": "veto-rate",    "name": "Rate Status" }
+        { "id": "veto-rate",    "name": "Rate Status" },
+        { "id": "veto-health",  "name": "Health" }
       ]
     },
     "commands": [
@@ -55,7 +56,8 @@
         { "command": "veto.refresh", "when": "view == veto-memory",  "group": "navigation" },
         { "command": "veto.refresh", "when": "view == veto-council", "group": "navigation" },
         { "command": "veto.refresh", "when": "view == veto-router",  "group": "navigation" },
-        { "command": "veto.refresh", "when": "view == veto-rate",    "group": "navigation" }
+        { "command": "veto.refresh", "when": "view == veto-rate",    "group": "navigation" },
+        { "command": "veto.refresh", "when": "view == veto-health",  "group": "navigation" }
       ]
     },
     "configuration": {

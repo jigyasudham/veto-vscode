@@ -2,13 +2,15 @@ import * as vscode from 'vscode';
 import { existsSync } from 'node:fs';
 import {
   getLatestSession, getMemoryEntries, getLastCouncilOutcome,
-  getTopPatterns, getRateStatus, setDbPath, setLogger, getDbPath,
+  getTopPatterns, getRateStatus, getUsageSummary, getHealthStats,
+  setDbPath, setLogger, getDbPath,
 } from './db/reader';
 import { SessionProvider } from './providers/SessionProvider';
 import { MemoryProvider }  from './providers/MemoryProvider';
 import { CouncilProvider } from './providers/CouncilProvider';
 import { RouterProvider }  from './providers/RouterProvider';
 import { RateProvider }    from './providers/RateProvider';
+import { HealthProvider }  from './providers/HealthProvider';
 import type { VetoSession, VetoCouncilOutcome } from './types';
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -29,6 +31,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const councilProvider = new CouncilProvider();
   const routerProvider  = new RouterProvider();
   const rateProvider    = new RateProvider();
+  const healthProvider  = new HealthProvider();
 
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('veto-session', sessionProvider),
@@ -36,6 +39,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.window.registerTreeDataProvider('veto-council', councilProvider),
     vscode.window.registerTreeDataProvider('veto-router',  routerProvider),
     vscode.window.registerTreeDataProvider('veto-rate',    rateProvider),
+    vscode.window.registerTreeDataProvider('veto-health',  healthProvider),
   );
 
   // Status bar
@@ -94,6 +98,7 @@ export function activate(context: vscode.ExtensionContext): void {
       councilProvider.refresh(null, true);
       routerProvider.refresh(null, true);
       rateProvider.refresh(null, true);
+      healthProvider.refresh(null, null, true);
       updateStatusBar(null, null);
       return;
     }
@@ -103,6 +108,8 @@ export function activate(context: vscode.ExtensionContext): void {
     const council  = getLastCouncilOutcome();
     const patterns = getTopPatterns();
     const rates    = getRateStatus();
+    const usage    = getUsageSummary();
+    const health   = getHealthStats();
 
     // RED verdict notification — only fires when a new RED outcome appears
     if (council && council.id !== previousVerdictId && council.verdict === 'RED') {
@@ -117,6 +124,7 @@ export function activate(context: vscode.ExtensionContext): void {
     councilProvider.refresh(council, false);
     routerProvider.refresh(patterns, false);
     rateProvider.refresh(rates,      false);
+    healthProvider.refresh(health, usage, false);
 
     updateStatusBar(session, council);
   }

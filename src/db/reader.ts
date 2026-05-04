@@ -1,8 +1,8 @@
 import { DatabaseSync } from 'node:sqlite';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
-import { existsSync } from 'node:fs';
-import type { VetoSession, VetoMemoryData, VetoMemoryEntry, VetoCouncilOutcome, VetoPattern, VetoRateEntry } from '../types';
+import { existsSync, statSync } from 'node:fs';
+import type { VetoSession, VetoMemoryData, VetoMemoryEntry, VetoCouncilOutcome, VetoPattern, VetoRateEntry, VetoUsageSummary, VetoHealthStats } from '../types';
 
 let dbPath = join(homedir(), '.veto', 'veto.db');
 let logger: ((msg: string) => void) | undefined;
@@ -111,6 +111,46 @@ export function getRateStatus(): VetoRateEntry[] | null {
     return db.prepare('SELECT platform, date_key, request_count, updated_at FROM rate_usage WHERE date_key = ?').all(today) as VetoRateEntry[];
   } catch (e) {
     logger?.(`getRateStatus error: ${e instanceof Error ? e.message : String(e)}`);
+    return null;
+  } finally {
+    db.close();
+  }
+}
+
+export function getUsageSummary(): VetoUsageSummary | null {
+  const db = openDb();
+  if (!db) return null;
+  try {
+    type TotalRow = { totalSessions: number; totalTokens: number };
+    type PlatformRow = { platform: string; tokens: number };
+    const total = db.prepare(
+      'SELECT COUNT(*) as totalSessions, COALESCE(SUM(tokens), 0) as totalTokens FROM usage_events'
+    ).get() as TotalRow;
+    const byPlatform = db.prepare(
+      'SELECT platform, COALESCE(SUM(tokens), 0) as tokens FROM usage_events GROUP BY platform ORDER BY tokens DESC'
+    ).all() as PlatformRow[];
+    return { totalSessions: total.totalSessions, totalTokens: total.totalTokens, byPlatform };
+  } catch (e) {
+    logger?.(`getUsageSummary error: ${e instanceof Error ? e.message : String(e)}`);
+    return null;
+  } finally {
+    db.close();
+  }
+}
+
+export function getHealthStats(): VetoHealthStats | null {
+  const db = openDb();
+  if (!db) return null;
+  try {
+    type CountRow = { c: number };
+    const sessionCount  = (db.prepare('SELECT COUNT(*) as c FROM sessions').get() as CountRow).c;
+    const memoryCount   = (db.prepare('SELECT COUNT(*) as c FROM knowledge_base').get() as CountRow).c;
+    const patternCount  = (db.prepare('SELECT COUNT(*) as c FROM patterns').get() as CountRow).c;
+    const learningCount = (db.prepare('SELECT COUNT(*) as c FROM learning_data').get() as CountRow).c;
+    const dbSizeMb = Math.round((statSync(dbPath).size / 1024 / 1024) * 10) / 10;
+    return { sessionCount, memoryCount, patternCount, learningCount, dbSizeMb };
+  } catch (e) {
+    logger?.(`getHealthStats error: ${e instanceof Error ? e.message : String(e)}`);
     return null;
   } finally {
     db.close();

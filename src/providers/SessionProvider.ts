@@ -36,6 +36,7 @@ export class SessionProvider implements vscode.TreeDataProvider<vscode.TreeItem>
       sessionItem,
       makeItem('Created by', s.platform),
       makeItem('Active in', s.active_client ?? s.platform),
+      makeItem('Connection', s.connection_type ?? 'subscription'),
       makeItem('Started', relativeTime(s.started_at)),
       makeItem('Tokens', s.token_count.toLocaleString()),
     ];

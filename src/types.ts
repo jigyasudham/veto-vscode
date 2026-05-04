@@ -3,6 +3,7 @@ export interface VetoSession {
   platform: string;
   active_client: string | null;
   last_resumed_at: string | null;
+  connection_type: string;
   started_at: string;
   summary: string | null;
   project_dir: string | null;
@@ -51,6 +52,20 @@ export interface VetoRateEntry {
   date_key: string;
   request_count: number;
   updated_at: string;
+}
+
+export interface VetoUsageSummary {
+  totalSessions: number;
+  totalTokens: number;
+  byPlatform: Array<{ platform: string; tokens: number }>;
+}
+
+export interface VetoHealthStats {
+  sessionCount: number;
+  memoryCount: number;
+  patternCount: number;
+  learningCount: number;
+  dbSizeMb: number;
 }
 
 export type CouncilNode =
