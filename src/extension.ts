@@ -195,6 +195,28 @@ export function activate(context: vscode.ExtensionContext): void {
       outputChannel.show(true);
     }),
 
+    vscode.commands.registerCommand('veto.saveSession', async () => {
+      const session = getLatestSession();
+      const summary = await vscode.window.showInputBox({
+        prompt: 'Session summary',
+        placeHolder: 'What did you accomplish this session?',
+        value: session?.summary ?? '',
+        ignoreFocusOut: true,
+      });
+      if (!summary?.trim()) return;
+
+      const projectDir = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? '';
+      const msg = [
+        'Save this veto session using veto_session_save.',
+        `Summary: "${summary.trim()}"`,
+        projectDir ? `Project dir: ${projectDir}` : '',
+      ].filter(Boolean).join(' ');
+
+      const terminal = vscode.window.createTerminal({ name: 'Veto Save', hideFromUser: false });
+      terminal.show(false);
+      terminal.sendText(`claude -p "${msg.replace(/"/g, '\\"')}"`, true);
+    }),
+
     // Search memory entries directly from VS Code
     vscode.commands.registerCommand('veto.searchMemory', async () => {
       const query = await vscode.window.showInputBox({

@@ -58,6 +58,11 @@
         "command": "veto.openLog",
         "title": "Open Veto Log",
         "icon": "$(output)"
+      },
+      {
+        "command": "veto.saveSession",
+        "title": "Save Session",
+        "icon": "$(save)"
       }
     ],
     "menus": {
@@ -69,7 +74,8 @@
         { "command": "veto.refresh", "when": "view == veto-rate",    "group": "navigation" },
         { "command": "veto.refresh",       "when": "view == veto-health",  "group": "navigation" },
         { "command": "veto.searchMemory",  "when": "view == veto-memory",  "group": "navigation" },
-        { "command": "veto.openLog",       "when": "view == veto-session", "group": "navigation" }
+        { "command": "veto.openLog",        "when": "view == veto-session", "group": "navigation" },
+        { "command": "veto.saveSession",   "when": "view == veto-session", "group": "navigation" }
       ]
     },
     "configuration": {
