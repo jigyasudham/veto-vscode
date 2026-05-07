@@ -138,6 +138,24 @@ export function getUsageSummary(): VetoUsageSummary | null {
   }
 }
 
+export function searchMemoryEntries(query: string): VetoMemoryEntry[] | null {
+  const db = openDb();
+  if (!db) return null;
+  try {
+    const like = `%${query}%`;
+    type RawEntry = { id: string; title: string; tags: string | null; project_dir: string | null; type: string; created_at: string };
+    const rows = db.prepare(
+      'SELECT id, title, tags, project_dir, type, created_at FROM knowledge_base WHERE title LIKE ? OR tags LIKE ? ORDER BY created_at DESC LIMIT 20'
+    ).all(like, like) as RawEntry[];
+    return rows.map(r => ({ ...r, tags: r.tags ? (JSON.parse(r.tags) as string[]) : [] }));
+  } catch (e) {
+    logger?.(`searchMemoryEntries error: ${e instanceof Error ? e.message : String(e)}`);
+    return null;
+  } finally {
+    db.close();
+  }
+}
+
 export function getHealthStats(): VetoHealthStats | null {
   const db = openDb();
   if (!db) return null;

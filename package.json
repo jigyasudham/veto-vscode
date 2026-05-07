@@ -2,7 +2,7 @@
   "name": "veto-vscode",
   "displayName": "Veto",
   "description": "Live dashboard for the Veto MCP server",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "jigyasudham",
   "engines": { "vscode": "^1.97.0" },
   "categories": ["Other"],
@@ -48,6 +48,16 @@
       {
         "command": "veto.focusSidebar",
         "title": "Focus Veto Sidebar"
+      },
+      {
+        "command": "veto.searchMemory",
+        "title": "Search Veto Memory",
+        "icon": "$(search)"
+      },
+      {
+        "command": "veto.openLog",
+        "title": "Open Veto Log",
+        "icon": "$(output)"
       }
     ],
     "menus": {
@@ -57,7 +67,9 @@
         { "command": "veto.refresh", "when": "view == veto-council", "group": "navigation" },
         { "command": "veto.refresh", "when": "view == veto-router",  "group": "navigation" },
         { "command": "veto.refresh", "when": "view == veto-rate",    "group": "navigation" },
-        { "command": "veto.refresh", "when": "view == veto-health",  "group": "navigation" }
+        { "command": "veto.refresh",       "when": "view == veto-health",  "group": "navigation" },
+        { "command": "veto.searchMemory",  "when": "view == veto-memory",  "group": "navigation" },
+        { "command": "veto.openLog",       "when": "view == veto-session", "group": "navigation" }
       ]
     },
     "configuration": {
@@ -75,6 +87,12 @@
           "default": "",
           "description": "Override the Veto database path. Leave empty to use the default ~/.veto/veto.db.",
           "scope": "machine"
+        },
+        "veto.autoRefreshOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "Refresh the Veto dashboard whenever any file is saved in the workspace.",
+          "scope": "window"
         }
       }
     }

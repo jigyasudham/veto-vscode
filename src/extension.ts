@@ -1,9 +1,11 @@
 import * as vscode from 'vscode';
 import { existsSync } from 'node:fs';
+import { watch as fsWatch, FSWatcher } from 'node:fs';
+import { dirname } from 'node:path';
 import {
   getLatestSession, getMemoryEntries, getLastCouncilOutcome,
   getTopPatterns, getRateStatus, getUsageSummary, getHealthStats,
-  setDbPath, setLogger, getDbPath,
+  searchMemoryEntries, setDbPath, setLogger, getDbPath,
 } from './db/reader';
 import { SessionProvider } from './providers/SessionProvider';
 import { MemoryProvider }  from './providers/MemoryProvider';
@@ -14,14 +16,12 @@ import { HealthProvider }  from './providers/HealthProvider';
 import type { VetoSession, VetoCouncilOutcome } from './types';
 
 export function activate(context: vscode.ExtensionContext): void {
-  // Output channel for diagnostics
   const outputChannel = vscode.window.createOutputChannel('Veto');
   context.subscriptions.push(outputChannel);
   setLogger(msg => outputChannel.appendLine(`[${new Date().toISOString()}] ${msg}`));
 
-  // Settings
-  const config = vscode.workspace.getConfiguration('veto');
-  const pollIntervalMs = Math.max(1000, config.get<number>('pollInterval', 5000));
+  let config = vscode.workspace.getConfiguration('veto');
+  let pollIntervalMs = Math.max(1000, config.get<number>('pollInterval', 5000));
   const dbPathOverride = config.get<string>('dbPath', '');
   if (dbPathOverride) setDbPath(dbPathOverride);
 
@@ -48,26 +48,7 @@ export function activate(context: vscode.ExtensionContext): void {
   statusBarItem.show();
   context.subscriptions.push(statusBarItem);
 
-  // Commands
-  context.subscriptions.push(
-    vscode.commands.registerCommand('veto.refresh', () => refresh()),
-
-    vscode.commands.registerCommand('veto.copySessionId', (id: string) => {
-      vscode.env.clipboard.writeText(id).then(() => {
-        vscode.window.showInformationMessage('Session ID copied');
-      });
-    }),
-
-    vscode.commands.registerCommand('veto.openInstallDocs', () => {
-      vscode.env.openExternal(vscode.Uri.parse('https://www.npmjs.com/package/@jigyasudham/veto'));
-    }),
-
-    vscode.commands.registerCommand('veto.focusSidebar', () => {
-      vscode.commands.executeCommand('veto-session.focus');
-    }),
-  );
-
-  const projectDir = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  let projectDir = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   let previousVerdictId: string | null = null;
 
   function updateStatusBar(session: VetoSession | null, council: VetoCouncilOutcome | null): void {
@@ -111,7 +92,6 @@ export function activate(context: vscode.ExtensionContext): void {
     const usage    = getUsageSummary();
     const health   = getHealthStats();
 
-    // RED verdict notification — only fires when a new RED outcome appears
     if (council && council.id !== previousVerdictId && council.verdict === 'RED') {
       vscode.window.showWarningMessage(
         `Veto Council: RED verdict — ${council.recommended ?? 'no recommendation'}`
@@ -129,15 +109,133 @@ export function activate(context: vscode.ExtensionContext): void {
     updateStatusBar(session, council);
   }
 
-  // Log startup DB state once
+  // ── Auto-trigger 1: DB directory watcher ─────────────────────────────────
+  // Watches ~/.veto/ for any change → instant refresh (sub-second vs poll interval)
+  let dbWatcher: FSWatcher | null = null;
+  let dbWatchDebounce: ReturnType<typeof setTimeout> | undefined;
+
+  function startDbWatcher(): void {
+    dbWatcher?.close();
+    dbWatcher = null;
+    const dir = dirname(getDbPath());
+    if (!existsSync(dir)) return;
+    try {
+      dbWatcher = fsWatch(dir, { persistent: false }, (_event, filename) => {
+        if (filename && !filename.startsWith('veto')) return;
+        clearTimeout(dbWatchDebounce);
+        dbWatchDebounce = setTimeout(() => refresh(), 150);
+      });
+      dbWatcher.on('error', () => { dbWatcher = null; });
+    } catch { /* ignore if dir not watchable */ }
+  }
+
+  startDbWatcher();
+  context.subscriptions.push({ dispose: () => { dbWatcher?.close(); clearTimeout(dbWatchDebounce); } });
+
+  // ── Auto-trigger 2: Live configuration reload ─────────────────────────────
+  let intervalId = setInterval(refresh, pollIntervalMs);
+  context.subscriptions.push({ dispose: () => clearInterval(intervalId) });
+
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration(e => {
+      if (!e.affectsConfiguration('veto')) return;
+      config = vscode.workspace.getConfiguration('veto');
+      const newInterval = Math.max(1000, config.get<number>('pollInterval', 5000));
+      const newDbPath = config.get<string>('dbPath', '');
+      if (newDbPath) setDbPath(newDbPath);
+      if (newInterval !== pollIntervalMs) {
+        pollIntervalMs = newInterval;
+        clearInterval(intervalId);
+        intervalId = setInterval(refresh, pollIntervalMs);
+      }
+      startDbWatcher();
+      refresh();
+      outputChannel.appendLine(`[config] Reloaded — pollInterval=${pollIntervalMs}ms dbPath=${getDbPath()}`);
+    })
+  );
+
+  // ── Auto-trigger 3: Workspace folder change ───────────────────────────────
+  // Re-scopes Memory panel to the new active folder
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeWorkspaceFolders(() => {
+      projectDir = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      refresh();
+    })
+  );
+
+  // ── Auto-trigger 4: Optional refresh on file save ────────────────────────
+  let saveDebounce: ReturnType<typeof setTimeout> | undefined;
+  context.subscriptions.push(
+    vscode.workspace.onDidSaveTextDocument(() => {
+      if (!vscode.workspace.getConfiguration('veto').get<boolean>('autoRefreshOnSave', false)) return;
+      clearTimeout(saveDebounce);
+      saveDebounce = setTimeout(() => refresh(), 300);
+    })
+  );
+
+  // ── Commands ──────────────────────────────────────────────────────────────
+  context.subscriptions.push(
+    vscode.commands.registerCommand('veto.refresh', () => refresh()),
+
+    vscode.commands.registerCommand('veto.copySessionId', (id: string) => {
+      vscode.env.clipboard.writeText(id).then(() => {
+        vscode.window.showInformationMessage('Session ID copied');
+      });
+    }),
+
+    vscode.commands.registerCommand('veto.openInstallDocs', () => {
+      vscode.env.openExternal(vscode.Uri.parse('https://www.npmjs.com/package/@jigyasudham/veto'));
+    }),
+
+    vscode.commands.registerCommand('veto.focusSidebar', () => {
+      vscode.commands.executeCommand('veto-session.focus');
+    }),
+
+    vscode.commands.registerCommand('veto.openLog', () => {
+      outputChannel.show(true);
+    }),
+
+    // Search memory entries directly from VS Code
+    vscode.commands.registerCommand('veto.searchMemory', async () => {
+      const query = await vscode.window.showInputBox({
+        prompt: 'Search Veto memory',
+        placeHolder: 'keyword or tag…',
+      });
+      if (!query?.trim()) return;
+
+      const results = searchMemoryEntries(query.trim());
+      if (!results?.length) {
+        vscode.window.showInformationMessage(`Veto: no memory entries matching "${query}"`);
+        return;
+      }
+
+      const items = results.map(r => ({
+        label:       r.title,
+        description: r.tags.length ? r.tags.join(', ') : r.type,
+        detail:      r.project_dir ?? 'global',
+      }));
+
+      const picked = await vscode.window.showQuickPick(items, {
+        placeHolder: `${results.length} result(s) for "${query}"`,
+        matchOnDescription: true,
+      });
+
+      if (picked) {
+        vscode.env.clipboard.writeText(picked.label).then(() => {
+          vscode.window.showInformationMessage(`Copied: ${picked.label}`);
+        });
+      }
+    }),
+  );
+
+  // Log startup state
   if (!existsSync(getDbPath())) {
-    outputChannel.appendLine(`[startup] Veto DB not found at ${getDbPath()}. Install Veto: npm i -g @jigyasudham/veto`);
+    outputChannel.appendLine(`[startup] Veto DB not found at ${getDbPath()}. Install: npm i -g @jigyasudham/veto`);
+  } else {
+    outputChannel.appendLine(`[startup] Veto DB found at ${getDbPath()}. Watching for changes.`);
   }
 
   refresh();
-
-  const intervalId = setInterval(refresh, pollIntervalMs);
-  context.subscriptions.push({ dispose: () => clearInterval(intervalId) });
 }
 
 export function deactivate(): void {}
