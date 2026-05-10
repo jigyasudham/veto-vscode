@@ -47,10 +47,14 @@ export class SessionProvider implements vscode.TreeDataProvider<vscode.TreeItem>
       ...(() => {
         const client = (s.active_client ?? s.platform).toLowerCase();
         const ctxWindow = CONTEXT_WINDOWS[client] ?? 200_000;
-        const pct = Math.round((s.token_count / ctxWindow) * 100);
-        const bar = '█'.repeat(Math.round(pct / 10)) + '░'.repeat(10 - Math.round(pct / 10));
-        const tokItem = makeItem('Tokens', `${s.token_count.toLocaleString()} / ${(ctxWindow / 1000).toFixed(0)}K  ${bar}  ${pct}%`);
-        tokItem.tooltip = `${s.token_count.toLocaleString()} tokens used of ${ctxWindow.toLocaleString()} context window (${pct}%)`;
+        const tokens = s.token_count ?? 0;
+        const pct = Math.min(100, Math.round((tokens / ctxWindow) * 100));
+        const filled = Math.round(pct / 20);
+        const bar = '█'.repeat(filled) + '░'.repeat(5 - filled);
+        const tokK = Math.round(tokens / 1000);
+        const ctxK = Math.round(ctxWindow / 1000);
+        const tokItem = makeItem('Tokens', `${tokK}K/${ctxK}K ${bar} ${pct}%`);
+        tokItem.tooltip = `${tokens.toLocaleString()} tokens used of ${ctxWindow.toLocaleString()} context window (${pct}%)`;
         return [tokItem];
       })(),
     ];

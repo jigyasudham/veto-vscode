@@ -25,9 +25,9 @@
         { "id": "veto-sessions-list", "name": "Sessions" },
         { "id": "veto-memory",        "name": "Memory" },
         { "id": "veto-council", "name": "Last Council" },
-        { "id": "veto-router",  "name": "Router Stats" },
-        { "id": "veto-rate",    "name": "Rate Status" },
-        { "id": "veto-health",  "name": "Health" }
+        { "id": "veto-router",  "name": "Router Stats",  "visibility": "collapsed" },
+        { "id": "veto-rate",    "name": "Rate Status",   "visibility": "collapsed" },
+        { "id": "veto-health",  "name": "Health",        "visibility": "collapsed" }
       ]
     },
     "commands": [

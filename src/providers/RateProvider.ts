@@ -9,8 +9,8 @@ const DAILY_LIMITS: Record<string, number> = {
 };
 
 function bar(pct: number): string {
-  const filled = Math.round(pct / 10);
-  return '█'.repeat(filled) + '░'.repeat(10 - filled);
+  const filled = Math.round(pct / 20);
+  return '█'.repeat(filled) + '░'.repeat(5 - filled);
 }
 
 export class RateProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
@@ -43,7 +43,7 @@ export class RateProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
       const tokens   = entry?.token_count   ?? 0;
       const pct      = Math.min(100, Math.round((count / limit) * 100));
       const label    = platform.charAt(0).toUpperCase() + platform.slice(1);
-      const reqItem  = makeItem(label, `${count} / ${limit} requests  ${bar(pct)}  ${pct}%`);
+      const reqItem  = makeItem(label, `${count}/${limit} req ${bar(pct)} ${pct}%`);
       reqItem.tooltip = `${label}: ${count} requests today out of ${limit} daily limit`;
 
       const items: vscode.TreeItem[] = [reqItem];
