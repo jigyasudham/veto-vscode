@@ -2,6 +2,12 @@ import * as vscode from 'vscode';
 import type { VetoSession } from '../types';
 import { relativeTime, makeItem } from '../utils';
 
+const CONTEXT_WINDOWS: Record<string, number> = {
+  claude: 200_000,
+  gemini: 1_000_000,
+  codex:  128_000,
+};
+
 export class SessionProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _onDidChangeTreeData = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
@@ -38,7 +44,15 @@ export class SessionProvider implements vscode.TreeDataProvider<vscode.TreeItem>
       makeItem('Active in', s.active_client ?? s.platform),
       makeItem('Connection', s.connection_type ?? 'subscription'),
       makeItem('Started', relativeTime(s.started_at)),
-      makeItem('Tokens', s.token_count.toLocaleString()),
+      ...(() => {
+        const client = (s.active_client ?? s.platform).toLowerCase();
+        const ctxWindow = CONTEXT_WINDOWS[client] ?? 200_000;
+        const pct = Math.round((s.token_count / ctxWindow) * 100);
+        const bar = '█'.repeat(Math.round(pct / 10)) + '░'.repeat(10 - Math.round(pct / 10));
+        const tokItem = makeItem('Tokens', `${s.token_count.toLocaleString()} / ${(ctxWindow / 1000).toFixed(0)}K  ${bar}  ${pct}%`);
+        tokItem.tooltip = `${s.token_count.toLocaleString()} tokens used of ${ctxWindow.toLocaleString()} context window (${pct}%)`;
+        return [tokItem];
+      })(),
     ];
 
     if (s.summary) {

@@ -2,7 +2,7 @@
   "name": "veto-vscode",
   "displayName": "Veto",
   "description": "Live dashboard for the Veto MCP server",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "jigyasudham",
   "engines": { "vscode": "^1.97.0" },
   "categories": ["Other"],
@@ -21,8 +21,9 @@
     },
     "views": {
       "veto-sidebar": [
-        { "id": "veto-session", "name": "Session" },
-        { "id": "veto-memory",  "name": "Memory" },
+        { "id": "veto-session",       "name": "Session" },
+        { "id": "veto-sessions-list", "name": "Sessions" },
+        { "id": "veto-memory",        "name": "Memory" },
         { "id": "veto-council", "name": "Last Council" },
         { "id": "veto-router",  "name": "Router Stats" },
         { "id": "veto-rate",    "name": "Rate Status" },
@@ -63,6 +64,21 @@
         "command": "veto.saveSession",
         "title": "Save Session",
         "icon": "$(save)"
+      },
+      {
+        "command": "veto.continueSession",
+        "title": "Resume Session",
+        "icon": "$(play)"
+      },
+      {
+        "command": "veto.councilDebate",
+        "title": "Council Debate",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "veto.reviewFile",
+        "title": "Review Current File",
+        "icon": "$(shield)"
       }
     ],
     "menus": {
@@ -75,7 +91,9 @@
         { "command": "veto.refresh",       "when": "view == veto-health",  "group": "navigation" },
         { "command": "veto.searchMemory",  "when": "view == veto-memory",  "group": "navigation" },
         { "command": "veto.openLog",        "when": "view == veto-session", "group": "navigation" },
-        { "command": "veto.saveSession",   "when": "view == veto-session", "group": "navigation" }
+        { "command": "veto.saveSession",     "when": "view == veto-session", "group": "navigation" },
+        { "command": "veto.councilDebate",  "when": "view == veto-council", "group": "navigation" },
+        { "command": "veto.reviewFile",     "when": "view == veto-council", "group": "navigation" }
       ]
     },
     "configuration": {

@@ -8,24 +8,40 @@ Veto is a local MCP server that gives every AI (Claude, Gemini, Codex) a council
 
 ## What it shows
 
-The sidebar has 4 panels, all updated every 5 seconds from `~/.veto/veto.db`.
+The sidebar has 7 panels, all updated every 5 seconds (or instantly via DB watcher) from `~/.veto/veto.db`.
 
 ### Session
 - Session ID, which AI created it (`Created by`), and which AI is currently using it (`Active in`)
-- Start time (relative), token count, summary
+- Start time (relative), connection type, summary
+- Context usage bar: `48,000 / 200K  ████░░░░░░  24%`
+- **Save Session** button (toolbar) — prompts for a summary and saves via `veto_session_save`
+
+### Sessions
+- Last 10 sessions listed with summary and relative time
+- Click any session to resume it — dispatches to Claude, Gemini, or Codex depending on which AI last used it
 
 ### Memory
 - Total memory count — automatically scoped to your current workspace folder
 - Last 3 stored entries with their type tag
+- **Search Memory** button (toolbar) — fuzzy search by keyword or tag, copy result to clipboard
 
 ### Last Council
 - Verdict badge: `GREEN` / `YELLOW` / `RED` with colour icons
 - Each agent's vote (Lead Dev, PM, Architect, UX, Devil, Legal, Security)
 - Recommendation and time of last debate
+- **Council Debate** button (toolbar) — opens an input box, then runs `veto_council_debate` via Claude CLI
+- **Review File** button (toolbar) — runs `veto_code_review` on the currently open file
 
 ### Router Stats
 - Top learned routing patterns: `*.ts → reviewer · 94% (12x)`
 - Updated as you use `veto_record_outcome`
+
+### Rate Status
+- Requests used today per platform vs. daily limit, with a visual progress bar
+- Token count for the day per platform
+
+### Health
+- DB size, session count, memory count, pattern count, learning entries
 
 ---
 

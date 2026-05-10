@@ -49,9 +49,8 @@ export interface VetoPattern {
 
 export interface VetoRateEntry {
   platform: string;
-  date_key: string;
   request_count: number;
-  updated_at: string;
+  token_count: number;
 }
 
 export interface VetoUsageSummary {
@@ -66,6 +65,16 @@ export interface VetoHealthStats {
   patternCount: number;
   learningCount: number;
   dbSizeMb: number;
+}
+
+export interface VetoSessionSummary {
+  id: string;
+  platform: string;
+  active_client: string | null;
+  started_at: string;
+  summary: string | null;
+  token_count: number;
+  project_dir: string | null;
 }
 
 export type CouncilNode =

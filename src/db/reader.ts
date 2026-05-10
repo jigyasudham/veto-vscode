@@ -2,7 +2,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { existsSync, statSync } from 'node:fs';
-import type { VetoSession, VetoMemoryData, VetoMemoryEntry, VetoCouncilOutcome, VetoPattern, VetoRateEntry, VetoUsageSummary, VetoHealthStats } from '../types';
+import type { VetoSession, VetoMemoryData, VetoMemoryEntry, VetoCouncilOutcome, VetoPattern, VetoRateEntry, VetoUsageSummary, VetoHealthStats, VetoSessionSummary } from '../types';
 
 let dbPath = join(homedir(), '.veto', 'veto.db');
 let logger: ((msg: string) => void) | undefined;
@@ -108,7 +108,14 @@ export function getRateStatus(): VetoRateEntry[] | null {
   if (!db) return null;
   try {
     const today = new Date().toISOString().slice(0, 10);
-    return db.prepare('SELECT platform, date_key, request_count, updated_at FROM rate_usage WHERE date_key = ?').all(today) as VetoRateEntry[];
+    return db.prepare(
+      `SELECT platform,
+              COUNT(*) as request_count,
+              COALESCE(SUM(tokens), 0) as token_count
+       FROM usage_events
+       WHERE date(created_at) = ?
+       GROUP BY platform`
+    ).all(today) as VetoRateEntry[];
   } catch (e) {
     logger?.(`getRateStatus error: ${e instanceof Error ? e.message : String(e)}`);
     return null;
@@ -132,6 +139,21 @@ export function getUsageSummary(): VetoUsageSummary | null {
     return { totalSessions: total.totalSessions, totalTokens: total.totalTokens, byPlatform };
   } catch (e) {
     logger?.(`getUsageSummary error: ${e instanceof Error ? e.message : String(e)}`);
+    return null;
+  } finally {
+    db.close();
+  }
+}
+
+export function getSessions(limit = 10): VetoSessionSummary[] | null {
+  const db = openDb();
+  if (!db) return null;
+  try {
+    return db.prepare(
+      'SELECT id, platform, active_client, started_at, summary, token_count, project_dir FROM sessions ORDER BY created_at DESC LIMIT ?'
+    ).all(limit) as VetoSessionSummary[];
+  } catch (e) {
+    logger?.(`getSessions error: ${e instanceof Error ? e.message : String(e)}`);
     return null;
   } finally {
     db.close();

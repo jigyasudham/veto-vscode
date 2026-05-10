@@ -5,14 +5,15 @@ import { dirname } from 'node:path';
 import {
   getLatestSession, getMemoryEntries, getLastCouncilOutcome,
   getTopPatterns, getRateStatus, getUsageSummary, getHealthStats,
-  searchMemoryEntries, setDbPath, setLogger, getDbPath,
+  searchMemoryEntries, getSessions, setDbPath, setLogger, getDbPath,
 } from './db/reader';
 import { SessionProvider } from './providers/SessionProvider';
 import { MemoryProvider }  from './providers/MemoryProvider';
 import { CouncilProvider } from './providers/CouncilProvider';
 import { RouterProvider }  from './providers/RouterProvider';
 import { RateProvider }    from './providers/RateProvider';
-import { HealthProvider }  from './providers/HealthProvider';
+import { HealthProvider }       from './providers/HealthProvider';
+import { SessionsListProvider } from './providers/SessionsListProvider';
 import type { VetoSession, VetoCouncilOutcome } from './types';
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -26,16 +27,18 @@ export function activate(context: vscode.ExtensionContext): void {
   if (dbPathOverride) setDbPath(dbPathOverride);
 
   // Providers
-  const sessionProvider = new SessionProvider();
-  const memoryProvider  = new MemoryProvider();
-  const councilProvider = new CouncilProvider();
-  const routerProvider  = new RouterProvider();
-  const rateProvider    = new RateProvider();
-  const healthProvider  = new HealthProvider();
+  const sessionProvider      = new SessionProvider();
+  const sessionsListProvider = new SessionsListProvider();
+  const memoryProvider       = new MemoryProvider();
+  const councilProvider      = new CouncilProvider();
+  const routerProvider       = new RouterProvider();
+  const rateProvider         = new RateProvider();
+  const healthProvider       = new HealthProvider();
 
   context.subscriptions.push(
-    vscode.window.registerTreeDataProvider('veto-session', sessionProvider),
-    vscode.window.registerTreeDataProvider('veto-memory',  memoryProvider),
+    vscode.window.registerTreeDataProvider('veto-session',       sessionProvider),
+    vscode.window.registerTreeDataProvider('veto-sessions-list', sessionsListProvider),
+    vscode.window.registerTreeDataProvider('veto-memory',        memoryProvider),
     vscode.window.registerTreeDataProvider('veto-council', councilProvider),
     vscode.window.registerTreeDataProvider('veto-router',  routerProvider),
     vscode.window.registerTreeDataProvider('veto-rate',    rateProvider),
@@ -75,6 +78,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
     if (!dbExists) {
       sessionProvider.refresh(null, true);
+      sessionsListProvider.refresh(null, true);
       memoryProvider.refresh(null, true);
       councilProvider.refresh(null, true);
       routerProvider.refresh(null, true);
@@ -85,6 +89,7 @@ export function activate(context: vscode.ExtensionContext): void {
     }
 
     const session  = getLatestSession();
+    const sessions = getSessions();
     const memory   = getMemoryEntries(projectDir);
     const council  = getLastCouncilOutcome();
     const patterns = getTopPatterns();
@@ -100,6 +105,7 @@ export function activate(context: vscode.ExtensionContext): void {
     if (council) previousVerdictId = council.id;
 
     sessionProvider.refresh(session, false);
+    sessionsListProvider.refresh(sessions, false);
     memoryProvider.refresh(memory,   false);
     councilProvider.refresh(council, false);
     routerProvider.refresh(patterns, false);
@@ -213,6 +219,50 @@ export function activate(context: vscode.ExtensionContext): void {
       ].filter(Boolean).join(' ');
 
       const terminal = vscode.window.createTerminal({ name: 'Veto Save', hideFromUser: false });
+      terminal.show(false);
+      terminal.sendText(`claude -p "${msg.replace(/"/g, '\\"')}"`, true);
+    }),
+
+    vscode.commands.registerCommand('veto.continueSession', (sessionId: string, platform = 'claude') => {
+      const p = platform.toLowerCase();
+      let cmd: string;
+      if (p === 'gemini') {
+        cmd = `gemini -p "veto_continue ${sessionId}"`;
+      } else if (p === 'codex') {
+        cmd = `codex "veto_continue ${sessionId}"`;
+      } else {
+        // claude (default) — pre-authorise the tool so it doesn't block
+        cmd = `claude --allowedTools "mcp__veto__veto_continue" -p "veto_continue ${sessionId}"`;
+      }
+      const label = p.charAt(0).toUpperCase() + p.slice(1);
+      const terminal = vscode.window.createTerminal({ name: `Veto Resume (${label})`, hideFromUser: false });
+      terminal.show(false);
+      terminal.sendText(cmd, true);
+    }),
+
+    vscode.commands.registerCommand('veto.councilDebate', async () => {
+      const topic = await vscode.window.showInputBox({
+        prompt: 'Council debate topic',
+        placeHolder: 'What should the council debate?',
+        ignoreFocusOut: true,
+      });
+      if (!topic?.trim()) return;
+
+      const msg = `Run a Veto council debate using veto_council_debate. Topic: "${topic.trim()}"`;
+      const terminal = vscode.window.createTerminal({ name: 'Veto Council', hideFromUser: false });
+      terminal.show(false);
+      terminal.sendText(`claude -p "${msg.replace(/"/g, '\\"')}"`, true);
+    }),
+
+    vscode.commands.registerCommand('veto.reviewFile', async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) {
+        vscode.window.showWarningMessage('Veto: no active file to review');
+        return;
+      }
+      const filePath = editor.document.uri.fsPath;
+      const msg = `Run veto_code_review on this file: ${filePath}`;
+      const terminal = vscode.window.createTerminal({ name: 'Veto Review', hideFromUser: false });
       terminal.show(false);
       terminal.sendText(`claude -p "${msg.replace(/"/g, '\\"')}"`, true);
     }),
