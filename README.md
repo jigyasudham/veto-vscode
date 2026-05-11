@@ -67,7 +67,7 @@ git clone https://github.com/jigyasudham/veto-vscode
 cd veto-vscode
 npm install
 npm run package       # produces veto-vscode-x.x.x.vsix
-code --install-extension veto-vscode-0.1.0.vsix
+code --install-extension veto-vscode-0.5.0.vsix
 ```
 
 ---

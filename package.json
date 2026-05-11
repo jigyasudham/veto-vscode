@@ -5,6 +5,12 @@
   "version": "0.5.0",
   "publisher": "jigyasudham",
   "engines": { "vscode": "^1.97.0" },
+  "icon": "icons/veto.svg",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jigyasudham/veto-vscode.git"
+  },
   "categories": ["Other"],
   "keywords": ["veto", "mcp", "ai", "claude", "gemini", "dashboard"],
   "activationEvents": ["onStartupFinished"],
