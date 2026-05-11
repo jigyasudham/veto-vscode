@@ -94,7 +94,7 @@ export function getTopPatterns(): VetoPattern[] | null {
   const db = openDb();
   if (!db) return null;
   try {
-    return db.prepare('SELECT * FROM patterns ORDER BY confidence DESC, seen_count DESC LIMIT 10').all() as VetoPattern[];
+    return db.prepare('SELECT * FROM patterns ORDER BY confidence DESC, seen_count DESC LIMIT 10').all() as unknown as VetoPattern[];
   } catch (e) {
     logger?.(`getTopPatterns error: ${e instanceof Error ? e.message : String(e)}`);
     return null;
@@ -115,7 +115,7 @@ export function getRateStatus(): VetoRateEntry[] | null {
        FROM usage_events
        WHERE date(created_at) = ?
        GROUP BY platform`
-    ).all(today) as VetoRateEntry[];
+    ).all(today) as unknown as VetoRateEntry[];
   } catch (e) {
     logger?.(`getRateStatus error: ${e instanceof Error ? e.message : String(e)}`);
     return null;
@@ -151,7 +151,7 @@ export function getSessions(limit = 10): VetoSessionSummary[] | null {
   try {
     return db.prepare(
       'SELECT id, platform, active_client, started_at, summary, token_count, project_dir FROM sessions ORDER BY created_at DESC LIMIT ?'
-    ).all(limit) as VetoSessionSummary[];
+    ).all(limit) as unknown as VetoSessionSummary[];
   } catch (e) {
     logger?.(`getSessions error: ${e instanceof Error ? e.message : String(e)}`);
     return null;

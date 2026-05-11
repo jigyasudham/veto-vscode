@@ -7,6 +7,7 @@ import {
   getTopPatterns, getRateStatus, getUsageSummary, getHealthStats,
   searchMemoryEntries, getSessions, setDbPath, setLogger, getDbPath,
 } from './db/reader';
+import { registerAutoReviewTrigger, registerGitStageTrigger } from './triggers';
 import { SessionProvider } from './providers/SessionProvider';
 import { MemoryProvider }  from './providers/MemoryProvider';
 import { CouncilProvider } from './providers/CouncilProvider';
@@ -70,7 +71,16 @@ export function activate(context: vscode.ExtensionContext): void {
     } else {
       statusBarItem.text = `$(warning) YELLOW ${id8}`;
     }
-    statusBarItem.tooltip = `Veto session: ${session.id}`;
+    const health = getHealthStats();
+    const sessionCount = health?.sessionCount ?? '?';
+    const ext = vscode.extensions.getExtension('jigyasudham.veto-vscode');
+    const version = ext?.packageJSON?.version ?? '?';
+    statusBarItem.tooltip = [
+      `Veto v${version}`,
+      `Session: ${session.id}`,
+      `Total sessions: ${sessionCount}`,
+      health ? `Memory: ${health.memoryCount}  Patterns: ${health.patternCount}  DB: ${health.dbSizeMb}MB` : '',
+    ].filter(Boolean).join('\n');
   }
 
   function refresh(): void {
@@ -178,6 +188,12 @@ export function activate(context: vscode.ExtensionContext): void {
       saveDebounce = setTimeout(() => refresh(), 300);
     })
   );
+
+  // ── Auto-trigger 5: file save → veto_code_review ─────────────────────────
+  registerAutoReviewTrigger(context, outputChannel);
+
+  // ── Auto-trigger 6: git stage → veto_ci_gate ─────────────────────────────
+  registerGitStageTrigger(context, outputChannel);
 
   // ── Commands ──────────────────────────────────────────────────────────────
   context.subscriptions.push(

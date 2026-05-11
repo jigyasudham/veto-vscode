@@ -2,7 +2,7 @@
   "name": "veto-vscode",
   "displayName": "Veto",
   "description": "Live dashboard for the Veto MCP server",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "publisher": "jigyasudham",
   "engines": { "vscode": "^1.97.0" },
   "categories": ["Other"],
@@ -116,6 +116,18 @@
           "type": "boolean",
           "default": false,
           "description": "Refresh the Veto dashboard whenever any file is saved in the workspace.",
+          "scope": "window"
+        },
+        "veto.autoReview": {
+          "type": "boolean",
+          "default": false,
+          "description": "On file save, automatically run veto_code_review via claude CLI and show verdict notification.",
+          "scope": "window"
+        },
+        "veto.autoCiGate": {
+          "type": "boolean",
+          "default": false,
+          "description": "When files are staged in git, automatically run veto_ci_gate via claude CLI and show result notification.",
           "scope": "window"
         }
       }
