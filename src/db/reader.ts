@@ -1,7 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
-import { existsSync, statSync } from 'node:fs';
+import { existsSync, statSync, readFileSync } from 'node:fs';
 import type { VetoSession, VetoMemoryData, VetoMemoryEntry, VetoCouncilOutcome, VetoPattern, VetoRateEntry, VetoUsageSummary, VetoHealthStats, VetoSessionSummary } from '../types';
 
 let dbPath = join(homedir(), '.veto', 'veto.db');
@@ -103,19 +103,45 @@ export function getTopPatterns(): VetoPattern[] | null {
   }
 }
 
+const DEFAULT_BUDGETS: Record<string, number> = {
+  claude:  500_000,
+  gemini: 1_000_000,
+  codex:   200_000,
+};
+
+function readTokenBudgets(): Record<string, number> {
+  try {
+    const configPath = join(homedir(), '.veto', 'config.json');
+    if (!existsSync(configPath)) return { ...DEFAULT_BUDGETS };
+    const raw = JSON.parse(readFileSync(configPath, 'utf8')) as { dailyTokenBudget?: Record<string, number> };
+    return {
+      claude: raw.dailyTokenBudget?.claude  ?? DEFAULT_BUDGETS.claude,
+      gemini: raw.dailyTokenBudget?.gemini  ?? DEFAULT_BUDGETS.gemini,
+      codex:  raw.dailyTokenBudget?.codex   ?? DEFAULT_BUDGETS.codex,
+    };
+  } catch {
+    return { ...DEFAULT_BUDGETS };
+  }
+}
+
 export function getRateStatus(): VetoRateEntry[] | null {
   const db = openDb();
   if (!db) return null;
   try {
     const today = new Date().toISOString().slice(0, 10);
-    return db.prepare(
+    type RateRow = { platform: string; request_count: number; token_count: number };
+    const rows = db.prepare(
       `SELECT platform,
-              COUNT(*) as request_count,
-              COALESCE(SUM(tokens), 0) as token_count
-       FROM usage_events
-       WHERE date(created_at) = ?
-       GROUP BY platform`
-    ).all(today) as unknown as VetoRateEntry[];
+              COALESCE(request_count, 0) as request_count,
+              COALESCE(token_count, 0) as token_count
+       FROM rate_usage
+       WHERE date_key = ?`
+    ).all(today) as unknown as RateRow[];
+    const budgets = readTokenBudgets();
+    return rows.map(r => ({
+      ...r,
+      daily_token_budget: budgets[r.platform] ?? DEFAULT_BUDGETS[r.platform] ?? 500_000,
+    }));
   } catch (e) {
     logger?.(`getRateStatus error: ${e instanceof Error ? e.message : String(e)}`);
     return null;

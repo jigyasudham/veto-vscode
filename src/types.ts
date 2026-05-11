@@ -51,6 +51,7 @@ export interface VetoRateEntry {
   platform: string;
   request_count: number;
   token_count: number;
+  daily_token_budget: number;
 }
 
 export interface VetoUsageSummary {

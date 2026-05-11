@@ -2,16 +2,24 @@ import * as vscode from 'vscode';
 import type { VetoRateEntry } from '../types';
 import { makeItem } from '../utils';
 
-const DAILY_LIMITS: Record<string, number> = {
-  claude: 100,
-  gemini: 200,
-  codex:  150,
-};
-
 function bar(pct: number): string {
   const filled = Math.round(pct / 20);
   return '█'.repeat(filled) + '░'.repeat(5 - filled);
 }
+
+function fmtTokens(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+  return String(n);
+}
+
+const PLATFORMS = ['claude', 'gemini', 'codex'];
+
+const DEFAULT_BUDGETS: Record<string, number> = {
+  claude:  500_000,
+  gemini: 1_000_000,
+  codex:   200_000,
+};
 
 export class RateProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
   private _onDidChangeTreeData = new vscode.EventEmitter<void>();
@@ -37,20 +45,19 @@ export class RateProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
     const map = new Map<string, VetoRateEntry>();
     (this.data ?? []).forEach(r => map.set(r.platform, r));
 
-    return Object.entries(DAILY_LIMITS).flatMap(([platform, limit]) => {
-      const entry    = map.get(platform);
-      const count    = entry?.request_count ?? 0;
-      const tokens   = entry?.token_count   ?? 0;
-      const pct      = Math.min(100, Math.round((count / limit) * 100));
-      const label    = platform.charAt(0).toUpperCase() + platform.slice(1);
-      const reqItem  = makeItem(label, `${count}/${limit} req ${bar(pct)} ${pct}%`);
-      reqItem.tooltip = `${label}: ${count} requests today out of ${limit} daily limit`;
-
-      const items: vscode.TreeItem[] = [reqItem];
-      if (tokens > 0) {
-        items.push(makeItem('', `${tokens.toLocaleString()} tokens`));
-      }
-      return items;
+    return PLATFORMS.map(platform => {
+      const entry  = map.get(platform);
+      const tokens = entry?.token_count ?? 0;
+      const budget = entry?.daily_token_budget ?? DEFAULT_BUDGETS[platform] ?? 500_000;
+      const pct    = Math.min(100, Math.round((tokens / budget) * 100));
+      const label  = platform.charAt(0).toUpperCase() + platform.slice(1);
+      const item   = makeItem(label, `${fmtTokens(tokens)} / ${fmtTokens(budget)} ${bar(pct)} ${pct}%`);
+      item.tooltip = [
+        `${label}: ${tokens.toLocaleString()} tokens used today`,
+        `Budget: ${budget.toLocaleString()} tokens`,
+        `To change: veto_usage_status({ set_budget: { ${platform}: <number> } })`,
+      ].join('\n');
+      return item;
     });
   }
 }
