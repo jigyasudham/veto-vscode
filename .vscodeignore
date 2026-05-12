@@ -4,3 +4,9 @@ esbuild.js
 .gitignore
 **/*.map
 node_modules/**
+.claude/**
+.github/**
+.vscode/**
+scripts/**
+icons/veto.svg
+package-lock.json

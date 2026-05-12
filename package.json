@@ -5,7 +5,7 @@
   "version": "0.5.0",
   "publisher": "jigyasudham",
   "engines": { "vscode": "^1.97.0" },
-  "icon": "icons/veto.svg",
+  "icon": "icons/veto.png",
   "license": "MIT",
   "repository": {
     "type": "git",
