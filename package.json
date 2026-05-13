@@ -2,7 +2,7 @@
   "name": "veto-vscode",
   "displayName": "Veto MCP Dashboard",
   "description": "Live dashboard for the Veto MCP server",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "publisher": "jigyasudham",
   "engines": { "vscode": "^1.97.0" },
   "icon": "icons/veto.png",
@@ -33,7 +33,7 @@
         { "id": "veto-memory",        "name": "Memory" },
         { "id": "veto-council", "name": "Last Council" },
         { "id": "veto-router",  "name": "Router Stats",  "visibility": "collapsed" },
-        { "id": "veto-rate",    "name": "Rate Status",   "visibility": "collapsed" },
+        { "id": "veto-rate",    "name": "Daily Tool Usage", "visibility": "collapsed" },
         { "id": "veto-health",  "name": "Health",        "visibility": "collapsed" }
       ]
     },

@@ -53,11 +53,19 @@ export class SessionProvider implements vscode.TreeDataProvider<vscode.TreeItem>
         const bar = '█'.repeat(filled) + '░'.repeat(5 - filled);
         const tokK = Math.round(tokens / 1000);
         const ctxK = Math.round(ctxWindow / 1000);
-        const tokItem = makeItem('Tokens', `${tokK}K/${ctxK}K ${bar} ${pct}%`);
-        tokItem.tooltip = `${tokens.toLocaleString()} tokens used of ${ctxWindow.toLocaleString()} context window (${pct}%)`;
+        const tokItem = makeItem('Tokens (last save)', `${tokK}K/${ctxK}K ${bar} ${pct}%`);
+        tokItem.tooltip = `${tokens.toLocaleString()} tokens at last veto_session_save — not a live counter`;
         return [tokItem];
       })(),
     ];
+
+    if (s.project_dir) {
+      const dirParts = s.project_dir.replace(/\\/g, '/').split('/');
+      const shortDir = dirParts.slice(-2).join('/');
+      const dirItem = makeItem('Project', shortDir);
+      dirItem.tooltip = s.project_dir;
+      items.push(dirItem);
+    }
 
     if (s.summary) {
       const summaryItem = makeItem('Summary', s.summary.slice(0, 60));

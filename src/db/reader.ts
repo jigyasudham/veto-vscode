@@ -45,6 +45,19 @@ export function getLatestSession(): VetoSession | null {
   }
 }
 
+export function getLatestSessionForDir(dir: string): VetoSession | null {
+  const db = openDb();
+  if (!db) return null;
+  try {
+    return (db.prepare('SELECT * FROM sessions WHERE project_dir = ? ORDER BY created_at DESC LIMIT 1').get(dir) as VetoSession | undefined) ?? null;
+  } catch (e) {
+    logger?.(`getLatestSessionForDir error: ${e instanceof Error ? e.message : String(e)}`);
+    return null;
+  } finally {
+    db.close();
+  }
+}
+
 export function getMemoryEntries(projectDir?: string): VetoMemoryData | null {
   const db = openDb();
   if (!db) return null;

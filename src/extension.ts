@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 import { watch as fsWatch, FSWatcher } from 'node:fs';
 import { dirname } from 'node:path';
 import {
-  getLatestSession, getMemoryEntries, getLastCouncilOutcome,
+  getLatestSession, getLatestSessionForDir, getMemoryEntries, getLastCouncilOutcome,
   getTopPatterns, getRateStatus, getUsageSummary, getHealthStats,
   searchMemoryEntries, getSessions, setDbPath, setLogger, getDbPath,
 } from './db/reader';
@@ -98,7 +98,7 @@ export function activate(context: vscode.ExtensionContext): void {
       return;
     }
 
-    const session  = getLatestSession();
+    const session  = projectDir ? (getLatestSessionForDir(projectDir) ?? getLatestSession()) : getLatestSession();
     const sessions = getSessions();
     const memory   = getMemoryEntries(projectDir);
     const council  = getLastCouncilOutcome();
