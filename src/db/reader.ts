@@ -45,11 +45,23 @@ export function getLatestSession(): VetoSession | null {
   }
 }
 
+function normPath(p: string): string {
+  return p.replace(/\\/g, '/').replace(/\/+$/, '').toLowerCase();
+}
+
 export function getLatestSessionForDir(dir: string): VetoSession | null {
   const db = openDb();
   if (!db) return null;
   try {
-    return (db.prepare('SELECT * FROM sessions WHERE project_dir = ? ORDER BY created_at DESC LIMIT 1').get(dir) as VetoSession | undefined) ?? null;
+    // Fast path: exact match
+    const exact = db.prepare('SELECT * FROM sessions WHERE project_dir = ? ORDER BY created_at DESC LIMIT 1').get(dir) as VetoSession | undefined;
+    if (exact) return exact;
+    // Normalized fallback: handles Windows backslash↔forward-slash and drive-letter case differences
+    const norm = normPath(dir);
+    const candidates = db.prepare(
+      'SELECT * FROM sessions WHERE project_dir IS NOT NULL ORDER BY created_at DESC LIMIT 200'
+    ).all() as VetoSession[];
+    return candidates.find(s => normPath(s.project_dir ?? '') === norm) ?? null;
   } catch (e) {
     logger?.(`getLatestSessionForDir error: ${e instanceof Error ? e.message : String(e)}`);
     return null;

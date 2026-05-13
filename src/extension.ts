@@ -4,7 +4,7 @@ import { watch as fsWatch, FSWatcher } from 'node:fs';
 import { dirname } from 'node:path';
 import {
   getLatestSession, getLatestSessionForDir, getMemoryEntries, getLastCouncilOutcome,
-  getTopPatterns, getRateStatus, getUsageSummary, getHealthStats,
+  getTopPatterns, getUsageSummary, getHealthStats,
   searchMemoryEntries, getSessions, setDbPath, setLogger, getDbPath,
 } from './db/reader';
 import { registerAutoReviewTrigger, registerGitStageTrigger } from './triggers';
@@ -12,7 +12,6 @@ import { SessionProvider } from './providers/SessionProvider';
 import { MemoryProvider }  from './providers/MemoryProvider';
 import { CouncilProvider } from './providers/CouncilProvider';
 import { RouterProvider }  from './providers/RouterProvider';
-import { RateProvider }    from './providers/RateProvider';
 import { HealthProvider }       from './providers/HealthProvider';
 import { SessionsListProvider } from './providers/SessionsListProvider';
 import type { VetoSession, VetoCouncilOutcome } from './types';
@@ -33,7 +32,6 @@ export function activate(context: vscode.ExtensionContext): void {
   const memoryProvider       = new MemoryProvider();
   const councilProvider      = new CouncilProvider();
   const routerProvider       = new RouterProvider();
-  const rateProvider         = new RateProvider();
   const healthProvider       = new HealthProvider();
 
   context.subscriptions.push(
@@ -42,7 +40,6 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.window.registerTreeDataProvider('veto-memory',        memoryProvider),
     vscode.window.registerTreeDataProvider('veto-council', councilProvider),
     vscode.window.registerTreeDataProvider('veto-router',  routerProvider),
-    vscode.window.registerTreeDataProvider('veto-rate',    rateProvider),
     vscode.window.registerTreeDataProvider('veto-health',  healthProvider),
   );
 
@@ -92,7 +89,6 @@ export function activate(context: vscode.ExtensionContext): void {
       memoryProvider.refresh(null, true);
       councilProvider.refresh(null, true);
       routerProvider.refresh(null, true);
-      rateProvider.refresh(null, true);
       healthProvider.refresh(null, null, true);
       updateStatusBar(null, null);
       return;
@@ -103,7 +99,6 @@ export function activate(context: vscode.ExtensionContext): void {
     const memory   = getMemoryEntries(projectDir);
     const council  = getLastCouncilOutcome();
     const patterns = getTopPatterns();
-    const rates    = getRateStatus();
     const usage    = getUsageSummary();
     const health   = getHealthStats();
 
@@ -119,7 +114,6 @@ export function activate(context: vscode.ExtensionContext): void {
     memoryProvider.refresh(memory,   false);
     councilProvider.refresh(council, false);
     routerProvider.refresh(patterns, false);
-    rateProvider.refresh(rates,      false);
     healthProvider.refresh(health, usage, false);
 
     updateStatusBar(session, council);
