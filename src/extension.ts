@@ -94,7 +94,7 @@ export function activate(context: vscode.ExtensionContext): void {
       return;
     }
 
-    const session  = projectDir ? (getLatestSessionForDir(projectDir) ?? getLatestSession()) : getLatestSession();
+    const session  = projectDir ? getLatestSessionForDir(projectDir) : getLatestSession();
     const sessions = getSessions();
     const memory   = getMemoryEntries(projectDir);
     const council  = getLastCouncilOutcome();
