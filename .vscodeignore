@@ -10,3 +10,4 @@ node_modules/**
 scripts/**
 icons/veto.svg
 package-lock.json
+*.vsix
