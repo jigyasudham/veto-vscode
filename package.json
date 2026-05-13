@@ -2,7 +2,7 @@
   "name": "veto-vscode",
   "displayName": "Veto MCP Dashboard",
   "description": "Live dashboard for the Veto MCP server",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "publisher": "jigyasudham",
   "engines": { "vscode": "^1.97.0" },
   "icon": "icons/veto.png",
@@ -22,7 +22,7 @@
         {
           "id": "veto-sidebar",
           "title": "Veto",
-          "icon": "icons/veto.png"
+          "icon": "icons/veto.svg"
         }
       ]
     },

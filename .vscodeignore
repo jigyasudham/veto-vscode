@@ -8,6 +8,5 @@ node_modules/**
 .github/**
 .vscode/**
 scripts/**
-icons/veto.svg
 package-lock.json
 *.vsix
