@@ -12,8 +12,9 @@ The sidebar has 7 panels, all updated every 5 seconds (or instantly via DB watch
 
 ### Session
 - Session ID, which AI created it (`Created by`), and which AI is currently using it (`Active in`)
-- Start time (relative), connection type, summary
-- Context usage bar: `48,000 / 200K  ████░░░░░░  24%`
+- Start time (relative), connection type, project directory, summary
+- **Workspace-scoped** — each VS Code window shows the session matching its open folder
+- Tokens (last save): `16K/200K █░░░░ 8%` — reflects token count at the last `veto_session_save` call, not a live counter
 - **Save Session** button (toolbar) — prompts for a summary and saves via `veto_session_save`
 
 ### Sessions
@@ -36,9 +37,10 @@ The sidebar has 7 panels, all updated every 5 seconds (or instantly via DB watch
 - Top learned routing patterns: `*.ts → reviewer · 94% (12x)`
 - Updated as you use `veto_record_outcome`
 
-### Rate Status
-- Requests used today per platform vs. daily limit, with a visual progress bar
-- Token count for the day per platform
+### Daily Tool Usage
+- Tokens consumed today by Veto tool calls (council debate, parallel exec) per platform vs. daily budget
+- Visual progress bar: `Claude  16K / 500K █░░░░ 3%`
+- Not a context window meter — tracks Veto's own tool invocations only
 
 ### Health
 - DB size, session count, memory count, pattern count, learning entries
@@ -67,7 +69,7 @@ git clone https://github.com/jigyasudham/veto-vscode
 cd veto-vscode
 npm install
 npm run package       # produces veto-vscode-x.x.x.vsix
-code --install-extension veto-vscode-0.5.1.vsix
+code --install-extension veto-vscode-0.5.3.vsix
 ```
 
 ---
