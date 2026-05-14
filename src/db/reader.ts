@@ -60,7 +60,7 @@ export function getLatestSessionForDir(dir: string): VetoSession | null {
     const norm = normPath(dir);
     const candidates = db.prepare(
       'SELECT * FROM sessions WHERE project_dir IS NOT NULL ORDER BY created_at DESC LIMIT 200'
-    ).all() as VetoSession[];
+    ).all() as unknown as VetoSession[];
     return candidates.find(s => normPath(s.project_dir ?? '') === norm) ?? null;
   } catch (e) {
     logger?.(`getLatestSessionForDir error: ${e instanceof Error ? e.message : String(e)}`);
