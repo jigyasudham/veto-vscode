@@ -229,6 +229,53 @@ export function searchMemoryEntries(query: string): VetoMemoryEntry[] | null {
   }
 }
 
+export type VetoLearningStats = {
+  totalOutcomes: number;
+  avgQuality: number | null;
+  tierBreakdown: { tier: number; count: number; avgQuality: number | null }[];
+  topAgents: { agent: string; count: number; avgQuality: number | null }[];
+};
+
+export function getLearningStats(): VetoLearningStats | null {
+  const db = openDb();
+  if (!db) return null;
+  try {
+    type CountRow = { c: number };
+    type AvgRow = { avg: number | null };
+    type TierRow = { model_tier: number; count: number; avg_quality: number | null };
+    type AgentRow = { agent: string; count: number; avg_quality: number | null };
+
+    const total = (db.prepare('SELECT COUNT(*) as c FROM learning_data').get() as CountRow).c;
+    const avgRow = db.prepare(
+      'SELECT AVG(output_quality) as avg FROM learning_data WHERE output_quality IS NOT NULL'
+    ).get() as AvgRow;
+    const tierRows = db.prepare(
+      'SELECT model_tier, COUNT(*) as count, AVG(output_quality) as avg_quality FROM learning_data GROUP BY model_tier ORDER BY model_tier'
+    ).all() as TierRow[];
+    const agentRows = db.prepare(
+      'SELECT agent, COUNT(*) as count, AVG(output_quality) as avg_quality FROM learning_data WHERE agent IS NOT NULL GROUP BY agent ORDER BY avg_quality DESC LIMIT 5'
+    ).all() as AgentRow[];
+
+    return {
+      totalOutcomes: total,
+      avgQuality: avgRow.avg !== null ? Math.round(avgRow.avg) : null,
+      tierBreakdown: tierRows.map(r => ({
+        tier: r.model_tier, count: r.count,
+        avgQuality: r.avg_quality !== null ? Math.round(r.avg_quality) : null,
+      })),
+      topAgents: agentRows.map(r => ({
+        agent: r.agent, count: r.count,
+        avgQuality: r.avg_quality !== null ? Math.round(r.avg_quality) : null,
+      })),
+    };
+  } catch (e) {
+    logger?.(`getLearningStats error: ${e instanceof Error ? e.message : String(e)}`);
+    return null;
+  } finally {
+    db.close();
+  }
+}
+
 export function getHealthStats(): VetoHealthStats | null {
   const db = openDb();
   if (!db) return null;

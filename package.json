@@ -2,7 +2,7 @@
   "name": "veto-vscode",
   "displayName": "Veto MCP Dashboard",
   "description": "Live dashboard for the Veto MCP server",
-  "version": "0.5.6",
+  "version": "0.6.0",
   "publisher": "jigyasudham",
   "engines": { "vscode": "^1.97.0" },
   "icon": "icons/veto.png",
@@ -32,8 +32,9 @@
         { "id": "veto-sessions-list", "name": "Sessions" },
         { "id": "veto-memory",        "name": "Memory" },
         { "id": "veto-council", "name": "Last Council" },
-        { "id": "veto-router",  "name": "Router Stats",  "visibility": "collapsed" },
-        { "id": "veto-health",  "name": "Health",        "visibility": "collapsed" }
+        { "id": "veto-router",   "name": "Router Stats",    "visibility": "collapsed" },
+        { "id": "veto-health",   "name": "Health",          "visibility": "collapsed" },
+        { "id": "veto-learning", "name": "Learning Stats",  "visibility": "collapsed" }
       ]
     },
     "commands": [
@@ -85,6 +86,16 @@
         "command": "veto.reviewFile",
         "title": "Review Current File",
         "icon": "$(shield)"
+      },
+      {
+        "command": "veto.reviewPR",
+        "title": "Review Current PR Branch",
+        "icon": "$(git-pull-request)"
+      },
+      {
+        "command": "veto.scanSecrets",
+        "title": "Scan Project for Secrets",
+        "icon": "$(key)"
       }
     ],
     "menus": {
@@ -98,7 +109,9 @@
         { "command": "veto.openLog",        "when": "view == veto-session", "group": "navigation" },
         { "command": "veto.saveSession",     "when": "view == veto-session", "group": "navigation" },
         { "command": "veto.councilDebate",  "when": "view == veto-council", "group": "navigation" },
-        { "command": "veto.reviewFile",     "when": "view == veto-council", "group": "navigation" }
+        { "command": "veto.reviewFile",     "when": "view == veto-council",   "group": "navigation" },
+        { "command": "veto.reviewPR",       "when": "view == veto-council",   "group": "navigation" },
+        { "command": "veto.scanSecrets",    "when": "view == veto-learning",  "group": "navigation" }
       ]
     },
     "configuration": {
@@ -133,6 +146,12 @@
           "type": "boolean",
           "default": false,
           "description": "When files are staged in git, automatically run veto_ci_gate via claude CLI and show result notification.",
+          "scope": "window"
+        },
+        "veto.autoSecretsOnStage": {
+          "type": "boolean",
+          "default": false,
+          "description": "When files are staged in git, automatically run veto_secrets_scan via claude CLI and warn if secrets are detected.",
           "scope": "window"
         }
       }

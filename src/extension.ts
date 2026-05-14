@@ -2,18 +2,20 @@ import * as vscode from 'vscode';
 import { existsSync } from 'node:fs';
 import { watch as fsWatch, FSWatcher } from 'node:fs';
 import { dirname } from 'node:path';
+import { spawn } from 'node:child_process';
 import {
   getLatestSession, getLatestSessionForDir, getMemoryEntries, getLastCouncilOutcome,
-  getTopPatterns, getUsageSummary, getHealthStats,
+  getTopPatterns, getUsageSummary, getHealthStats, getRateStatus, getLearningStats,
   searchMemoryEntries, getSessions, setDbPath, setLogger, getDbPath,
 } from './db/reader';
 import { registerAutoReviewTrigger, registerGitStageTrigger } from './triggers';
-import { SessionProvider } from './providers/SessionProvider';
-import { MemoryProvider }  from './providers/MemoryProvider';
-import { CouncilProvider } from './providers/CouncilProvider';
-import { RouterProvider }  from './providers/RouterProvider';
+import { SessionProvider }      from './providers/SessionProvider';
+import { MemoryProvider }       from './providers/MemoryProvider';
+import { CouncilProvider }      from './providers/CouncilProvider';
+import { RouterProvider }       from './providers/RouterProvider';
 import { HealthProvider }       from './providers/HealthProvider';
 import { SessionsListProvider } from './providers/SessionsListProvider';
+import { LearningProvider }     from './providers/LearningProvider';
 import type { VetoSession, VetoCouncilOutcome } from './types';
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -33,14 +35,16 @@ export function activate(context: vscode.ExtensionContext): void {
   const councilProvider      = new CouncilProvider();
   const routerProvider       = new RouterProvider();
   const healthProvider       = new HealthProvider();
+  const learningProvider     = new LearningProvider();
 
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider('veto-session',       sessionProvider),
     vscode.window.registerTreeDataProvider('veto-sessions-list', sessionsListProvider),
     vscode.window.registerTreeDataProvider('veto-memory',        memoryProvider),
-    vscode.window.registerTreeDataProvider('veto-council', councilProvider),
-    vscode.window.registerTreeDataProvider('veto-router',  routerProvider),
-    vscode.window.registerTreeDataProvider('veto-health',  healthProvider),
+    vscode.window.registerTreeDataProvider('veto-council',       councilProvider),
+    vscode.window.registerTreeDataProvider('veto-router',        routerProvider),
+    vscode.window.registerTreeDataProvider('veto-health',        healthProvider),
+    vscode.window.registerTreeDataProvider('veto-learning',      learningProvider),
   );
 
   // Status bar
@@ -53,21 +57,31 @@ export function activate(context: vscode.ExtensionContext): void {
   let previousVerdictId: string | null = null;
 
   function updateStatusBar(session: VetoSession | null, council: VetoCouncilOutcome | null): void {
-    const id8 = session ? session.id.slice(0, 8) : 'no session';
     if (!session) {
       statusBarItem.text = '$(circle-slash) Veto';
       statusBarItem.tooltip = 'Veto: no active session';
       return;
     }
-    if (!council) {
-      statusBarItem.text = `$(circle-outline) ${id8}`;
-    } else if (council.verdict === 'GREEN') {
-      statusBarItem.text = `$(check) GREEN ${id8}`;
-    } else if (council.verdict === 'RED') {
-      statusBarItem.text = `$(error) RED ${id8}`;
-    } else {
-      statusBarItem.text = `$(warning) YELLOW ${id8}`;
+
+    // Token % — highest usage across all platforms today
+    const rates = getRateStatus();
+    let tokenSuffix = '';
+    if (rates && rates.length > 0) {
+      const maxPct = Math.max(...rates.map(r => Math.round((r.token_count / r.daily_token_budget) * 100)));
+      tokenSuffix = ` · ${maxPct}%`;
     }
+
+    const platform = session.platform ?? 'veto';
+    if (!council) {
+      statusBarItem.text = `$(circle-outline) Veto · ${platform}${tokenSuffix}`;
+    } else if (council.verdict === 'GREEN') {
+      statusBarItem.text = `$(check) Veto · GREEN${tokenSuffix}`;
+    } else if (council.verdict === 'RED') {
+      statusBarItem.text = `$(error) Veto · RED${tokenSuffix}`;
+    } else {
+      statusBarItem.text = `$(warning) Veto · YELLOW${tokenSuffix}`;
+    }
+
     const health = getHealthStats();
     const sessionCount = health?.sessionCount ?? '?';
     const ext = vscode.extensions.getExtension('jigyasudham.veto-vscode');
@@ -75,8 +89,10 @@ export function activate(context: vscode.ExtensionContext): void {
     statusBarItem.tooltip = [
       `Veto v${version}`,
       `Session: ${session.id}`,
+      `Platform: ${platform}`,
       `Total sessions: ${sessionCount}`,
       health ? `Memory: ${health.memoryCount}  Patterns: ${health.patternCount}  DB: ${health.dbSizeMb}MB` : '',
+      tokenSuffix ? `Tokens today: ${tokenSuffix.trim()}` : '',
     ].filter(Boolean).join('\n');
   }
 
@@ -90,31 +106,35 @@ export function activate(context: vscode.ExtensionContext): void {
       councilProvider.refresh(null, true);
       routerProvider.refresh(null, true);
       healthProvider.refresh(null, null, true);
+      learningProvider.refresh(null, true);
       updateStatusBar(null, null);
       return;
     }
 
-    const session  = projectDir ? getLatestSessionForDir(projectDir) : getLatestSession();
-    const sessions = getSessions();
-    const memory   = getMemoryEntries(projectDir);
-    const council  = getLastCouncilOutcome();
-    const patterns = getTopPatterns();
-    const usage    = getUsageSummary();
-    const health   = getHealthStats();
+    const session   = projectDir ? getLatestSessionForDir(projectDir) : getLatestSession();
+    const sessions  = getSessions();
+    const memory    = getMemoryEntries(projectDir);
+    const council   = getLastCouncilOutcome();
+    const patterns  = getTopPatterns();
+    const usage     = getUsageSummary();
+    const health    = getHealthStats();
+    const learning  = getLearningStats();
 
     if (council && council.id !== previousVerdictId && council.verdict === 'RED') {
+      const openCouncil = 'Open Council';
       vscode.window.showWarningMessage(
-        `Veto Council: RED verdict — ${council.recommended ?? 'no recommendation'}`
-      );
+        `Veto Council: RED verdict — ${council.recommended ?? 'no recommendation'}`, openCouncil
+      ).then(a => { if (a === openCouncil) vscode.commands.executeCommand('veto-council.focus'); });
     }
     if (council) previousVerdictId = council.id;
 
     sessionProvider.refresh(session, false);
     sessionsListProvider.refresh(sessions, false);
-    memoryProvider.refresh(memory,   false);
-    councilProvider.refresh(council, false);
-    routerProvider.refresh(patterns, false);
+    memoryProvider.refresh(memory,    false);
+    councilProvider.refresh(council,  false);
+    routerProvider.refresh(patterns,  false);
     healthProvider.refresh(health, usage, false);
+    learningProvider.refresh(learning, false);
 
     updateStatusBar(session, council);
   }
@@ -275,6 +295,42 @@ export function activate(context: vscode.ExtensionContext): void {
       const terminal = vscode.window.createTerminal({ name: 'Veto Review', hideFromUser: false });
       terminal.show(false);
       terminal.sendText(`claude -p "${msg.replace(/"/g, '\\"')}"`, true);
+    }),
+
+    vscode.commands.registerCommand('veto.reviewPR', async () => {
+      const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      if (!workspaceRoot) {
+        vscode.window.showWarningMessage('Veto: no workspace folder open');
+        return;
+      }
+      let branch = 'HEAD';
+      try {
+        branch = await new Promise<string>((resolve, reject) => {
+          const proc = spawn('git', ['rev-parse', '--abbrev-ref', 'HEAD'],
+            { cwd: workspaceRoot, shell: true, windowsHide: true });
+          let out = '';
+          proc.stdout?.on('data', (d: Buffer) => { out += d.toString(); });
+          proc.on('close', code => code === 0 ? resolve(out.trim()) : reject());
+          proc.on('error', reject);
+        });
+      } catch { /* fall back to HEAD */ }
+
+      const msg = `Run veto_pr_review for branch "${branch}" in project: ${workspaceRoot}`;
+      const terminal = vscode.window.createTerminal({ name: 'Veto PR Review', hideFromUser: false });
+      terminal.show(false);
+      terminal.sendText(`claude --allowedTools "mcp__veto__veto_pr_review" -p "${msg.replace(/"/g, '\\"')}"`, true);
+    }),
+
+    vscode.commands.registerCommand('veto.scanSecrets', async () => {
+      const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      if (!workspaceRoot) {
+        vscode.window.showWarningMessage('Veto: no workspace folder open');
+        return;
+      }
+      const msg = `Run veto_secrets_scan for project: ${workspaceRoot}`;
+      const terminal = vscode.window.createTerminal({ name: 'Veto Secrets Scan', hideFromUser: false });
+      terminal.show(false);
+      terminal.sendText(`claude --allowedTools "mcp__veto__veto_secrets_scan" -p "${msg.replace(/"/g, '\\"')}"`, true);
     }),
 
     // Search memory entries directly from VS Code

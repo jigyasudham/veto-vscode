@@ -49,12 +49,16 @@ export function registerAutoReviewTrigger(
               );
               outputChannel.appendLine(`[autoReview] ${out.slice(0, 500)}`);
               const fileName = filePath.split(/[\\/]/).pop() ?? filePath;
+              const openCouncil = 'Open Council';
               if (out.includes('RED')) {
-                vscode.window.showWarningMessage(`Veto review: RED — ${fileName}`);
+                vscode.window.showWarningMessage(`Veto review: RED — ${fileName}`, openCouncil)
+                  .then(a => { if (a === openCouncil) vscode.commands.executeCommand('veto-council.focus'); });
               } else if (out.includes('GREEN')) {
-                vscode.window.showInformationMessage(`Veto review: GREEN — ${fileName}`);
+                vscode.window.showInformationMessage(`Veto review: GREEN — ${fileName}`, openCouncil)
+                  .then(a => { if (a === openCouncil) vscode.commands.executeCommand('veto-council.focus'); });
               } else {
-                vscode.window.showInformationMessage(`Veto review done — ${fileName}`);
+                vscode.window.showInformationMessage(`Veto review done — ${fileName}`, openCouncil)
+                  .then(a => { if (a === openCouncil) vscode.commands.executeCommand('veto-council.focus'); });
               }
             },
           );
@@ -77,30 +81,66 @@ export function registerGitStageTrigger(
     if (!existsSync(gitIndex)) return;
     try {
       gitIndexWatcher = fsWatch(gitIndex, { persistent: false }, () => {
-        if (!vscode.workspace.getConfiguration('veto').get<boolean>('autoCiGate', false)) return;
+        const cfg = vscode.workspace.getConfiguration('veto');
+        const ciGateEnabled   = cfg.get<boolean>('autoCiGate', false);
+        const secretsEnabled  = cfg.get<boolean>('autoSecretsOnStage', false);
+        if (!ciGateEnabled && !secretsEnabled) return;
         clearTimeout(ciGateDebounce);
         ciGateDebounce = setTimeout(async () => {
-          outputChannel.appendLine(`[autoCiGate] Staged changes detected in ${workspaceRoot}`);
-          try {
-            await vscode.window.withProgress(
-              { location: vscode.ProgressLocation.Window, title: 'Veto: CI gate…' },
-              async () => {
-                const out = await runClaude(
-                  ['--allowedTools', 'mcp__veto__veto_ci_gate', '-p',
-                    `Run veto_ci_gate for staged changes in project: ${workspaceRoot}`],
-                  outputChannel,
-                );
-                outputChannel.appendLine(`[autoCiGate] ${out.slice(0, 500)}`);
-                const failed = out.toLowerCase().includes('fail') || out.includes('RED');
-                if (failed) {
-                  vscode.window.showWarningMessage('Veto CI gate: issues found — check Veto log');
-                } else {
-                  vscode.window.showInformationMessage('Veto CI gate: passed');
-                }
-              },
-            );
-          } catch (e) {
-            outputChannel.appendLine(`[autoCiGate] error: ${e instanceof Error ? e.message : String(e)}`);
+          const openCouncil = 'Open Council';
+          const openLog = 'Open Log';
+
+          if (ciGateEnabled) {
+            outputChannel.appendLine(`[autoCiGate] Staged changes detected in ${workspaceRoot}`);
+            try {
+              await vscode.window.withProgress(
+                { location: vscode.ProgressLocation.Window, title: 'Veto: CI gate…' },
+                async () => {
+                  const out = await runClaude(
+                    ['--allowedTools', 'mcp__veto__veto_ci_gate', '-p',
+                      `Run veto_ci_gate for staged changes in project: ${workspaceRoot}`],
+                    outputChannel,
+                  );
+                  outputChannel.appendLine(`[autoCiGate] ${out.slice(0, 500)}`);
+                  const failed = out.toLowerCase().includes('fail') || out.includes('RED');
+                  if (failed) {
+                    vscode.window.showWarningMessage('Veto CI gate: issues found', openCouncil)
+                      .then(a => { if (a === openCouncil) vscode.commands.executeCommand('veto-council.focus'); });
+                  } else {
+                    vscode.window.showInformationMessage('Veto CI gate: passed', openCouncil)
+                      .then(a => { if (a === openCouncil) vscode.commands.executeCommand('veto-council.focus'); });
+                  }
+                },
+              );
+            } catch (e) {
+              outputChannel.appendLine(`[autoCiGate] error: ${e instanceof Error ? e.message : String(e)}`);
+            }
+          }
+
+          if (secretsEnabled) {
+            outputChannel.appendLine(`[autoSecrets] Scanning staged changes for secrets in ${workspaceRoot}`);
+            try {
+              await vscode.window.withProgress(
+                { location: vscode.ProgressLocation.Window, title: 'Veto: scanning secrets…' },
+                async () => {
+                  const out = await runClaude(
+                    ['--allowedTools', 'mcp__veto__veto_secrets_scan', '-p',
+                      `Run veto_secrets_scan for project: ${workspaceRoot}`],
+                    outputChannel,
+                  );
+                  outputChannel.appendLine(`[autoSecrets] ${out.slice(0, 500)}`);
+                  const found = out.toLowerCase().includes('secret') || out.toLowerCase().includes('leak') || out.toLowerCase().includes('token') || out.toLowerCase().includes('key');
+                  if (found) {
+                    vscode.window.showWarningMessage('Veto: possible secrets detected in staged files', openLog)
+                      .then(a => { if (a === openLog) vscode.commands.executeCommand('veto.openLog'); });
+                  } else {
+                    vscode.window.showInformationMessage('Veto secrets scan: clean');
+                  }
+                },
+              );
+            } catch (e) {
+              outputChannel.appendLine(`[autoSecrets] error: ${e instanceof Error ? e.message : String(e)}`);
+            }
           }
         }, 1500);
       });
