@@ -6,7 +6,7 @@ import { spawn } from 'node:child_process';
 import {
   getLatestSession, getLatestSessionForDir, getMemoryEntries, getLastCouncilOutcome,
   getTopPatterns, getUsageSummary, getHealthStats, getRateStatus, getLearningStats,
-  searchMemoryEntries, getSessions, setDbPath, setLogger, getDbPath,
+  searchMemoryEntries, getSessions, setDbPath, setLogger, getDbPath, getScanDiagnostics,
 } from './db/reader';
 import { registerAutoReviewTrigger, registerGitStageTrigger } from './triggers';
 import { SessionProvider }      from './providers/SessionProvider';
@@ -46,6 +46,10 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.window.registerTreeDataProvider('veto-health',        healthProvider),
     vscode.window.registerTreeDataProvider('veto-learning',      learningProvider),
   );
+
+  // Inline diagnostics (squiggles from veto scans)
+  const diagnosticCollection = vscode.languages.createDiagnosticCollection('veto');
+  context.subscriptions.push(diagnosticCollection);
 
   // Status bar
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
@@ -137,6 +141,28 @@ export function activate(context: vscode.ExtensionContext): void {
     learningProvider.refresh(learning, false);
 
     updateStatusBar(session, council);
+
+    // Inline diagnostics — group DB rows by file and convert to vscode.Diagnostic
+    const diagRows = getScanDiagnostics();
+    if (diagRows && diagRows.length > 0) {
+      const byFile = new Map<string, vscode.Diagnostic[]>();
+      for (const row of diagRows) {
+        if (!byFile.has(row.file_path)) byFile.set(row.file_path, []);
+        const range = new vscode.Range(row.line, row.col_start, row.line, row.col_start + 999);
+        const sev = row.severity === 'error'   ? vscode.DiagnosticSeverity.Error
+                  : row.severity === 'warning' ? vscode.DiagnosticSeverity.Warning
+                  : vscode.DiagnosticSeverity.Information;
+        const d = new vscode.Diagnostic(range, `[veto/${row.source}] ${row.message}`, sev);
+        d.source = 'veto';
+        byFile.get(row.file_path)!.push(d);
+      }
+      diagnosticCollection.clear();
+      for (const [fp, diags] of byFile) {
+        diagnosticCollection.set(vscode.Uri.file(fp), diags);
+      }
+    } else {
+      diagnosticCollection.clear();
+    }
   }
 
   // ── Auto-trigger 1: DB directory watcher ─────────────────────────────────

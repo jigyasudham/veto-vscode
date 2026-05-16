@@ -211,6 +211,33 @@ export function getSessions(limit = 10): VetoSessionSummary[] | null {
   }
 }
 
+export type ScanDiagnosticRow = {
+  id: string;
+  file_path: string;
+  line: number;
+  col_start: number;
+  message: string;
+  severity: string;
+  source: string;
+  created_at: string;
+};
+
+export function getScanDiagnostics(): ScanDiagnosticRow[] | null {
+  const db = openDb();
+  if (!db) return null;
+  try {
+    // Table may not exist on older DBs
+    const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='scan_diagnostics'").all() as Array<{ name: string }>;
+    if (tables.length === 0) return [];
+    return db.prepare('SELECT * FROM scan_diagnostics ORDER BY file_path, line').all() as unknown as ScanDiagnosticRow[];
+  } catch (e) {
+    logger?.(`getScanDiagnostics error: ${e instanceof Error ? e.message : String(e)}`);
+    return null;
+  } finally {
+    db.close();
+  }
+}
+
 export function searchMemoryEntries(query: string): VetoMemoryEntry[] | null {
   const db = openDb();
   if (!db) return null;
