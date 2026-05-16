@@ -32,18 +32,54 @@ The sidebar has 7 panels, all updated every 5 seconds (or instantly via DB watch
 - Recommendation and time of last debate
 - **Council Debate** button (toolbar) — opens an input box, then runs `veto_council_debate` via Claude CLI
 - **Review File** button (toolbar) — runs `veto_code_review` on the currently open file
+- **PR Review** button (toolbar) — runs `veto_pr_review` on the current git branch
 
 ### Router Stats
 - Top learned routing patterns: `*.ts → reviewer · 94% (12x)`
 - Updated as you use `veto_record_outcome`
 
-### Daily Tool Usage
-- Tokens consumed today by Veto tool calls (council debate, parallel exec) per platform vs. daily budget
-- Visual progress bar: `Claude  16K / 500K █░░░░ 3%`
-- Not a context window meter — tracks Veto's own tool invocations only
-
 ### Health
 - DB size, session count, memory count, pattern count, learning entries
+
+### Learning Stats
+- Total outcomes recorded, average quality per tier
+- Top agents by performance score
+- Updated automatically — no manual recording needed (auto-hooks fire after every council/scan/workflow)
+
+---
+
+## Inline Diagnostics (v0.7.0)
+
+When you call `veto_code_review`, `veto_security_scan`, or `veto_secrets_scan` with a `file_path` parameter, findings are stored in the Veto DB and surfaced as VS Code squiggles (inline diagnostics) directly in the editor — no separate panel needed.
+
+- Red squiggles for critical/high findings
+- Yellow squiggles for medium findings
+- Clears automatically when the next passing scan runs on the same file
+
+---
+
+## Auto-Triggers
+
+Four optional auto-triggers run silently in the background (all off by default, enable in Settings):
+
+| Setting | Trigger | What runs |
+|---|---|---|
+| `veto.autoRefreshOnSave` | Any file save | Dashboard refresh |
+| `veto.autoReview` | File save | `veto_code_review` via Claude CLI |
+| `veto.autoCiGate` | Git stage (`.git/index` change) | `veto_ci_gate` via Claude CLI |
+| `veto.autoSecretsOnStage` | Git stage | `veto_secrets_scan` via Claude CLI |
+
+---
+
+## Status Bar
+
+The bottom status bar shows the active session platform + council verdict:
+
+- `$(check) Veto · GREEN · 8%` — last council passed, 8% of today's token budget used
+- `$(warning) Veto · YELLOW · 42%` — council warned
+- `$(error) Veto · RED · 91%` — council blocked
+
+Click the status bar item to focus the Veto sidebar.
 
 ---
 
@@ -51,7 +87,8 @@ The sidebar has 7 panels, all updated every 5 seconds (or instantly via DB watch
 
 | Requirement | Details |
 |---|---|
-| **VS Code** | 1.97 or higher (uses Node 22 built-in SQLite) |
+| **VS Code** | 1.97 or higher |
+| **Node.js** | 22 or higher (uses built-in `node:sqlite`) |
 | **Veto MCP server** | `npm i -g @jigyasudham/veto` — must be installed and used at least once |
 
 The extension reads `~/.veto/veto.db` directly — no server process needed while browsing the dashboard.
@@ -69,7 +106,7 @@ git clone https://github.com/jigyasudham/veto-vscode
 cd veto-vscode
 npm install
 npm run package       # produces veto-vscode-x.x.x.vsix
-code --install-extension veto-vscode-0.5.3.vsix
+code --install-extension veto-vscode-0.7.0.vsix
 ```
 
 ---
@@ -83,6 +120,34 @@ Each session tracks:
 - **Active in** — which AI last resumed it
 
 So if you hand off from Claude to Gemini mid-task via `veto_handoff`, the Session panel updates to show `Active in: gemini` on the next poll.
+
+---
+
+## Changelog
+
+### v0.7.0
+- **feat:** Inline diagnostics — `veto_code_review`, `veto_security_scan`, `veto_secrets_scan` with `file_path` store findings to DB; extension shows squiggles in the editor, clears on passing scan
+- **fix:** CI bumped to Node 22 (required for `node:sqlite`); `package-lock.json` regenerated
+
+### v0.6.0
+- **feat:** Status bar — platform + council verdict + token % at a glance
+- **feat:** Auto-triggers: file save → `veto_code_review`, git stage → `veto_ci_gate` + `veto_secrets_scan`
+- **feat:** PR Review command — detects current branch, runs `veto_pr_review`
+- **feat:** Learning Stats panel — surfaces what Veto has learned about your codebase
+- **feat:** Sessions panel — last 10 sessions with click-to-restore
+
+### v0.5.6
+- **fix:** Cast `candidates.all()` through `unknown` to satisfy stricter `@types/node` (CI fix)
+
+### v0.5.5
+- **fix:** Window-scoped session — no fallback to global when workspace has no session
+
+### v0.5.4
+- **fix:** Window-scoped session matching; remove misleading Rate panel
+
+### v0.5.3
+- **feat:** Workspace-scoped sessions — each VS Code window tracks its own project session
+- **feat:** SVG activity bar icon; renamed panels for clarity
 
 ---
 
