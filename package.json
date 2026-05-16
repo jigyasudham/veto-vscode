@@ -4,7 +4,7 @@
   "description": "Live dashboard for the Veto MCP server",
   "version": "0.6.0",
   "publisher": "jigyasudham",
-  "engines": { "vscode": "^1.97.0" },
+  "engines": { "vscode": "^1.97.0", "node": ">=22" },
   "icon": "icons/veto.png",
   "license": "MIT",
   "repository": {
