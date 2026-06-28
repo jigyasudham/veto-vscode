@@ -1,85 +1,62 @@
-# Veto for VS Code
+# Veto HUD for VS Code
 
-> Live dashboard for the [Veto MCP server](https://github.com/jigyasudham/veto) — right inside your sidebar.
+> A single, live heads-up display for the [Veto MCP server](https://github.com/jigyasudham/veto) — right in your sidebar and status bar.
 
-Veto is a local MCP server that gives every AI (Claude, Gemini, Codex) a council of specialist agents, persistent memory, and a self-learning router. This extension surfaces what Veto knows directly in VS Code — no terminal, no AI session required.
-
----
-
-## What it shows
-
-The sidebar has 7 panels, all updated every 5 seconds (or instantly via DB watcher) from `~/.veto/veto.db`.
-
-### Session
-- Session ID, which AI created it (`Created by`), and which AI is currently using it (`Active in`)
-- Start time (relative), connection type, project directory, summary
-- **Workspace-scoped** — each VS Code window shows the session matching its open folder
-- Tokens (last save): `16K/200K █░░░░ 8%` — reflects token count at the last `veto_session_save` call, not a live counter
-- **Save Session** button (toolbar) — prompts for a summary and saves via `veto_session_save`
-
-### Sessions
-- Last 10 sessions listed with summary and relative time
-- Click any session to resume it — dispatches to Claude, Gemini, or Codex depending on which AI last used it
-
-### Memory
-- Total memory count — automatically scoped to your current workspace folder
-- Last 3 stored entries with their type tag
-- **Search Memory** button (toolbar) — fuzzy search by keyword or tag, copy result to clipboard
-
-### Last Council
-- Verdict badge: `GREEN` / `YELLOW` / `RED` with colour icons
-- Each agent's vote (Lead Dev, PM, Architect, UX, Devil, Legal, Security)
-- Recommendation and time of last debate
-- **Council Debate** button (toolbar) — opens an input box, then runs `veto_council_debate` via Claude CLI
-- **Review File** button (toolbar) — runs `veto_code_review` on the currently open file
-- **PR Review** button (toolbar) — runs `veto_pr_review` on the current git branch
-
-### Router Stats
-- Top learned routing patterns: `*.ts → reviewer · 94% (12x)`
-- Updated as you use `veto_record_outcome`
-
-### Health
-- DB size, session count, memory count, pattern count, learning entries
-
-### Learning Stats
-- Total outcomes recorded, average quality per tier
-- Top agents by performance score
-- Updated automatically — no manual recording needed (auto-hooks fire after every council/scan/workflow)
+Veto is a local MCP server that gives every AI (Claude, Gemini, Codex) a **council of specialist agents**, **persistent memory**, and a **self-learning router**. This extension surfaces what Veto knows — verdict, routing confidence, session, memory, rate — in one focused HUD. No terminal, no AI session required to read it.
 
 ---
 
-## Inline Diagnostics (v0.7.0)
+## The HUD
 
-When you call `veto_code_review`, `veto_security_scan`, or `veto_secrets_scan` with a `file_path` parameter, findings are stored in the Veto DB and surfaced as VS Code squiggles (inline diagnostics) directly in the editor — no separate panel needed.
+One sidebar view (and one status-bar pulse) replaces the old seven panels. Everything updates instantly via a file watcher, with a polling fallback.
 
-- Red squiggles for critical/high findings
-- Yellow squiggles for medium findings
-- Clears automatically when the next passing scan runs on the same file
+```
+⬡ VETO        ● GREEN
+Session   claude · 16K/200K ▓░░░ 8%   [Resume] [Save]
+Council   GREEN · just now
+          ✓ Lead ✓ PM ⚠ Arch ✓ UX ⚠ Devil ✓ Legal ✓ Sec
+          → ship it
+Router    *.ts → reviewer   94% · 12×
+Today     claude  ▓▓▓▓▓░░░░░ 50%
+Memory    15 entries · this project   [ search… ]
+Health    0.7 MB · 10 sessions · 24 patterns
+```
+
+- **Session** — the session matching your open workspace; created-by / active-in AI, token gauge, click **Resume** to continue it in Claude/Gemini/Codex.
+- **Council** — last verdict (GREEN/YELLOW/RED) with each agent's vote and the recommendation. Buttons run a fresh **Debate**, **Review file**, or **Review PR**.
+- **Router** — the strongest learned routing patterns and their confidence — *why* Veto routes the way it does.
+- **Today** — per-platform token-budget usage.
+- **Memory** — workspace-scoped count + inline search.
+- **Health** — DB size and counts.
+
+## Status-bar pulse
+
+Always-on, one glance: `$(check) Veto · GREEN · 50%` — verdict + today's peak token-budget use. Hover for session, router, rate, and DB detail. Click to focus the HUD. Shows `⟳` when serving last-good data because the DB is mid-write.
+
+## Inline diagnostics
+
+When you run `veto_code_review`, `veto_security_scan`, or `veto_secrets_scan` with a `file_path`, findings are stored in the Veto DB and shown as squiggles in the editor — cleared automatically on the next passing scan.
 
 ---
 
-## Auto-Triggers
+## Architecture (v1.0)
 
-Four optional auto-triggers run silently in the background (all off by default, enable in Settings):
+A clean, layered rewrite — no god-function, one DB connection, no shell strings.
 
-| Setting | Trigger | What runs |
-|---|---|---|
-| `veto.autoRefreshOnSave` | Any file save | Dashboard refresh |
-| `veto.autoReview` | File save | `veto_code_review` via Claude CLI |
-| `veto.autoCiGate` | Git stage (`.git/index` change) | `veto_ci_gate` via Claude CLI |
-| `veto.autoSecretsOnStage` | Git stage | `veto_secrets_scan` via Claude CLI |
+```
+src/
+├── extension.ts     wiring only
+├── core/            VetoStore (single long-lived read-only connection + change-detection
+│                    + typed snapshot emitter), snapshot types, path/budget helpers
+├── data/            pure SQL queries against the open handle
+├── ui/              StatusBar pulse + HudView (nonce-CSP webview, DB strings never run as HTML)
+└── commands/        actions via spawn(argv) — no shell, no string interpolation
+```
 
----
-
-## Status Bar
-
-The bottom status bar shows the active session platform + council verdict:
-
-- `$(check) Veto · GREEN · 8%` — last council passed, 8% of today's token budget used
-- `$(warning) Veto · YELLOW · 42%` — council warned
-- `$(error) Veto · RED · 91%` — council blocked
-
-Click the status bar item to focus the Veto sidebar.
+- **One read-only connection** for the whole extension (no per-query open/close churn).
+- **Resilient:** when the DB is locked mid-WAL-write it serves the last-good snapshot instead of blanking; missing tables are feature-detected for forward-compat.
+- **Safe by construction:** the webview renders DB values with `textContent` only (no `innerHTML`); the one interactive `claude` call validates its inputs against an allowlist and all one-shot tools run via `spawn(argv)` with `shell:false`.
+- **Tested:** `npm test` runs a smoke suite over the data path against a fixture DB.
 
 ---
 
@@ -89,89 +66,66 @@ Click the status bar item to focus the Veto sidebar.
 |---|---|
 | **VS Code** | 1.97 or higher |
 | **Node.js** | 22 or higher (uses built-in `node:sqlite`) |
-| **Veto MCP server** | `npm i -g @jigyasudham/veto` — must be installed and used at least once |
+| **Veto MCP server** | `npm i -g @jigyasudham/veto` — installed and used at least once |
 
-The extension reads `~/.veto/veto.db` directly — no server process needed while browsing the dashboard.
+The extension reads `~/.veto/veto.db` directly (read-only) — no server process needed to browse the HUD.
+
+### Settings
+
+| Setting | Default | Description |
+|---|---|---|
+| `veto.pollInterval` | `5000` | Fallback poll interval (ms); the HUD also updates instantly via a file watcher. |
+| `veto.dbPath` | `""` | Override the Veto DB path. Empty = `~/.veto/veto.db`. |
 
 ---
 
-## Installation
+## Install
 
-### From the Marketplace
-Search **Veto MCP Dashboard** in the VS Code Extensions panel and click Install.
+**Marketplace:** search **Veto MCP Dashboard** in the Extensions panel.
 
-### From source
+**From source:**
 ```bash
 git clone https://github.com/jigyasudham/veto-vscode
 cd veto-vscode
 npm install
-npm run package       # produces veto-vscode-x.x.x.vsix
-code --install-extension veto-vscode-0.7.0.vsix
+npm run build        # bundle
+npm test             # smoke tests
+npm run package      # produce the .vsix
+code --install-extension veto-vscode-1.0.0.vsix
 ```
+
+Press **F5** to launch the Extension Development Host with the extension live.
 
 ---
 
-## Multi-AI support
+## Want the same stats in your terminal?
 
-If you run Claude in VS Code and Gemini CLI in another tool simultaneously on different projects, the Memory panel automatically shows only memories scoped to the currently open workspace — no cross-project contamination.
+The "stats below the CLI" statusline lives in the **Veto CLI itself** (so every Veto user gets it, not just VS Code users):
 
-Each session tracks:
-- **Created by** — which AI originally saved it
-- **Active in** — which AI last resumed it
+```bash
+veto statusline install
+```
 
-So if you hand off from Claude to Gemini mid-task via `veto_handoff`, the Session panel updates to show `Active in: gemini` on the next poll.
+renders a compact `⬡ veto GREEN · router 94% · claude 50% · mem 15` line beneath your Claude Code prompt. See the [Veto server](https://github.com/jigyasudham/veto).
 
 ---
 
 ## Changelog
 
-### v0.7.0
-- **feat:** Inline diagnostics — `veto_code_review`, `veto_security_scan`, `veto_secrets_scan` with `file_path` store findings to DB; extension shows squiggles in the editor, clears on passing scan
-- **fix:** CI bumped to Node 22 (required for `node:sqlite`); `package-lock.json` regenerated
+### v1.0.0 — "Veto HUD"
+- **Rewrite:** seven tree panels → one live HUD (sidebar webview) + a status-bar pulse.
+- **Architecture:** layered `core` / `data` / `ui` / `commands`; a single long-lived read-only SQLite connection with change-detection and last-good fallback replaces 8 connections per poll.
+- **Security:** removed all `claude` CLI shell-string building (CWE-78); one-shot tools now run via `spawn(argv)` with `shell:false`; webview uses nonce CSP + `textContent`.
+- **Focus:** surfaces council verdict, agent votes, and router confidence prominently; dropped the off-by-default auto-triggers (the same actions remain on-demand).
+- **Tests:** added a smoke suite over the data path.
+- **Moved out:** the terminal statusline now ships with the Veto CLI (`veto statusline install`).
 
-### v0.6.0
-- **feat:** Status bar — platform + council verdict + token % at a glance
-- **feat:** Auto-triggers: file save → `veto_code_review`, git stage → `veto_ci_gate` + `veto_secrets_scan`
-- **feat:** PR Review command — detects current branch, runs `veto_pr_review`
-- **feat:** Learning Stats panel — surfaces what Veto has learned about your codebase
-- **feat:** Sessions panel — last 10 sessions with click-to-restore
+<details><summary>Earlier (0.x)</summary>
 
-### v0.5.6
-- **fix:** Cast `candidates.all()` through `unknown` to satisfy stricter `@types/node` (CI fix)
-
-### v0.5.5
-- **fix:** Window-scoped session — no fallback to global when workspace has no session
-
-### v0.5.4
-- **fix:** Window-scoped session matching; remove misleading Rate panel
-
-### v0.5.3
-- **feat:** Workspace-scoped sessions — each VS Code window tracks its own project session
-- **feat:** SVG activity bar icon; renamed panels for clarity
-
----
-
-## Development
-
-```bash
-git clone https://github.com/jigyasudham/veto-vscode
-cd veto-vscode
-npm install
-```
-
-Press **F5** in VS Code to launch the Extension Development Host with the extension live.
-
-```bash
-npm run watch    # rebuild on file change
-npm run build    # one-shot build
-```
-
----
-
-## Related
-
-- [Veto MCP server](https://www.npmjs.com/package/@jigyasudham/veto) — the server this extension reads from
-- [Veto GitHub](https://github.com/jigyasudham/veto)
+- **0.7.0** — inline diagnostics; session browser
+- **0.6.0** — status bar token %, auto-triggers, PR review, learning stats, sessions panel
+- **0.5.x** — workspace-scoped sessions; SVG icon; panel renames
+</details>
 
 ---
 
