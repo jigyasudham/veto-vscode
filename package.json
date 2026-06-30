@@ -2,7 +2,7 @@
   "name": "veto-vscode",
   "displayName": "Veto MCP Dashboard",
   "description": "Live dashboard for the Veto MCP server",
-  "version": "0.7.0",
+  "version": "1.0.0",
   "publisher": "jigyasudham",
   "engines": {
     "vscode": "^1.97.0",
@@ -46,160 +46,105 @@
     "views": {
       "veto-sidebar": [
         {
-          "id": "veto-session",
-          "name": "Session"
-        },
-        {
-          "id": "veto-sessions-list",
-          "name": "Sessions"
-        },
-        {
-          "id": "veto-memory",
-          "name": "Memory"
-        },
-        {
-          "id": "veto-council",
-          "name": "Last Council"
-        },
-        {
-          "id": "veto-router",
-          "name": "Router Stats",
-          "visibility": "collapsed"
-        },
-        {
-          "id": "veto-health",
-          "name": "Health",
-          "visibility": "collapsed"
-        },
-        {
-          "id": "veto-learning",
-          "name": "Learning Stats",
-          "visibility": "collapsed"
+          "id": "veto-hud",
+          "name": "Veto HUD",
+          "type": "webview"
         }
       ]
     },
     "commands": [
       {
+        "command": "veto.openHud",
+        "title": "Veto: Open HUD",
+        "icon": "$(dashboard)"
+      },
+      {
         "command": "veto.refresh",
-        "title": "Refresh",
+        "title": "Veto: Refresh",
         "icon": "$(refresh)"
       },
       {
-        "command": "veto.copySessionId",
-        "title": "Copy Session ID",
-        "icon": "$(copy)"
-      },
-      {
-        "command": "veto.openInstallDocs",
-        "title": "Open Veto Install Docs",
-        "icon": "$(link-external)"
-      },
-      {
-        "command": "veto.focusSidebar",
-        "title": "Focus Veto Sidebar"
-      },
-      {
         "command": "veto.searchMemory",
-        "title": "Search Veto Memory",
+        "title": "Veto: Search Memory",
         "icon": "$(search)"
       },
       {
         "command": "veto.openLog",
-        "title": "Open Veto Log",
+        "title": "Veto: Open Log",
         "icon": "$(output)"
       },
       {
         "command": "veto.saveSession",
-        "title": "Save Session",
+        "title": "Veto: Save Session",
         "icon": "$(save)"
       },
       {
         "command": "veto.continueSession",
-        "title": "Resume Session",
+        "title": "Veto: Resume Session",
         "icon": "$(play)"
       },
       {
         "command": "veto.councilDebate",
-        "title": "Council Debate",
+        "title": "Veto: Council Debate",
         "icon": "$(comment-discussion)"
       },
       {
         "command": "veto.reviewFile",
-        "title": "Review Current File",
+        "title": "Veto: Review Current File",
         "icon": "$(shield)"
       },
       {
         "command": "veto.reviewPR",
-        "title": "Review Current PR Branch",
+        "title": "Veto: Review Current PR Branch",
         "icon": "$(git-pull-request)"
       },
       {
         "command": "veto.scanSecrets",
-        "title": "Scan Project for Secrets",
+        "title": "Veto: Scan Project for Secrets",
         "icon": "$(key)"
+      },
+      {
+        "command": "veto.openInstallDocs",
+        "title": "Veto: Open Install Docs",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "veto.copySessionId",
+        "title": "Veto: Copy Session ID",
+        "icon": "$(copy)"
       }
     ],
     "menus": {
       "view/title": [
         {
           "command": "veto.refresh",
-          "when": "view == veto-session",
-          "group": "navigation"
-        },
-        {
-          "command": "veto.refresh",
-          "when": "view == veto-memory",
-          "group": "navigation"
-        },
-        {
-          "command": "veto.refresh",
-          "when": "view == veto-council",
-          "group": "navigation"
-        },
-        {
-          "command": "veto.refresh",
-          "when": "view == veto-router",
-          "group": "navigation"
-        },
-        {
-          "command": "veto.refresh",
-          "when": "view == veto-health",
-          "group": "navigation"
+          "when": "view == veto-hud",
+          "group": "navigation@1"
         },
         {
           "command": "veto.searchMemory",
-          "when": "view == veto-memory",
-          "group": "navigation"
-        },
-        {
-          "command": "veto.openLog",
-          "when": "view == veto-session",
-          "group": "navigation"
+          "when": "view == veto-hud",
+          "group": "navigation@2"
         },
         {
           "command": "veto.saveSession",
-          "when": "view == veto-session",
-          "group": "navigation"
+          "when": "view == veto-hud",
+          "group": "navigation@3"
         },
         {
-          "command": "veto.councilDebate",
-          "when": "view == veto-council",
-          "group": "navigation"
+          "command": "veto.openLog",
+          "when": "view == veto-hud",
+          "group": "navigation@4"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "veto.continueSession",
+          "when": "false"
         },
         {
-          "command": "veto.reviewFile",
-          "when": "view == veto-council",
-          "group": "navigation"
-        },
-        {
-          "command": "veto.reviewPR",
-          "when": "view == veto-council",
-          "group": "navigation"
-        },
-        {
-          "command": "veto.scanSecrets",
-          "when": "view == veto-learning",
-          "group": "navigation"
+          "command": "veto.copySessionId",
+          "when": "false"
         }
       ]
     },
@@ -210,7 +155,7 @@
           "type": "number",
           "default": 5000,
           "minimum": 1000,
-          "description": "How often (in milliseconds) the Veto dashboard polls the database. Minimum 1000ms.",
+          "description": "How often (in milliseconds) the Veto HUD polls the database as a fallback. The HUD also updates instantly via a file watcher. Minimum 1000ms.",
           "scope": "window"
         },
         "veto.dbPath": {
@@ -218,30 +163,6 @@
           "default": "",
           "description": "Override the Veto database path. Leave empty to use the default ~/.veto/veto.db.",
           "scope": "machine"
-        },
-        "veto.autoRefreshOnSave": {
-          "type": "boolean",
-          "default": false,
-          "description": "Refresh the Veto dashboard whenever any file is saved in the workspace.",
-          "scope": "window"
-        },
-        "veto.autoReview": {
-          "type": "boolean",
-          "default": false,
-          "description": "On file save, automatically run veto_code_review via claude CLI and show verdict notification.",
-          "scope": "window"
-        },
-        "veto.autoCiGate": {
-          "type": "boolean",
-          "default": false,
-          "description": "When files are staged in git, automatically run veto_ci_gate via claude CLI and show result notification.",
-          "scope": "window"
-        },
-        "veto.autoSecretsOnStage": {
-          "type": "boolean",
-          "default": false,
-          "description": "When files are staged in git, automatically run veto_secrets_scan via claude CLI and warn if secrets are detected.",
-          "scope": "window"
         }
       }
     }
@@ -249,6 +170,8 @@
   "scripts": {
     "build": "node esbuild.js",
     "watch": "node esbuild.js --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test test/**/*.test.ts",
     "package": "npm run build && vsce package",
     "publish": "npm run build && vsce publish"
   },
@@ -257,6 +180,7 @@
     "@types/vscode": "^1.97.0",
     "@vscode/vsce": "^3.0.0",
     "esbuild": "^0.20.0",
+    "tsx": "^4.7.0",
     "typescript": "^5.3.0"
   }
 }
