@@ -1,3 +1,8 @@
 node_modules/
 dist/
 *.vsix
+
+# Local dev tooling — not part of the public extension
+.claude/
+AGENTS.md
+docs/PLAN-A-extension.md
