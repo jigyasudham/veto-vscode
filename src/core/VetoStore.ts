@@ -40,6 +40,7 @@ export class VetoStore {
   private intervalId: ReturnType<typeof setInterval> | undefined;
   private lastSize = -1;
   private lastMtimeMs = -1;
+  private lastProjectDir: string | undefined = undefined;
 
   constructor(opts: VetoStoreOptions = {}) {
     if (opts.dbPath) setDbPath(opts.dbPath);
@@ -147,11 +148,14 @@ export class VetoStore {
     if (!existsSync(getDbPath())) {
       this.closeDb();
       this.lastSize = -1; this.lastMtimeMs = -1;
+      this.lastProjectDir = undefined;
       return emptySnapshot(false);
     }
 
+    const projectDirChanged = this.projectDir !== this.lastProjectDir;
+
     // Nothing changed since the last successful read → reuse it (cheap path).
-    if (!this.changedSinceLast() && this.last.installed && !this.last.stale) {
+    if (!projectDirChanged && !this.changedSinceLast() && this.last.installed && !this.last.stale) {
       return this.last;
     }
 
@@ -164,7 +168,7 @@ export class VetoStore {
         installed: true,
         session:     queryLatestSession(db, this.projectDir),
         sessions:    querySessions(db),
-        council:     queryLastCouncil(db),
+        council:     queryLastCouncil(db, this.projectDir),
         patterns:    queryTopPatterns(db),
         rate:        queryRate(db, budgets),
         usage:       queryUsage(db),
@@ -175,6 +179,7 @@ export class VetoStore {
         generatedAt: Date.now(),
         stale: false,
       };
+      this.lastProjectDir = this.projectDir;
       return snap;
     } catch (e) {
       // DB locked mid-write / transient error → drop the connection and serve last-good.
@@ -194,6 +199,7 @@ export class VetoStore {
       } catch {
         this.db = new DatabaseSync(getDbPath(), { open: true });
       }
+      this.db.exec('PRAGMA busy_timeout = 3000');
       return this.db;
     } catch (e) {
       this.log(`DB open error: ${errMsg(e)}`);

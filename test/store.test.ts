@@ -99,3 +99,83 @@ test('normPath normalizes separators, case, trailing slash', () => {
   assert.equal(normPath('C:\\Proj\\App\\'), 'c:/proj/app');
   assert.equal(normPath('C:/proj/app'), 'c:/proj/app');
 });
+
+test('queryLastCouncil project scoping via session join', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'veto-test-scoping-'));
+  const dbPath = join(dir, 'veto.db');
+  const db = new DatabaseSync(dbPath);
+  db.exec(`
+    CREATE TABLE sessions (id TEXT, started_at TEXT, platform TEXT, project_dir TEXT, summary TEXT,
+      token_count INTEGER, created_at TEXT, active_client TEXT, last_resumed_at TEXT, connection_type TEXT);
+    CREATE TABLE council_outcomes (id TEXT, session_id TEXT, task TEXT, verdict TEXT, lead_dev TEXT, pm TEXT,
+      architect TEXT, ux TEXT, devil TEXT, recommended TEXT, debated_at TEXT, legal TEXT, security TEXT);
+    CREATE TABLE patterns (id TEXT, pattern_key TEXT, pattern_val TEXT, confidence REAL, seen_count INTEGER, updated_at TEXT);
+    CREATE TABLE rate_usage (id TEXT, platform TEXT, date_key TEXT, request_count INTEGER, token_count INTEGER, updated_at TEXT);
+    CREATE TABLE knowledge_base (id TEXT, type TEXT, title TEXT, content TEXT, tags TEXT, project_dir TEXT, created_at TEXT);
+    CREATE TABLE learning_data (id TEXT, task_type TEXT, complexity TEXT, model_tier INTEGER, output_quality INTEGER, agent TEXT);
+    CREATE TABLE usage_events (id TEXT, platform TEXT, tokens INTEGER, event_type TEXT);
+    CREATE TABLE scan_diagnostics (id TEXT, file_path TEXT, line INTEGER, col_start INTEGER, message TEXT, severity TEXT, source TEXT, created_at TEXT);
+  `);
+  db.prepare('INSERT INTO sessions (id, project_dir) VALUES (?, ?)').run('sess-a', 'C:/proj-a');
+  db.prepare('INSERT INTO sessions (id, project_dir) VALUES (?, ?)').run('sess-b', 'C:/proj-b');
+  db.prepare("INSERT INTO council_outcomes (id, session_id, verdict, debated_at) VALUES (?, ?, ?, ?)").run(
+    'c-a', 'sess-a', 'GREEN', new Date(Date.now() - 10000).toISOString()
+  );
+  db.prepare("INSERT INTO council_outcomes (id, session_id, verdict, debated_at) VALUES (?, ?, ?, ?)").run(
+    'c-b', 'sess-b', 'RED', new Date().toISOString()
+  );
+  db.close();
+
+  const store = new VetoStore({ dbPath });
+  try {
+    store.setProjectDir('C:/proj-a');
+    store.refresh();
+    assert.equal(store.getSnapshot().council?.verdict, 'GREEN');
+    
+    store.setProjectDir('C:/proj-b');
+    store.refresh();
+    assert.equal(store.getSnapshot().council?.verdict, 'RED');
+  } finally {
+    store.dispose();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('queryLastCouncil direct column project scoping', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'veto-test-col-scoping-'));
+  const dbPath = join(dir, 'veto.db');
+  const db = new DatabaseSync(dbPath);
+  db.exec(`
+    CREATE TABLE sessions (id TEXT, started_at TEXT, platform TEXT, project_dir TEXT, summary TEXT,
+      token_count INTEGER, created_at TEXT, active_client TEXT, last_resumed_at TEXT, connection_type TEXT);
+    CREATE TABLE council_outcomes (id TEXT, session_id TEXT, task TEXT, verdict TEXT, lead_dev TEXT, pm TEXT,
+      architect TEXT, ux TEXT, devil TEXT, recommended TEXT, debated_at TEXT, legal TEXT, security TEXT, project_dir TEXT);
+    CREATE TABLE patterns (id TEXT, pattern_key TEXT, pattern_val TEXT, confidence REAL, seen_count INTEGER, updated_at TEXT);
+    CREATE TABLE rate_usage (id TEXT, platform TEXT, date_key TEXT, request_count INTEGER, token_count INTEGER, updated_at TEXT);
+    CREATE TABLE knowledge_base (id TEXT, type TEXT, title TEXT, content TEXT, tags TEXT, project_dir TEXT, created_at TEXT);
+    CREATE TABLE learning_data (id TEXT, task_type TEXT, complexity TEXT, model_tier INTEGER, output_quality INTEGER, agent TEXT);
+    CREATE TABLE usage_events (id TEXT, platform TEXT, tokens INTEGER, event_type TEXT);
+    CREATE TABLE scan_diagnostics (id TEXT, file_path TEXT, line INTEGER, col_start INTEGER, message TEXT, severity TEXT, source TEXT, created_at TEXT);
+  `);
+  db.prepare("INSERT INTO council_outcomes (id, verdict, debated_at, project_dir) VALUES (?, ?, ?, ?)").run(
+    'c-a', 'GREEN', new Date(Date.now() - 10000).toISOString(), 'C:/proj-a'
+  );
+  db.prepare("INSERT INTO council_outcomes (id, verdict, debated_at, project_dir) VALUES (?, ?, ?, ?)").run(
+    'c-b', 'RED', new Date().toISOString(), 'C:/proj-b'
+  );
+  db.close();
+
+  const store = new VetoStore({ dbPath });
+  try {
+    store.setProjectDir('C:/proj-a');
+    store.refresh();
+    assert.equal(store.getSnapshot().council?.verdict, 'GREEN');
+    
+    store.setProjectDir('C:/proj-b');
+    store.refresh();
+    assert.equal(store.getSnapshot().council?.verdict, 'RED');
+  } finally {
+    store.dispose();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

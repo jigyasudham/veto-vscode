@@ -19,6 +19,15 @@ export function hasTable(db: DatabaseSync, name: string): boolean {
   return rows.length > 0;
 }
 
+export function hasColumn(db: DatabaseSync, table: string, column: string): boolean {
+  try {
+    const info = db.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
+    return info.some(c => c.name === column);
+  } catch {
+    return false;
+  }
+}
+
 export function queryLatestSession(db: DatabaseSync, projectDir?: string): VetoSession | null {
   if (!projectDir) {
     return (db.prepare('SELECT * FROM sessions ORDER BY created_at DESC LIMIT 1').get() as VetoSession | undefined) ?? null;
@@ -74,8 +83,48 @@ export function searchMemory(db: DatabaseSync, query: string): VetoMemoryEntry[]
   return rows.map(parseMemory);
 }
 
-export function queryLastCouncil(db: DatabaseSync): VetoCouncilOutcome | null {
-  return (db.prepare('SELECT * FROM council_outcomes ORDER BY debated_at DESC LIMIT 1').get() as VetoCouncilOutcome | undefined) ?? null;
+export function queryLastCouncil(db: DatabaseSync, projectDir?: string): VetoCouncilOutcome | null {
+  if (!projectDir) {
+    return (db.prepare('SELECT * FROM council_outcomes ORDER BY debated_at DESC LIMIT 1').get() as VetoCouncilOutcome | undefined) ?? null;
+  }
+
+  const useDirectColumn = hasColumn(db, 'council_outcomes', 'project_dir');
+
+  if (useDirectColumn) {
+    // Exact match
+    const exact = db.prepare(
+      'SELECT * FROM council_outcomes WHERE project_dir = ? ORDER BY debated_at DESC LIMIT 1'
+    ).get(projectDir) as VetoCouncilOutcome | undefined;
+    if (exact) return exact;
+
+    // Normalized fallback
+    const norm = normPath(projectDir);
+    const candidates = db.prepare(
+      'SELECT * FROM council_outcomes WHERE project_dir IS NOT NULL ORDER BY debated_at DESC LIMIT 200'
+    ).all() as unknown as VetoCouncilOutcome[];
+    return candidates.find(c => normPath(c.project_dir ?? '') === norm) ?? null;
+  } else {
+    // Join on session_id to get project_dir as an interim fallback
+    // Exact match
+    const exact = db.prepare(`
+      SELECT c.* FROM council_outcomes c
+      JOIN sessions s ON c.session_id = s.id
+      WHERE s.project_dir = ?
+      ORDER BY c.debated_at DESC LIMIT 1
+    `).get(projectDir) as VetoCouncilOutcome | undefined;
+    if (exact) return exact;
+
+    // Normalized fallback
+    const norm = normPath(projectDir);
+    const candidates = db.prepare(`
+      SELECT c.*, s.project_dir as session_project_dir FROM council_outcomes c
+      JOIN sessions s ON c.session_id = s.id
+      WHERE s.project_dir IS NOT NULL
+      ORDER BY c.debated_at DESC LIMIT 200
+    `).all() as unknown as Array<VetoCouncilOutcome & { session_project_dir: string }>;
+    const found = candidates.find(c => normPath(c.session_project_dir ?? '') === norm);
+    return found ? found : null;
+  }
 }
 
 export function queryTopPatterns(db: DatabaseSync): VetoPattern[] {

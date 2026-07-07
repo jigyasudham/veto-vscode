@@ -1,13 +1,28 @@
 // DB path resolution, token-budget config, and model context windows.
 // Kept UI-agnostic (no vscode import) so core/ stays testable in plain Node.
 
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { homedir } from 'node:os';
 import { existsSync, readFileSync } from 'node:fs';
 
 let dbPath = join(homedir(), '.veto', 'veto.db');
 
+export function isValidDbPath(p: string): boolean {
+  if (!p) return true;
+  try {
+    const resolved = resolve(p);
+    if (/[\x00-\x1f]/.test(resolved)) return false;
+    return resolved.toLowerCase().endsWith('.db');
+  } catch {
+    return false;
+  }
+}
+
 export function setDbPath(p: string): void {
+  if (p && !isValidDbPath(p)) {
+    dbPath = join(homedir(), '.veto', 'veto.db');
+    return;
+  }
   dbPath = p || join(homedir(), '.veto', 'veto.db');
 }
 

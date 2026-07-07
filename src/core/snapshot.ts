@@ -51,6 +51,7 @@ export interface VetoCouncilOutcome {
   security: string | null;
   recommended: string | null;
   debated_at: string;
+  project_dir?: string | null;
 }
 
 export interface VetoPattern {

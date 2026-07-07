@@ -14,6 +14,11 @@ const watch = process.argv.includes('--watch');
     platform: 'node',
     target: 'node22',
     sourcemap: true,
+    loader: {
+      '.html': 'text',
+      '.css': 'text',
+      '.js': 'text',
+    },
   });
 
   if (watch) {
