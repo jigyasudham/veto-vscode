@@ -4,5 +4,6 @@ dist/
 
 # Local dev tooling — not part of the public extension
 .claude/
+.vscode/
 AGENTS.md
 docs/PLAN-A-extension.md
