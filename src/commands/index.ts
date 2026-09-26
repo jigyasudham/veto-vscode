@@ -20,7 +20,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Command
   context.subscriptions.push(
     vscode.commands.registerCommand('veto.openHud', () => openHud()),
 
-    vscode.commands.registerCommand('veto.refresh', () => store.refresh()),
+    vscode.commands.registerCommand('veto.refresh', () => store.refresh(true)),
 
     vscode.commands.registerCommand('veto.openLog', () => outputChannel.show(true)),
 

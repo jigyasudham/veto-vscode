@@ -1,20 +1,21 @@
 // VetoStore — the single source of truth for Veto state in the extension.
 //
-// Owns ONE long-lived read-only SQLite connection (no per-query open/close churn),
-// detects DB changes via a debounced fs.watch + a slow interval fallback, and emits
-// a typed VetoSnapshot. On any read failure (DB locked mid-WAL-write, transient I/O)
-// it returns the last-good snapshot instead of throwing, so the UI never blanks.
+// Owns ONE long-lived strictly read-only SQLite connection (never writable fallback),
+// detects DB changes via a debounced fs.watch + PRAGMA data_version / WAL tracking,
+// and emits a typed VetoSnapshot. On read failures (DB locked mid-WAL-write, transient I/O)
+// it returns the last-good snapshot with preserved read timestamps and stale reasons.
 //
 // UI-agnostic on purpose (no vscode import) — keeps the data path unit-testable.
 
-import { DatabaseSync } from 'node:sqlite';
 import { existsSync, statSync, watch as fsWatch, type FSWatcher } from 'node:fs';
-import { dirname } from 'node:path';
-import { getDbPath, setDbPath, readTokenBudgets } from './paths';
+import { dirname, basename } from 'node:path';
+import { loadSqlite, isSqliteSupported, type DatabaseSync } from '../data/sqlite-loader';
+import { getDbPath, setDbPath, readTokenBudgets, pathsEqual } from './paths';
 import { emptySnapshot, type VetoSnapshot, type VetoMemoryEntry } from './snapshot';
 import {
   queryLatestSession, querySessions, queryMemory, searchMemory, queryLastCouncil,
   queryTopPatterns, queryRate, queryUsage, queryHealth, queryLearning, queryDiagnostics,
+  querySchemaVersion,
 } from '../data/queries';
 
 export type Disposable = { dispose: () => void };
@@ -38,14 +39,25 @@ export class VetoStore {
   private watcher: FSWatcher | null = null;
   private watchDebounce: ReturnType<typeof setTimeout> | undefined;
   private intervalId: ReturnType<typeof setInterval> | undefined;
-  private lastSize = -1;
-  private lastMtimeMs = -1;
+
+  // Change tracking state
+  private lastDbSize = -1;
+  private lastDbMtimeMs = -1;
+  private lastWalSize = -1;
+  private lastWalMtimeMs = -1;
+  private lastDataVersion = -1;
+  private lastDateKey = '';
+  private isDirty = false;
   private lastProjectDir: string | undefined = undefined;
 
   constructor(opts: VetoStoreOptions = {}) {
     if (opts.dbPath) setDbPath(opts.dbPath);
     this.pollIntervalMs = Math.max(1000, opts.pollIntervalMs ?? 5000);
     this.log = opts.log ?? (() => {});
+  }
+
+  isSupported(): boolean {
+    return isSqliteSupported();
   }
 
   // ── Subscription ───────────────────────────────────────────────────────────
@@ -63,20 +75,23 @@ export class VetoStore {
   // ── Lifecycle ────────────────────────────────────────────────────────────────
   start(): void {
     this.startWatcher();
-    this.intervalId = setInterval(() => this.refresh(), this.pollIntervalMs);
-    this.refresh();
+    this.intervalId = setInterval(() => this.refresh(false), this.pollIntervalMs);
+    this.refresh(false);
   }
 
   setProjectDir(dir: string | undefined): void {
+    if (pathsEqual(this.projectDir, dir)) return;
     this.projectDir = dir;
-    this.refresh();
+    this.refresh(true);
   }
 
   setDbPath(p: string | undefined): void {
     setDbPath(p ?? '');
     this.closeDb();
+    this.resetStats();
+    this.last = emptySnapshot(false);
     this.startWatcher();
-    this.refresh();
+    this.refresh(true);
   }
 
   setPollInterval(ms: number): void {
@@ -84,7 +99,7 @@ export class VetoStore {
     if (next === this.pollIntervalMs) return;
     this.pollIntervalMs = next;
     if (this.intervalId) clearInterval(this.intervalId);
-    this.intervalId = setInterval(() => this.refresh(), this.pollIntervalMs);
+    this.intervalId = setInterval(() => this.refresh(false), this.pollIntervalMs);
   }
 
   getSnapshot(): VetoSnapshot {
@@ -96,11 +111,11 @@ export class VetoStore {
   }
 
   /** One-off memory search (own try/catch — never throws to the caller). */
-  searchMemory(query: string): VetoMemoryEntry[] {
+  searchMemory(query: string, projectDir?: string): VetoMemoryEntry[] {
     const db = this.openDb();
     if (!db) return [];
     try {
-      return searchMemory(db, query.trim());
+      return searchMemory(db, query.trim(), projectDir ?? this.projectDir);
     } catch (e) {
       this.log(`searchMemory error: ${errMsg(e)}`);
       this.closeDb();
@@ -112,97 +127,250 @@ export class VetoStore {
   private startWatcher(): void {
     this.watcher?.close();
     this.watcher = null;
-    const dir = dirname(getDbPath());
+    const dbPath = getDbPath();
+    const dir = dirname(dbPath);
     if (!existsSync(dir)) return;
+
+    const baseName = basename(dbPath);
+    const baseNameNoExt = baseName.replace(/\.db$/i, '');
+
     try {
       this.watcher = fsWatch(dir, { persistent: false }, (_event, filename) => {
-        if (filename && !filename.toString().startsWith('veto')) return;
+        if (filename) {
+          const str = filename.toString();
+          // Watch the configured database file and its sidecars (-wal, -shm)
+          if (!str.startsWith(baseName) && !str.startsWith(baseNameNoExt)) return;
+        }
+        this.isDirty = true;
         clearTimeout(this.watchDebounce);
-        this.watchDebounce = setTimeout(() => this.refresh(), 150);
+        this.watchDebounce = setTimeout(() => this.refresh(false), 150);
       });
       this.watcher.on('error', () => { this.watcher = null; });
     } catch { /* dir not watchable — interval fallback covers it */ }
   }
 
-  /** Cheap stat-based dirty check so polls that change nothing don't rebuild the snapshot. */
+  private resetStats(): void {
+    this.lastDbSize = -1;
+    this.lastDbMtimeMs = -1;
+    this.lastWalSize = -1;
+    this.lastWalMtimeMs = -1;
+    this.lastDataVersion = -1;
+    this.isDirty = false;
+  }
+
+  /**
+   * Fast check for external database changes:
+   * 1. Day rollover (rate_usage date_key changes at UTC midnight)
+   * 2. Main DB file stat changes
+   * 3. WAL file stat changes
+   * 4. Connection-local PRAGMA data_version (increments on other-connection commits)
+   */
   private changedSinceLast(): boolean {
-    try {
-      const st = statSync(getDbPath());
-      const changed = st.size !== this.lastSize || st.mtimeMs !== this.lastMtimeMs;
-      this.lastSize = st.size;
-      this.lastMtimeMs = st.mtimeMs;
-      return changed;
-    } catch {
-      return true; // can't stat — let the read attempt decide
+    const today = new Date().toISOString().slice(0, 10);
+    if (this.lastDateKey && this.lastDateKey !== today) {
+      return true;
     }
+
+    const dbPath = getDbPath();
+    try {
+      const st = statSync(dbPath);
+      if (st.size !== this.lastDbSize || st.mtimeMs !== this.lastDbMtimeMs) {
+        this.lastDbSize = st.size;
+        this.lastDbMtimeMs = st.mtimeMs;
+        return true;
+      }
+    } catch {
+      return true;
+    }
+
+    const walPath = `${dbPath}-wal`;
+    try {
+      if (existsSync(walPath)) {
+        const wst = statSync(walPath);
+        if (wst.size !== this.lastWalSize || wst.mtimeMs !== this.lastWalMtimeMs) {
+          this.lastWalSize = wst.size;
+          this.lastWalMtimeMs = wst.mtimeMs;
+          return true;
+        }
+      } else if (this.lastWalSize !== -1) {
+        this.lastWalSize = -1;
+        this.lastWalMtimeMs = -1;
+        return true;
+      }
+    } catch {
+      // WAL stat error ignored
+    }
+
+    if (this.db) {
+      try {
+        const row = this.db.prepare('PRAGMA data_version').get() as { data_version?: number } | undefined;
+        const ver = row?.data_version ?? -1;
+        if (ver !== -1 && ver !== this.lastDataVersion) {
+          this.lastDataVersion = ver;
+          return true;
+        }
+      } catch {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   // ── Snapshot building ─────────────────────────────────────────────────────────
-  refresh(): void {
-    const next = this.build();
+  refresh(force = false): void {
+    const next = this.build(force);
     this.last = next;
     this.emit();
   }
 
-  private build(): VetoSnapshot {
-    if (!existsSync(getDbPath())) {
+  private build(force = false): VetoSnapshot {
+    if (!isSqliteSupported()) {
+      return {
+        ...emptySnapshot(false),
+        compatibilityWarning: 'node:sqlite is not supported in this runtime environment.',
+      };
+    }
+
+    const dbPath = getDbPath();
+    if (!existsSync(dbPath)) {
       this.closeDb();
-      this.lastSize = -1; this.lastMtimeMs = -1;
+      this.resetStats();
       this.lastProjectDir = undefined;
       return emptySnapshot(false);
     }
 
-    const projectDirChanged = this.projectDir !== this.lastProjectDir;
+    const projectDirChanged = !pathsEqual(this.projectDir, this.lastProjectDir);
 
-    // Nothing changed since the last successful read → reuse it (cheap path).
-    if (!projectDirChanged && !this.changedSinceLast() && this.last.installed && !this.last.stale) {
+    if (!force && !this.isDirty && !projectDirChanged && !this.changedSinceLast() && this.last.installed && !this.last.stale) {
       return this.last;
     }
+    this.isDirty = false;
 
     const db = this.openDb();
-    if (!db) return staleCopy(this.last);
+    if (!db) {
+      return this.createStaleSnapshot('Database could not be opened in read-only mode.', projectDirChanged);
+    }
 
     try {
+      // Verify basic database readability; throws if corrupt or unreadable
+      db.prepare('SELECT 1 FROM sqlite_master LIMIT 1').get();
+
+      const schemaVersion = querySchemaVersion(db);
+      let compatibilityWarning: string | undefined = undefined;
+      if (schemaVersion > 1) {
+        compatibilityWarning = `Veto DB schema v${schemaVersion} is newer than extension read contract v1. Some fields may degrade.`;
+      }
+
       const budgets = readTokenBudgets();
-      const snap: VetoSnapshot = {
-        installed: true,
-        session:     queryLatestSession(db, this.projectDir),
-        sessions:    querySessions(db),
-        council:     queryLastCouncil(db, this.projectDir),
-        patterns:    queryTopPatterns(db),
-        rate:        queryRate(db, budgets),
-        usage:       queryUsage(db),
-        health:      queryHealth(db, getDbPath()),
-        learning:    queryLearning(db),
-        memory:      queryMemory(db, this.projectDir),
-        diagnostics: queryDiagnostics(db),
-        generatedAt: Date.now(),
-        stale: false,
-      };
+
+      // Read transaction for point-in-time cross-table consistency
+      let inTx = false;
+      try {
+        db.exec('BEGIN DEFERRED');
+        inTx = true;
+      } catch { /* proceed without tx if busy */ }
+
+      let snap: VetoSnapshot;
+      try {
+        snap = {
+          installed: true,
+          session:     queryLatestSession(db, this.projectDir),
+          sessions:    querySessions(db),
+          council:     queryLastCouncil(db, this.projectDir),
+          patterns:    queryTopPatterns(db),
+          rate:        queryRate(db, budgets),
+          usage:       queryUsage(db),
+          health:      queryHealth(db, dbPath),
+          learning:    queryLearning(db),
+          memory:      queryMemory(db, this.projectDir),
+          diagnostics: queryDiagnostics(db, this.projectDir),
+          generatedAt: Date.now(),
+          lastSuccessfulRead: Date.now(),
+          stale: false,
+          staleReason: undefined,
+          schemaVersion,
+          compatibilityWarning,
+        };
+      } finally {
+        if (inTx) {
+          try { db.exec('COMMIT'); } catch { /* rollback if needed */ }
+        }
+      }
+
+      try {
+        const row = db.prepare('PRAGMA data_version').get() as { data_version?: number } | undefined;
+        this.lastDataVersion = row?.data_version ?? -1;
+      } catch { /* ignored */ }
+
+      try {
+        const st = statSync(dbPath);
+        this.lastDbSize = st.size;
+        this.lastDbMtimeMs = st.mtimeMs;
+      } catch { /* ignored */ }
+
+      const walPath = `${dbPath}-wal`;
+      try {
+        if (existsSync(walPath)) {
+          const wst = statSync(walPath);
+          this.lastWalSize = wst.size;
+          this.lastWalMtimeMs = wst.mtimeMs;
+        } else {
+          this.lastWalSize = -1;
+          this.lastWalMtimeMs = -1;
+        }
+      } catch { /* ignored */ }
+
+      this.lastDateKey = new Date().toISOString().slice(0, 10);
       this.lastProjectDir = this.projectDir;
       return snap;
     } catch (e) {
-      // DB locked mid-write / transient error → drop the connection and serve last-good.
-      this.log(`snapshot build error (serving last-good): ${errMsg(e)}`);
+      const err = errMsg(e);
+      this.log(`snapshot build error (serving last-good): ${err}`);
       this.closeDb();
-      return staleCopy(this.last);
+      return this.createStaleSnapshot(`Database read error: ${err}`, projectDirChanged);
     }
+  }
+
+  private createStaleSnapshot(reason: string, projectChanged: boolean): VetoSnapshot {
+    const base = this.last.installed ? this.last : emptySnapshot(true);
+    const copy: VetoSnapshot = {
+      ...base,
+      stale: true,
+      staleReason: reason,
+      lastSuccessfulRead: this.last.lastSuccessfulRead ?? (this.last.installed ? this.last.generatedAt : undefined),
+      generatedAt: Date.now(),
+    };
+
+    // If the project changed but reading failed, do NOT present the previous project's
+    // data under the newly selected project. Clear project-scoped fields.
+    if (projectChanged) {
+      copy.session = null;
+      copy.council = null;
+      copy.memory = null;
+      copy.diagnostics = [];
+    }
+
+    return copy;
   }
 
   // ── Connection management ─────────────────────────────────────────────────────
   private openDb(): DatabaseSync | null {
     if (this.db) return this.db;
+    const sqlite = loadSqlite();
+    if (!sqlite) return null;
+
+    let dbInstance: DatabaseSync | null = null;
     try {
-      // read-only so we can never mutate Veto's DB; falls back if the flag is unsupported.
-      try {
-        this.db = new DatabaseSync(getDbPath(), { open: true, readOnly: true } as ConstructorParameters<typeof DatabaseSync>[1]);
-      } catch {
-        this.db = new DatabaseSync(getDbPath(), { open: true });
-      }
-      this.db.exec('PRAGMA busy_timeout = 3000');
+      // Strictly read-only: never fall back to a writable connection.
+      dbInstance = new sqlite.DatabaseSync(getDbPath(), { open: true, readOnly: true });
+      dbInstance.exec('PRAGMA query_only = ON');
+      dbInstance.exec('PRAGMA busy_timeout = 500');
+      this.db = dbInstance;
       return this.db;
     } catch (e) {
       this.log(`DB open error: ${errMsg(e)}`);
+      try { dbInstance?.close(); } catch { /* ignore */ }
       this.db = null;
       return null;
     }
@@ -220,10 +388,6 @@ export class VetoStore {
     this.closeDb();
     this.listeners.clear();
   }
-}
-
-function staleCopy(snap: VetoSnapshot): VetoSnapshot {
-  return { ...snap, stale: true, generatedAt: Date.now() };
 }
 
 function errMsg(e: unknown): string {

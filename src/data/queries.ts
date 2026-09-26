@@ -1,10 +1,10 @@
 // Pure read queries against an open node:sqlite handle. No connection management
 // here — VetoStore owns the single long-lived connection and passes it in.
-// SQL ported from the original db/reader.ts so no working behavior is lost.
+// Adheres strictly to the Veto stable read contract defined in S/src/memory/schema.ts.
 
 import type { DatabaseSync } from 'node:sqlite';
-import { statSync } from 'node:fs';
-import { normPath, budgetFor } from '../core/paths';
+import { statSync, existsSync } from 'node:fs';
+import { normPath, budgetFor, isSubpath, sqlPathCondition } from '../core/paths';
 import type {
   VetoSession, VetoSessionSummary, VetoMemoryData, VetoMemoryEntry,
   VetoCouncilOutcome, VetoPattern, VetoRateEntry, VetoUsageSummary,
@@ -13,10 +13,14 @@ import type {
 
 /** Cheap existence check so the extension degrades gracefully on schema drift. */
 export function hasTable(db: DatabaseSync, name: string): boolean {
-  const rows = db.prepare(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name=?"
-  ).all(name) as Array<{ name: string }>;
-  return rows.length > 0;
+  try {
+    const rows = db.prepare(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name=?"
+    ).all(name) as Array<{ name: string }>;
+    return rows.length > 0;
+  } catch {
+    return false;
+  }
 }
 
 export function hasColumn(db: DatabaseSync, table: string, column: string): boolean {
@@ -28,24 +32,41 @@ export function hasColumn(db: DatabaseSync, table: string, column: string): bool
   }
 }
 
-export function queryLatestSession(db: DatabaseSync, projectDir?: string): VetoSession | null {
-  if (!projectDir) {
-    return (db.prepare('SELECT * FROM sessions ORDER BY created_at DESC LIMIT 1').get() as VetoSession | undefined) ?? null;
+/** Check PRAGMA user_version to detect schema contract changes. */
+export function querySchemaVersion(db: DatabaseSync): number {
+  try {
+    const row = db.prepare('PRAGMA user_version').get() as { user_version?: number } | undefined;
+    return row?.user_version ?? 0;
+  } catch {
+    return 0;
   }
+}
+
+const SESSION_COLS = 'id, platform, active_client, last_resumed_at, connection_type, started_at, summary, project_dir, token_count';
+
+export function queryLatestSession(db: DatabaseSync, projectDir?: string): VetoSession | null {
+  if (!hasTable(db, 'sessions')) return null;
+
+  if (!projectDir) {
+    return (db.prepare(`SELECT ${SESSION_COLS} FROM sessions ORDER BY created_at DESC LIMIT 1`).get() as VetoSession | undefined) ?? null;
+  }
+
   // Fast path: exact match
   const exact = db.prepare(
-    'SELECT * FROM sessions WHERE project_dir = ? ORDER BY created_at DESC LIMIT 1'
+    `SELECT ${SESSION_COLS} FROM sessions WHERE project_dir = ? ORDER BY created_at DESC LIMIT 1`
   ).get(projectDir) as VetoSession | undefined;
   if (exact) return exact;
-  // Normalized fallback: Windows backslash↔slash and drive-letter case differences
-  const norm = normPath(projectDir);
-  const candidates = db.prepare(
-    'SELECT * FROM sessions WHERE project_dir IS NOT NULL ORDER BY created_at DESC LIMIT 200'
-  ).all() as unknown as VetoSession[];
-  return candidates.find(s => normPath(s.project_dir ?? '') === norm) ?? null;
+
+  // Normalized SQL match across slashes and case (unbounded, no 200-row cutoff)
+  const cond = sqlPathCondition('project_dir', projectDir);
+  const match = db.prepare(
+    `SELECT ${SESSION_COLS} FROM sessions WHERE ${cond.sql} ORDER BY created_at DESC LIMIT 1`
+  ).get(...cond.params) as VetoSession | undefined;
+  return match ?? null;
 }
 
 export function querySessions(db: DatabaseSync, limit = 10): VetoSessionSummary[] {
+  if (!hasTable(db, 'sessions')) return [];
   return db.prepare(
     'SELECT id, platform, active_client, started_at, summary, token_count, project_dir FROM sessions ORDER BY created_at DESC LIMIT ?'
   ).all(limit) as unknown as VetoSessionSummary[];
@@ -62,78 +83,108 @@ function safeTags(raw: string): string[] {
   catch { return []; }
 }
 
+const MEMORY_COLS = 'id, title, tags, project_dir, type, created_at';
+
 export function queryMemory(db: DatabaseSync, projectDir?: string): VetoMemoryData {
-  let countRow: { count: number };
-  let rows: RawMemory[];
-  if (projectDir) {
-    countRow = db.prepare('SELECT COUNT(*) as count FROM knowledge_base WHERE project_dir = ?').get(projectDir) as { count: number };
-    rows = db.prepare('SELECT id, title, tags, project_dir, type, created_at FROM knowledge_base WHERE project_dir = ? ORDER BY created_at DESC LIMIT 3').all(projectDir) as RawMemory[];
-  } else {
-    countRow = db.prepare('SELECT COUNT(*) as count FROM knowledge_base').get() as { count: number };
-    rows = db.prepare('SELECT id, title, tags, project_dir, type, created_at FROM knowledge_base ORDER BY created_at DESC LIMIT 3').all() as RawMemory[];
+  if (!hasTable(db, 'knowledge_base')) {
+    return { totalCount: 0, entries: [], scoped: !!projectDir };
   }
-  return { totalCount: countRow.count, entries: rows.map(parseMemory), scoped: !!projectDir };
+
+  let countRow: { count: number } | undefined;
+  let rows: RawMemory[] = [];
+
+  if (projectDir) {
+    const cond = sqlPathCondition('project_dir', projectDir);
+    countRow = db.prepare(
+      `SELECT COUNT(*) as count FROM knowledge_base WHERE project_dir = ? OR ${cond.sql}`
+    ).get(projectDir, ...cond.params) as { count: number } | undefined;
+
+    rows = db.prepare(
+      `SELECT ${MEMORY_COLS} FROM knowledge_base WHERE project_dir = ? OR ${cond.sql} ORDER BY created_at DESC LIMIT 3`
+    ).all(projectDir, ...cond.params) as RawMemory[];
+  } else {
+    countRow = db.prepare('SELECT COUNT(*) as count FROM knowledge_base').get() as { count: number } | undefined;
+    rows = db.prepare(`SELECT ${MEMORY_COLS} FROM knowledge_base ORDER BY created_at DESC LIMIT 3`).all() as RawMemory[];
+  }
+
+  return { totalCount: countRow?.count ?? 0, entries: rows.map(parseMemory), scoped: !!projectDir };
 }
 
-export function searchMemory(db: DatabaseSync, query: string): VetoMemoryEntry[] {
+export function searchMemory(db: DatabaseSync, query: string, projectDir?: string): VetoMemoryEntry[] {
+  if (!hasTable(db, 'knowledge_base')) return [];
   const like = `%${query}%`;
+
+  if (projectDir) {
+    const cond = sqlPathCondition('project_dir', projectDir);
+    const rows = db.prepare(
+      `SELECT ${MEMORY_COLS} FROM knowledge_base WHERE (title LIKE ? OR tags LIKE ?) AND (project_dir = ? OR ${cond.sql}) ORDER BY created_at DESC LIMIT 20`
+    ).all(like, like, projectDir, ...cond.params) as RawMemory[];
+    return rows.map(parseMemory);
+  }
+
   const rows = db.prepare(
-    'SELECT id, title, tags, project_dir, type, created_at FROM knowledge_base WHERE title LIKE ? OR tags LIKE ? ORDER BY created_at DESC LIMIT 20'
+    `SELECT ${MEMORY_COLS} FROM knowledge_base WHERE title LIKE ? OR tags LIKE ? ORDER BY created_at DESC LIMIT 20`
   ).all(like, like) as RawMemory[];
   return rows.map(parseMemory);
 }
 
 export function queryLastCouncil(db: DatabaseSync, projectDir?: string): VetoCouncilOutcome | null {
-  if (!projectDir) {
-    return (db.prepare('SELECT * FROM council_outcomes ORDER BY debated_at DESC LIMIT 1').get() as VetoCouncilOutcome | undefined) ?? null;
-  }
+  if (!hasTable(db, 'council_outcomes')) return null;
 
   const useDirectColumn = hasColumn(db, 'council_outcomes', 'project_dir');
+  const projCol = useDirectColumn ? 'project_dir' : 'NULL as project_dir';
+  const councilCols = `id, session_id, task, verdict, lead_dev, pm, architect, ux, devil, legal, security, recommended, debated_at, ${projCol}`;
+
+  if (!projectDir) {
+    return (db.prepare(`SELECT ${councilCols} FROM council_outcomes ORDER BY debated_at DESC LIMIT 1`).get() as VetoCouncilOutcome | undefined) ?? null;
+  }
 
   if (useDirectColumn) {
     // Exact match
     const exact = db.prepare(
-      'SELECT * FROM council_outcomes WHERE project_dir = ? ORDER BY debated_at DESC LIMIT 1'
+      `SELECT ${councilCols} FROM council_outcomes WHERE project_dir = ? ORDER BY debated_at DESC LIMIT 1`
     ).get(projectDir) as VetoCouncilOutcome | undefined;
     if (exact) return exact;
 
-    // Normalized fallback
-    const norm = normPath(projectDir);
-    const candidates = db.prepare(
-      'SELECT * FROM council_outcomes WHERE project_dir IS NOT NULL ORDER BY debated_at DESC LIMIT 200'
-    ).all() as unknown as VetoCouncilOutcome[];
-    return candidates.find(c => normPath(c.project_dir ?? '') === norm) ?? null;
+    // Normalized match in SQL (unbounded)
+    const cond = sqlPathCondition('project_dir', projectDir);
+    const match = db.prepare(
+      `SELECT ${councilCols} FROM council_outcomes WHERE ${cond.sql} ORDER BY debated_at DESC LIMIT 1`
+    ).get(...cond.params) as VetoCouncilOutcome | undefined;
+    return match ?? null;
   } else {
     // Join on session_id to get project_dir as an interim fallback
-    // Exact match
+    if (!hasTable(db, 'sessions')) return null;
+
+    const joinCols = 'c.id, c.session_id, c.task, c.verdict, c.lead_dev, c.pm, c.architect, c.ux, c.devil, c.legal, c.security, c.recommended, c.debated_at, s.project_dir';
     const exact = db.prepare(`
-      SELECT c.* FROM council_outcomes c
+      SELECT ${joinCols} FROM council_outcomes c
       JOIN sessions s ON c.session_id = s.id
       WHERE s.project_dir = ?
       ORDER BY c.debated_at DESC LIMIT 1
     `).get(projectDir) as VetoCouncilOutcome | undefined;
     if (exact) return exact;
 
-    // Normalized fallback
-    const norm = normPath(projectDir);
-    const candidates = db.prepare(`
-      SELECT c.*, s.project_dir as session_project_dir FROM council_outcomes c
+    const cond = sqlPathCondition('s.project_dir', projectDir);
+    const match = db.prepare(`
+      SELECT ${joinCols} FROM council_outcomes c
       JOIN sessions s ON c.session_id = s.id
-      WHERE s.project_dir IS NOT NULL
-      ORDER BY c.debated_at DESC LIMIT 200
-    `).all() as unknown as Array<VetoCouncilOutcome & { session_project_dir: string }>;
-    const found = candidates.find(c => normPath(c.session_project_dir ?? '') === norm);
-    return found ? found : null;
+      WHERE ${cond.sql}
+      ORDER BY c.debated_at DESC LIMIT 1
+    `).get(...cond.params) as VetoCouncilOutcome | undefined;
+    return match ?? null;
   }
 }
 
 export function queryTopPatterns(db: DatabaseSync): VetoPattern[] {
+  if (!hasTable(db, 'patterns')) return [];
   return db.prepare(
-    'SELECT * FROM patterns ORDER BY confidence DESC, seen_count DESC LIMIT 10'
+    'SELECT pattern_key, pattern_val, confidence, seen_count, updated_at FROM patterns ORDER BY confidence DESC, seen_count DESC LIMIT 10'
   ).all() as unknown as VetoPattern[];
 }
 
 export function queryRate(db: DatabaseSync, budgets: Record<string, number>): VetoRateEntry[] {
+  if (!hasTable(db, 'rate_usage')) return [];
   const today = new Date().toISOString().slice(0, 10);
   type RateRow = { platform: string; request_count: number; token_count: number };
   const rows = db.prepare(
@@ -144,11 +195,14 @@ export function queryRate(db: DatabaseSync, budgets: Record<string, number>): Ve
 }
 
 export function queryUsage(db: DatabaseSync): VetoUsageSummary {
+  if (!hasTable(db, 'usage_events')) {
+    return { totalSessions: 0, totalTokens: 0, byPlatform: [] };
+  }
   type TotalRow = { totalSessions: number; totalTokens: number };
   type PlatformRow = { platform: string; tokens: number };
-  const total = db.prepare(
+  const total = (db.prepare(
     'SELECT COUNT(*) as totalSessions, COALESCE(SUM(tokens), 0) as totalTokens FROM usage_events'
-  ).get() as TotalRow;
+  ).get() as TotalRow | undefined) ?? { totalSessions: 0, totalTokens: 0 };
   const byPlatform = db.prepare(
     'SELECT platform, COALESCE(SUM(tokens), 0) as tokens FROM usage_events GROUP BY platform ORDER BY tokens DESC'
   ).all() as PlatformRow[];
@@ -157,15 +211,25 @@ export function queryUsage(db: DatabaseSync): VetoUsageSummary {
 
 export function queryHealth(db: DatabaseSync, dbFilePath: string): VetoHealthStats {
   type CountRow = { c: number };
-  const sessionCount  = (db.prepare('SELECT COUNT(*) as c FROM sessions').get() as CountRow).c;
-  const memoryCount   = (db.prepare('SELECT COUNT(*) as c FROM knowledge_base').get() as CountRow).c;
-  const patternCount  = (db.prepare('SELECT COUNT(*) as c FROM patterns').get() as CountRow).c;
-  const learningCount = (db.prepare('SELECT COUNT(*) as c FROM learning_data').get() as CountRow).c;
-  const dbSizeMb = Math.round((statSync(dbFilePath).size / 1024 / 1024) * 10) / 10;
+  const sessionCount  = hasTable(db, 'sessions') ? (db.prepare('SELECT COUNT(*) as c FROM sessions').get() as CountRow).c : 0;
+  const memoryCount   = hasTable(db, 'knowledge_base') ? (db.prepare('SELECT COUNT(*) as c FROM knowledge_base').get() as CountRow).c : 0;
+  const patternCount  = hasTable(db, 'patterns') ? (db.prepare('SELECT COUNT(*) as c FROM patterns').get() as CountRow).c : 0;
+  const learningCount = hasTable(db, 'learning_data') ? (db.prepare('SELECT COUNT(*) as c FROM learning_data').get() as CountRow).c : 0;
+  
+  let dbSizeMb = 0;
+  try {
+    if (existsSync(dbFilePath)) {
+      dbSizeMb = Math.round((statSync(dbFilePath).size / 1024 / 1024) * 10) / 10;
+    }
+  } catch {
+    dbSizeMb = 0;
+  }
   return { sessionCount, memoryCount, patternCount, learningCount, dbSizeMb };
 }
 
-export function queryLearning(db: DatabaseSync): VetoLearningStats {
+export function queryLearning(db: DatabaseSync): VetoLearningStats | null {
+  if (!hasTable(db, 'learning_data')) return null;
+
   type AvgRow = { avg: number | null };
   type TierRow = { model_tier: number; count: number; avg_quality: number | null };
   type AgentRow = { agent: string; count: number; avg_quality: number | null };
@@ -187,7 +251,13 @@ export function queryLearning(db: DatabaseSync): VetoLearningStats {
   };
 }
 
-export function queryDiagnostics(db: DatabaseSync): ScanDiagnosticRow[] {
+export function queryDiagnostics(db: DatabaseSync, projectDir?: string): ScanDiagnosticRow[] {
   if (!hasTable(db, 'scan_diagnostics')) return [];
-  return db.prepare('SELECT * FROM scan_diagnostics ORDER BY file_path, line').all() as unknown as ScanDiagnosticRow[];
+  const rows = db.prepare(
+    'SELECT id, file_path, line, col_start, message, severity, source, created_at FROM scan_diagnostics ORDER BY file_path, line'
+  ).all() as unknown as ScanDiagnosticRow[];
+
+  if (!projectDir) return rows;
+  // Apply strict path boundary check so other projects never leak diagnostics
+  return rows.filter(r => isSubpath(r.file_path, projectDir));
 }

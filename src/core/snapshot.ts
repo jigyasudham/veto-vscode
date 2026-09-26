@@ -116,6 +116,10 @@ export interface VetoSnapshot {
   diagnostics: ScanDiagnosticRow[];
   generatedAt: number;           // Date.now() when this snapshot was built
   stale: boolean;                // true if returned from last-good cache (DB was locked/unreadable)
+  staleReason?: string;          // explanation if snapshot is stale
+  lastSuccessfulRead?: number;   // Date.now() of the last successful read from DB
+  schemaVersion?: number;        // PRAGMA user_version reported by DB
+  compatibilityWarning?: string; // warning if schema version or environment has drift
 }
 
 /** The empty snapshot used before any data is read or when Veto is not installed. */
@@ -134,6 +138,10 @@ export function emptySnapshot(installed = false): VetoSnapshot {
     diagnostics: [],
     generatedAt: Date.now(),
     stale: false,
+    staleReason: undefined,
+    lastSuccessfulRead: undefined,
+    schemaVersion: undefined,
+    compatibilityWarning: undefined,
   };
 }
 

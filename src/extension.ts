@@ -19,7 +19,23 @@ export function activate(context: vscode.ExtensionContext): void {
     pollIntervalMs: cfg().get<number>('pollInterval', 5000),
     log: msg => outputChannel.appendLine(`[${new Date().toISOString()}] ${msg}`),
   });
-  store.setProjectDir(vscode.workspace.workspaceFolders?.[0]?.uri.fsPath);
+
+  if (!store.isSupported()) {
+    const msg = 'Veto HUD requires Node 22.13+ (node:sqlite) in the VS Code extension host. Please update VS Code.';
+    outputChannel.appendLine(`[runtime error] ${msg}`);
+    vscode.window.showErrorMessage(msg);
+  }
+
+  const getActiveProjectDir = (): string | undefined => {
+    const editor = vscode.window.activeTextEditor;
+    if (editor && editor.document.uri.scheme === 'file') {
+      const folder = vscode.workspace.getWorkspaceFolder(editor.document.uri);
+      if (folder) return folder.uri.fsPath;
+    }
+    return vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  };
+
+  store.setProjectDir(getActiveProjectDir());
 
   const statusBar = new StatusBar(version);
   const diagnostics = vscode.languages.createDiagnosticCollection('veto');
@@ -73,7 +89,10 @@ export function activate(context: vscode.ExtensionContext): void {
       store.setPollInterval(cfg().get<number>('pollInterval', 5000));
     }),
     vscode.workspace.onDidChangeWorkspaceFolders(() => {
-      store.setProjectDir(vscode.workspace.workspaceFolders?.[0]?.uri.fsPath);
+      store.setProjectDir(getActiveProjectDir());
+    }),
+    vscode.window.onDidChangeActiveTextEditor(() => {
+      store.setProjectDir(getActiveProjectDir());
     }),
   );
 
