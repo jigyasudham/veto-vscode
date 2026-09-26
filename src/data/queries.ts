@@ -179,7 +179,10 @@ export function queryLastCouncil(db: DatabaseSync, projectDir?: string): VetoCou
 export function queryTopPatterns(db: DatabaseSync): VetoPattern[] {
   if (!hasTable(db, 'patterns')) return [];
   return db.prepare(
-    'SELECT pattern_key, pattern_val, confidence, seen_count, updated_at FROM patterns ORDER BY confidence DESC, seen_count DESC LIMIT 10'
+    `SELECT pattern_key, pattern_val, confidence, seen_count, updated_at
+     FROM patterns
+     WHERE pattern_key NOT LIKE 'router.%' AND pattern_key NOT LIKE 'composed_agent:%'
+     ORDER BY confidence DESC, seen_count DESC LIMIT 10`
   ).all() as unknown as VetoPattern[];
 }
 
@@ -196,17 +199,22 @@ export function queryRate(db: DatabaseSync, budgets: Record<string, number>): Ve
 
 export function queryUsage(db: DatabaseSync): VetoUsageSummary {
   if (!hasTable(db, 'usage_events')) {
-    return { totalSessions: 0, totalTokens: 0, byPlatform: [] };
+    return { totalSessions: 0, totalEvents: 0, totalTokens: 0, byPlatform: [] };
   }
-  type TotalRow = { totalSessions: number; totalTokens: number };
+  type TotalRow = { totalEvents: number; totalTokens: number };
   type PlatformRow = { platform: string; tokens: number };
   const total = (db.prepare(
-    'SELECT COUNT(*) as totalSessions, COALESCE(SUM(tokens), 0) as totalTokens FROM usage_events'
-  ).get() as TotalRow | undefined) ?? { totalSessions: 0, totalTokens: 0 };
+    'SELECT COUNT(*) as totalEvents, COALESCE(SUM(tokens), 0) as totalTokens FROM usage_events'
+  ).get() as TotalRow | undefined) ?? { totalEvents: 0, totalTokens: 0 };
   const byPlatform = db.prepare(
     'SELECT platform, COALESCE(SUM(tokens), 0) as tokens FROM usage_events GROUP BY platform ORDER BY tokens DESC'
   ).all() as PlatformRow[];
-  return { totalSessions: total.totalSessions, totalTokens: total.totalTokens, byPlatform };
+  return {
+    totalSessions: total.totalEvents, // backward-compat alias
+    totalEvents: total.totalEvents,
+    totalTokens: total.totalTokens,
+    byPlatform,
+  };
 }
 
 export function queryHealth(db: DatabaseSync, dbFilePath: string): VetoHealthStats {
@@ -217,14 +225,22 @@ export function queryHealth(db: DatabaseSync, dbFilePath: string): VetoHealthSta
   const learningCount = hasTable(db, 'learning_data') ? (db.prepare('SELECT COUNT(*) as c FROM learning_data').get() as CountRow).c : 0;
   
   let dbSizeMb = 0;
+  let walSizeMb = 0;
   try {
     if (existsSync(dbFilePath)) {
-      dbSizeMb = Math.round((statSync(dbFilePath).size / 1024 / 1024) * 10) / 10;
+      let totalBytes = statSync(dbFilePath).size;
+      const walPath = `${dbFilePath}-wal`;
+      if (existsSync(walPath)) {
+        const walBytes = statSync(walPath).size;
+        walSizeMb = Math.round((walBytes / 1024 / 1024) * 10) / 10;
+        totalBytes += walBytes;
+      }
+      dbSizeMb = Math.round((totalBytes / 1024 / 1024) * 10) / 10;
     }
   } catch {
     dbSizeMb = 0;
   }
-  return { sessionCount, memoryCount, patternCount, learningCount, dbSizeMb };
+  return { sessionCount, memoryCount, patternCount, learningCount, dbSizeMb, walSizeMb };
 }
 
 export function queryLearning(db: DatabaseSync): VetoLearningStats | null {

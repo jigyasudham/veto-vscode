@@ -202,3 +202,24 @@ code {
   padding: 1px 5px;
   border-radius: 4px;
 }
+.mem-title {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.tag {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--vscode-badge-background, #3c3c3c);
+  color: var(--vscode-badge-foreground, #ffffff);
+  margin-right: 4px;
+}
+.card-header:focus-visible,
+.row[tabindex="0"]:focus-visible,
+.list li:focus-visible,
+.btn:focus-visible,
+input:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder, #007acc);
+  outline-offset: -1px;
+}

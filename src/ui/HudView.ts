@@ -13,12 +13,19 @@ import type { VetoSnapshot } from '../core/snapshot';
 import htmlTemplate from './assets/hud.html';
 import styles from './assets/hud.css';
 import script from './assets/hud.js';
+import {
+  type HudMessage,
+  type MemoryResult,
+  ALLOWED_HUD_COMMANDS,
+  validateHudMessage,
+} from './messages';
 
-export type HudMessage =
-  | { type: 'resume'; id: string; platform: string }
-  | { type: 'copyId'; id: string }
-  | { type: 'searchMemory'; query: string }
-  | { type: 'command'; command: string };
+export {
+  type HudMessage,
+  type MemoryResult,
+  ALLOWED_HUD_COMMANDS,
+  validateHudMessage,
+};
 
 export interface MemoryResult { title: string; type: string; project_dir: string | null }
 
@@ -35,7 +42,10 @@ export class HudView implements vscode.WebviewViewProvider {
     this.view = view;
     view.webview.options = { enableScripts: true };
     view.webview.html = this.html(view.webview);
-    view.webview.onDidReceiveMessage((msg: HudMessage) => this.handler(msg));
+    view.webview.onDidReceiveMessage((raw: unknown) => {
+      const msg = validateHudMessage(raw);
+      if (msg) this.handler(msg);
+    });
     view.onDidDispose(() => { this.view = undefined; });
     this.render(this.getSnapshot());
   }
@@ -46,8 +56,8 @@ export class HudView implements vscode.WebviewViewProvider {
   }
 
   /** Reply to a webview memory-search request. */
-  postMemoryResults(results: MemoryResult[]): void {
-    void this.view?.webview.postMessage({ type: 'memoryResults', results });
+  postMemoryResults(results: MemoryResult[], requestId?: number): void {
+    void this.view?.webview.postMessage({ type: 'memoryResults', results, requestId });
   }
 
   // ── HTML shell (rendered once; data arrives via postMessage) ─────────────────

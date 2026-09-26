@@ -1,6 +1,15 @@
 const vscode = acquireVsCodeApi();
 const $ = (id) => document.getElementById(id);
 
+let uiState = vscode.getState() || {};
+function setUiState(key, val) {
+  uiState[key] = val;
+  vscode.setState(uiState);
+}
+function getUiState(key, defaultVal) {
+  return uiState[key] !== undefined ? uiState[key] : defaultVal;
+}
+
 function el(tag, cls, text) {
   const n = document.createElement(tag);
   if (cls) n.className = cls;
@@ -19,25 +28,39 @@ function card(title, id) {
   const c = el('section', 'card');
   if (title) {
     const header = el('header', 'card-header');
+    header.setAttribute('role', 'button');
+    header.setAttribute('tabindex', '0');
     header.appendChild(el('h3', null, title));
     const chevron = el('span', 'chevron', '▼');
     header.appendChild(chevron);
     c.appendChild(header);
 
     const body = el('div', 'card-body');
+    const bodyId = 'card-body-' + id;
+    body.id = bodyId;
+    header.setAttribute('aria-controls', bodyId);
     c.appendChild(body);
 
-    const storageKey = 'veto-collapse-' + id;
-    const isCollapsed = localStorage.getItem(storageKey) === 'true';
+    const isCollapsed = getUiState('collapse_' + id, false);
+    header.setAttribute('aria-expanded', String(!isCollapsed));
     if (isCollapsed) {
       body.classList.add('collapsed');
       chevron.classList.add('collapsed');
     }
 
-    header.addEventListener('click', () => {
+    const toggle = () => {
       const collapsedNow = body.classList.toggle('collapsed');
       chevron.classList.toggle('collapsed', collapsedNow);
-      localStorage.setItem(storageKey, collapsedNow ? 'true' : 'false');
+      header.setAttribute('aria-expanded', String(!collapsedNow));
+      setUiState('collapse_' + id, collapsedNow);
+    };
+
+    header.addEventListener('click', toggle);
+    header.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggle();
+      }
     });
 
     c.appendTarget = body;
@@ -106,6 +129,11 @@ function parseAgentVote(raw) {
   return { state: 'warn', icon: '⚠ ', reason: str };
 }
 
+let currentSearchQuery = '';
+let searchRequestId = 0;
+let lastRenderedRequestId = 0;
+let cachedSearchResults = null;
+
 function render(s) {
   const installed = !!s.installed;
   $('notInstalled').hidden = installed;
@@ -114,6 +142,16 @@ function render(s) {
   badge.textContent = installed ? (verdict || 'no verdict') : 'offline';
   badge.className = 'badge ' + (verdict === 'GREEN' ? 'green' : verdict === 'RED' ? 'red' : verdict === 'DEADLOCK' ? 'deadlock' : verdict === 'YELLOW' ? 'yellow' : '');
   $('stale').hidden = !s.stale;
+  
+  // Capture active search input state before rebuilding cards to maintain user typing focus
+  const existingInput = $('memSearchInput');
+  const hadFocus = document.activeElement === existingInput;
+  if (existingInput) {
+    currentSearchQuery = existingInput.value;
+  }
+  const selStart = existingInput ? existingInput.selectionStart : currentSearchQuery.length;
+  const selEnd = existingInput ? existingInput.selectionEnd : currentSearchQuery.length;
+
   const cards = $('cards');
   cards.textContent = '';
   if (!installed) return;
@@ -124,18 +162,29 @@ function render(s) {
   if (s.session) {
     const ss = s.session;
     const idRow = row('ID', (ss.id || '').slice(0, 8) + '…', true);
+    idRow.setAttribute('role', 'button');
+    idRow.setAttribute('tabindex', '0');
+    idRow.setAttribute('aria-label', 'Copy session ID');
     idRow.style.cursor = 'pointer';
-    idRow.title = 'Copy session ID';
-    idRow.addEventListener('click', () => vscode.postMessage({ type: 'copyId', id: ss.id }));
+    idRow.title = 'Click or press Enter to copy session ID';
+    const copySessId = () => vscode.postMessage({ type: 'copyId', id: ss.id });
+    idRow.addEventListener('click', copySessId);
+    idRow.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        copySessId();
+      }
+    });
     scTarget.appendChild(idRow);
     scTarget.appendChild(row('Created by', ss.platform || '—'));
     scTarget.appendChild(row('Active in', ss.active_client || ss.platform || '—'));
+    if (ss.connection_type) scTarget.appendChild(row('Type', ss.connection_type));
     if (ss.started_at) scTarget.appendChild(row('Started', rel(ss.started_at)));
     const win = ({ claude: 200000, gemini: 1000000, codex: 128000 })[(ss.active_client || ss.platform || '').toLowerCase()] || 200000;
     const pct = Math.min(100, Math.round(((ss.token_count || 0) / win) * 100));
     scTarget.appendChild(row('Tokens', Math.round((ss.token_count || 0) / 1000) + 'K/' + Math.round(win / 1000) + 'K', true));
     scTarget.appendChild(row('', bar(pct) + ' ' + pct + '%', true));
-    if (ss.summary) scTarget.appendChild(row('Summary', ss.summary.slice(0, 48)));
+    if (ss.summary) scTarget.appendChild(row('Summary', ss.summary.slice(0, 60)));
     const act = el('div', 'actions');
     act.appendChild(btn('Resume', () => vscode.postMessage({ type: 'resume', id: ss.id, platform: ss.active_client || ss.platform })));
     act.appendChild(btn('Save', () => vscode.postMessage({ type: 'command', command: 'veto.saveSession' }), true));
@@ -209,25 +258,53 @@ function render(s) {
   const mc = card('Memory', 'memory');
   const mcTarget = mc.appendTarget;
   mcTarget.appendChild(el('div', 'sub', (s.memory ? s.memory.totalCount : 0) + ' entries · ' + (s.memory && s.memory.scoped ? 'this project' : 'all projects')));
+  
   const sb = el('div', 'search');
   const input = el('input');
+  input.id = 'memSearchInput';
   input.placeholder = 'Search memory…';
+  input.setAttribute('aria-label', 'Search Veto memory');
+  input.value = currentSearchQuery;
+
   let t;
   input.addEventListener('input', () => {
     clearTimeout(t);
+    currentSearchQuery = input.value;
     t = setTimeout(() => {
       const q = input.value.trim();
-      if (q) vscode.postMessage({ type: 'searchMemory', query: q });
-      else renderMemoryList(s.memory ? s.memory.entries : []);
+      if (q) {
+        searchRequestId++;
+        const reqId = searchRequestId;
+        vscode.postMessage({ type: 'searchMemory', query: q, requestId: reqId });
+      } else {
+        cachedSearchResults = null;
+        renderMemoryList(s.memory ? s.memory.entries : []);
+      }
     }, 250);
   });
   sb.appendChild(input);
   mcTarget.appendChild(sb);
+
   const list = el('ul', 'list');
   list.id = 'memList';
   mcTarget.appendChild(list);
   cards.appendChild(mc);
-  renderMemoryList(s.memory ? s.memory.entries : []);
+
+  if (currentSearchQuery.trim() && cachedSearchResults) {
+    renderMemoryList(cachedSearchResults);
+  } else if (!currentSearchQuery.trim()) {
+    renderMemoryList(s.memory ? s.memory.entries : []);
+  }
+
+  if (hadFocus) {
+    requestAnimationFrame(() => {
+      const liveInput = $('memSearchInput');
+      if (liveInput) {
+        liveInput.focus();
+        try { liveInput.setSelectionRange(selStart, selEnd); } catch {}
+      }
+    });
+  }
 
   // Health Section
   if (s.health) {
@@ -246,12 +323,39 @@ function renderMemoryList(entries) {
   const list = $('memList');
   if (!list) return;
   list.textContent = '';
-  for (const e of (entries || [])) {
+  if (!entries || !entries.length) {
+    list.appendChild(el('div', 'empty', 'No matching memory entries.'));
+    return;
+  }
+  for (const e of entries) {
     const li = el('li');
-    li.appendChild(el('span', null, e.title));
-    li.appendChild(el('span', 'meta', '  ' + (e.type || '') + (e.project_dir ? ' · ' + e.project_dir.split(/[\\/]/).pop() : '')));
-    li.title = 'Copy title';
-    li.addEventListener('click', () => vscode.postMessage({ type: 'copyId', id: e.title }));
+    li.setAttribute('role', 'button');
+    li.setAttribute('tabindex', '0');
+    li.setAttribute('aria-label', 'Copy ' + (e.title || 'entry'));
+    li.title = 'Click or press Enter to copy title: ' + (e.title || '');
+
+    const titleSpan = el('span', 'mem-title', e.title);
+    li.appendChild(titleSpan);
+
+    const meta = el('span', 'meta');
+    if (e.tags && Array.isArray(e.tags) && e.tags.length) {
+      for (const t of e.tags.slice(0, 3)) {
+        meta.appendChild(el('span', 'tag', t));
+      }
+    }
+    const typeLabel = e.type || '';
+    const projLabel = e.project_dir ? ' · ' + e.project_dir.split(/[\\/]/).pop() : ' · global';
+    meta.appendChild(document.createTextNode(' ' + typeLabel + projLabel));
+    li.appendChild(meta);
+
+    const copyAction = () => vscode.postMessage({ type: 'copyId', id: e.title });
+    li.addEventListener('click', copyAction);
+    li.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter' || ev.key === ' ') {
+        ev.preventDefault();
+        copyAction();
+      }
+    });
     list.appendChild(li);
   }
 }
@@ -265,9 +369,17 @@ document.addEventListener('click', (ev) => {
 
 window.addEventListener('message', (ev) => {
   const m = ev.data;
+  if (!m || typeof m !== 'object') return;
   if (m.type === 'snapshot') {
     render(m.data);
   } else if (m.type === 'memoryResults') {
+    if (m.requestId != null && m.requestId < lastRenderedRequestId) {
+      return; // Ignore stale out-of-order response
+    }
+    if (m.requestId != null) {
+      lastRenderedRequestId = m.requestId;
+    }
+    cachedSearchResults = m.results;
     renderMemoryList(m.results);
   }
 });

@@ -71,6 +71,7 @@ export interface VetoRateEntry {
 
 export interface VetoUsageSummary {
   totalSessions: number;
+  totalEvents?: number;
   totalTokens: number;
   byPlatform: Array<{ platform: string; tokens: number }>;
 }
@@ -81,6 +82,7 @@ export interface VetoHealthStats {
   patternCount: number;
   learningCount: number;
   dbSizeMb: number;
+  walSizeMb?: number;
 }
 
 export interface VetoLearningStats {

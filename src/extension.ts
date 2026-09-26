@@ -48,7 +48,7 @@ export function activate(context: vscode.ExtensionContext): void {
       case 'command':      vscode.commands.executeCommand(msg.command); break;
       case 'searchMemory': {
         const results = store.searchMemory(msg.query).map(r => ({ title: r.title, type: r.type, project_dir: r.project_dir }));
-        hud.postMemoryResults(results);
+        hud.postMemoryResults(results, msg.requestId);
         break;
       }
     }
