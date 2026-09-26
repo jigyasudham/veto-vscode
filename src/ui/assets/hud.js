@@ -80,13 +80,39 @@ const AGENTS = [
   ['security', 'Sec']
 ];
 
+function parseAgentVote(raw) {
+  if (!raw) return { state: 'none', icon: '', reason: '' };
+  try {
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    if (parsed && typeof parsed === 'object') {
+      const v = (parsed.verdict || '').toLowerCase();
+      const reason = parsed.reason || parsed.recommendation || '';
+      if (v === 'approve' || v === 'green' || v === 'ok') return { state: 'ok', icon: '✓ ', reason };
+      if (v === 'block' || v === 'red' || v === 'reject' || v === 'veto') return { state: 'block', icon: '✕ ', reason };
+      if (v === 'warn' || v === 'yellow') return { state: 'warn', icon: '⚠ ', reason };
+      return { state: 'warn', icon: '⚠ ', reason };
+    }
+  } catch {
+    // not JSON
+  }
+  const str = String(raw).trim();
+  const lower = str.toLowerCase();
+  if (/^(block|red|reject|veto)\b/.test(lower)) return { state: 'block', icon: '✕ ', reason: str };
+  if (/^(warn|yellow)\b/.test(lower)) return { state: 'warn', icon: '⚠ ', reason: str };
+  if (/^(approve|green|ok)\b/.test(lower)) return { state: 'ok', icon: '✓ ', reason: str };
+  if (/\b(block|reject|veto)\b/.test(lower)) return { state: 'block', icon: '✕ ', reason: str };
+  if (/\b(warn)\b/.test(lower)) return { state: 'warn', icon: '⚠ ', reason: str };
+  if (/\b(approve)\b/.test(lower)) return { state: 'ok', icon: '✓ ', reason: str };
+  return { state: 'warn', icon: '⚠ ', reason: str };
+}
+
 function render(s) {
   const installed = !!s.installed;
   $('notInstalled').hidden = installed;
   const verdict = ((s.council && s.council.verdict) || '').toUpperCase();
   const badge = $('verdict');
   badge.textContent = installed ? (verdict || 'no verdict') : 'offline';
-  badge.className = 'badge ' + (verdict === 'GREEN' ? 'green' : verdict === 'RED' ? 'red' : verdict === 'YELLOW' ? 'yellow' : '');
+  badge.className = 'badge ' + (verdict === 'GREEN' ? 'green' : verdict === 'RED' ? 'red' : verdict === 'DEADLOCK' ? 'deadlock' : verdict === 'YELLOW' ? 'yellow' : '');
   $('stale').hidden = !s.stale;
   const cards = $('cards');
   cards.textContent = '';
@@ -129,9 +155,14 @@ function render(s) {
     const votes = el('div', 'votes');
     for (const [key, label] of AGENTS) {
       const raw = c[key];
-      const ok = raw && String(raw).toLowerCase().includes('approve');
-      const chip = el('span', 'vote ' + (ok ? 'ok' : 'warn'), (ok ? '✓ ' : '⚠ ') + label);
-      if (raw) chip.title = String(raw);
+      const parsedVote = parseAgentVote(raw);
+      if (parsedVote.state === 'none') continue;
+      const chip = el('span', 'vote ' + parsedVote.state, parsedVote.icon + label);
+      if (parsedVote.reason) {
+        chip.title = parsedVote.reason;
+      } else if (raw) {
+        chip.title = String(raw);
+      }
       votes.appendChild(chip);
     }
     ccTarget.appendChild(votes);

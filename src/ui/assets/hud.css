@@ -25,9 +25,10 @@ body {
   border-radius: 10px;
   border: 1px solid var(--vscode-panel-border, #3c3c3c);
 }
-.badge.green  { color: #1f9d55; border-color: #1f9d55; }
-.badge.red    { color: var(--vscode-errorForeground, #f48771); border-color: currentColor; }
-.badge.yellow { color: #b58900; border-color: #b58900; }
+.badge.green    { color: #1f9d55; border-color: #1f9d55; }
+.badge.red      { color: var(--vscode-errorForeground, #f48771); border-color: currentColor; }
+.badge.yellow   { color: #b58900; border-color: #b58900; }
+.badge.deadlock { color: #f48771; border-color: #f48771; background: rgba(244, 135, 113, 0.15); }
 .stale { font-size: 12px; opacity: .7; }
 
 /* Accordion Card Layout */
@@ -109,6 +110,7 @@ body {
 }
 .vote.ok { color: #1f9d55; }
 .vote.warn { color: #b58900; }
+.vote.block { color: var(--vscode-errorForeground, #f48771); }
 .recommend {
   margin-top: 7px;
   opacity: .85;

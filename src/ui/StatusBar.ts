@@ -29,7 +29,8 @@ export class StatusBar {
     const v = snap.council?.verdict?.toUpperCase();
     let icon = '$(circle-outline)';
     let label = snap.session?.platform ?? 'veto';
-    if (v === 'GREEN')  { icon = '$(check)';   label = 'GREEN'; }
+    if (v === 'GREEN')       { icon = '$(check)';   label = 'GREEN'; }
+    else if (v === 'DEADLOCK'){ icon = '$(stop)';    label = 'DEADLOCK'; }
     else if (v === 'RED')    { icon = '$(error)';   label = 'RED'; }
     else if (v === 'YELLOW') { icon = '$(warning)'; label = 'YELLOW'; }
 
@@ -39,23 +40,40 @@ export class StatusBar {
 
   private buildTooltip(snap: VetoSnapshot): vscode.MarkdownString {
     const md = new vscode.MarkdownString(undefined, true);
+    md.isTrusted = false;
     md.appendMarkdown(`**Veto v${this.version}**\n\n`);
 
     if (snap.session) {
       const s = snap.session;
-      md.appendMarkdown(`**Session:** \`${s.id.slice(0, 8)}…\` · ${s.active_client ?? s.platform}\n\n`);
-      if (s.summary) md.appendMarkdown(`_${s.summary.slice(0, 80)}_\n\n`);
+      const client = s.active_client ?? s.platform ?? 'unknown';
+      md.appendMarkdown(`**Session:** \`${s.id.slice(0, 8)}…\` · `);
+      md.appendText(client);
+      md.appendMarkdown('\n\n');
+      if (s.summary) {
+        md.appendMarkdown('_');
+        md.appendText(s.summary.slice(0, 80));
+        md.appendMarkdown('_\n\n');
+      }
     } else {
       md.appendMarkdown(`_No active session for this workspace_\n\n`);
     }
 
     if (snap.council) {
-      md.appendMarkdown(`**Council:** ${snap.council.verdict} · ${relativeTime(snap.council.debated_at)}\n\n`);
+      md.appendMarkdown(`**Council:** `);
+      md.appendText(snap.council.verdict ?? 'unknown');
+      md.appendMarkdown(` · ${relativeTime(snap.council.debated_at)}\n\n`);
+      if (snap.council.task) {
+        md.appendMarkdown('_');
+        md.appendText(snap.council.task.slice(0, 80));
+        md.appendMarkdown('_\n\n');
+      }
     }
 
     const top = topPattern(snap);
     if (top) {
-      md.appendMarkdown(`**Router:** ${top.pattern_key} → ${top.pattern_val} · ${Math.round(top.confidence * 100)}% (${top.seen_count}×)\n\n`);
+      md.appendMarkdown(`**Router:** `);
+      md.appendText(`${top.pattern_key} → ${top.pattern_val}`);
+      md.appendMarkdown(` · ${Math.round(top.confidence * 100)}% (${top.seen_count}×)\n\n`);
     }
 
     if (snap.rate.length) {
@@ -69,7 +87,14 @@ export class StatusBar {
       md.appendMarkdown(`**DB:** ${snap.health.dbSizeMb}MB · ${snap.health.memoryCount} memories · ${snap.health.patternCount} patterns\n\n`);
     }
 
-    if (snap.stale) md.appendMarkdown(`\n_⟳ showing last-good data — Veto DB busy_`);
+    if (snap.stale) {
+      md.appendMarkdown(`\n_⟳ showing last-good data`);
+      if (snap.staleReason) {
+        md.appendMarkdown(` — `);
+        md.appendText(snap.staleReason);
+      }
+      md.appendMarkdown(`_`);
+    }
     md.appendMarkdown(`\n\nClick to open the Veto HUD.`);
     return md;
   }
