@@ -27,8 +27,6 @@ export {
   validateHudMessage,
 };
 
-export interface MemoryResult { title: string; type: string; project_dir: string | null }
-
 export class HudView implements vscode.WebviewViewProvider {
   static readonly viewType = 'veto-hud';
   private view: vscode.WebviewView | undefined;
