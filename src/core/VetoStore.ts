@@ -11,11 +11,11 @@ import { existsSync, statSync, watch as fsWatch, type FSWatcher } from 'node:fs'
 import { dirname, basename } from 'node:path';
 import { loadSqlite, isSqliteSupported, type DatabaseSync } from '../data/sqlite-loader';
 import { getDbPath, setDbPath, readTokenBudgets, pathsEqual } from './paths';
-import { emptySnapshot, type VetoSnapshot, type VetoMemoryEntry } from './snapshot';
+import { emptySnapshot, type VetoSnapshot, type VetoMemoryEntry, type DetailScope } from './snapshot';
 import {
   queryLatestSession, querySessions, queryMemory, searchMemory, queryLastCouncil,
   queryTopPatterns, queryRate, queryUsage, queryHealth, queryLearning, queryDiagnostics,
-  querySchemaVersion,
+  querySchemaVersion, querySessionPage, queryMemoryPage, queryMemoryDetail, queryCouncilPage, queryConstraints, queryDecisionPage,
 } from '../data/queries';
 
 export type Disposable = { dispose: () => void };
@@ -25,6 +25,9 @@ export interface VetoStoreOptions {
   dbPath?: string;
   pollIntervalMs?: number;
   log?: (msg: string) => void;
+  /** Injectable sources keep midnight/config invalidation deterministic in tests. */
+  readBudgets?: () => Record<string, number>;
+  dateKey?: () => string;
 }
 
 export class VetoStore {
@@ -32,6 +35,10 @@ export class VetoStore {
   private projectDir: string | undefined;
   private pollIntervalMs: number;
   private readonly log: (msg: string) => void;
+  private readonly readBudgets: () => Record<string, number>;
+  private readonly dateKey: () => string;
+  private lastBudgets = '';
+  private dbIdentity = '';
 
   private last: VetoSnapshot = emptySnapshot(false);
   private listeners = new Set<Listener>();
@@ -54,6 +61,8 @@ export class VetoStore {
     if (opts.dbPath) setDbPath(opts.dbPath);
     this.pollIntervalMs = Math.max(1000, opts.pollIntervalMs ?? 5000);
     this.log = opts.log ?? (() => {});
+    this.readBudgets = opts.readBudgets ?? readTokenBudgets;
+    this.dateKey = opts.dateKey ?? (() => new Date().toISOString().slice(0, 10));
   }
 
   isSupported(): boolean {
@@ -110,6 +119,38 @@ export class VetoStore {
     return getDbPath();
   }
 
+  /** Detail reads are explicit and fail visibly; never substitute another project's cached data. */
+  private readDetail<T>(read: (db: DatabaseSync) => T): T {
+    const db = this.openDb();
+    if (!db) throw new Error('Veto database is unavailable or cannot be opened read-only.');
+    return read(db);
+  }
+
+  sessionPage(scope: DetailScope, offset = 0, search = '') {
+    return this.readDetail(db => querySessionPage(db, scope, offset, 30, search));
+  }
+  memoryPage(scope: DetailScope, offset = 0, search = '') {
+    return this.readDetail(db => queryMemoryPage(db, scope, offset, search));
+  }
+  memoryDetail(scope: DetailScope, id: string) {
+    return this.readDetail(db => queryMemoryDetail(db, scope, id));
+  }
+  councilPage(scope: DetailScope, offset = 0) {
+    return this.readDetail(db => queryCouncilPage(db, scope, offset));
+  }
+  constraintPage(scope: DetailScope, offset = 0) {
+    return this.readDetail(db => queryConstraints(db, scope, offset));
+  }
+  decisionPage(scope: DetailScope, offset = 0) {
+    return this.readDetail(db => queryDecisionPage(db, scope, offset));
+  }
+  reviewDetails(scope: DetailScope) {
+    return this.readDetail(db => queryDiagnostics(db, 'projectDir' in scope ? scope.projectDir : undefined));
+  }
+  learningDetails() {
+    return this.readDetail(db => ({ learning: queryLearning(db), patterns: queryTopPatterns(db) }));
+  }
+
   /** One-off memory search (own try/catch — never throws to the caller). */
   searchMemory(query: string, projectDir?: string): VetoMemoryEntry[] {
     const db = this.openDb();
@@ -132,14 +173,13 @@ export class VetoStore {
     if (!existsSync(dir)) return;
 
     const baseName = basename(dbPath);
-    const baseNameNoExt = baseName.replace(/\.db$/i, '');
 
     try {
       this.watcher = fsWatch(dir, { persistent: false }, (_event, filename) => {
         if (filename) {
           const str = filename.toString();
           // Watch the configured database file and its sidecars (-wal, -shm)
-          if (!str.startsWith(baseName) && !str.startsWith(baseNameNoExt)) return;
+          if (![baseName, `${baseName}-wal`, `${baseName}-shm`].includes(str)) return;
         }
         this.isDirty = true;
         clearTimeout(this.watchDebounce);
@@ -166,7 +206,7 @@ export class VetoStore {
    * 4. Connection-local PRAGMA data_version (increments on other-connection commits)
    */
   private changedSinceLast(): boolean {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = this.dateKey();
     if (this.lastDateKey && this.lastDateKey !== today) {
       return true;
     }
@@ -220,6 +260,7 @@ export class VetoStore {
   // ── Snapshot building ─────────────────────────────────────────────────────────
   refresh(force = false): void {
     const next = this.build(force);
+    if (next === this.last) return;
     this.last = next;
     this.emit();
   }
@@ -233,16 +274,20 @@ export class VetoStore {
     }
 
     const dbPath = getDbPath();
+    if (!this.watcher && this.intervalId) this.startWatcher();
     if (!existsSync(dbPath)) {
       this.closeDb();
       this.resetStats();
       this.lastProjectDir = undefined;
-      return emptySnapshot(false);
+      return { ...emptySnapshot(false), projectDir: this.projectDir };
     }
 
     const projectDirChanged = !pathsEqual(this.projectDir, this.lastProjectDir);
+    this.checkDbIdentity();
+    const budgets = this.readBudgets();
+    const budgetsKey = JSON.stringify(budgets);
 
-    if (!force && !this.isDirty && !projectDirChanged && !this.changedSinceLast() && this.last.installed && !this.last.stale) {
+    if (!force && !this.isDirty && !projectDirChanged && budgetsKey === this.lastBudgets && !this.changedSinceLast() && this.last.installed && !this.last.stale) {
       return this.last;
     }
     this.isDirty = false;
@@ -262,7 +307,16 @@ export class VetoStore {
         compatibilityWarning = `Veto DB schema v${schemaVersion} is newer than extension read contract v1. Some fields may degrade.`;
       }
 
-      const budgets = readTokenBudgets();
+      const warnings: string[] = [];
+      const section = <T>(name: string, read: () => T, fallback: T): T => {
+        try { return read(); }
+        catch (error) {
+          const message = `${name} unavailable: ${errMsg(error)}`;
+          warnings.push(message);
+          this.log(message);
+          return fallback;
+        }
+      };
 
       // Read transaction for point-in-time cross-table consistency
       let inTx = false;
@@ -275,26 +329,28 @@ export class VetoStore {
       try {
         snap = {
           installed: true,
-          session:     queryLatestSession(db, this.projectDir),
-          sessions:    querySessions(db),
-          council:     queryLastCouncil(db, this.projectDir),
-          patterns:    queryTopPatterns(db),
-          rate:        queryRate(db, budgets),
-          usage:       queryUsage(db),
-          health:      queryHealth(db, dbPath),
-          learning:    queryLearning(db),
-          memory:      queryMemory(db, this.projectDir),
-          diagnostics: queryDiagnostics(db, this.projectDir),
+          projectDir: this.projectDir,
+          session:     section('Session', () => queryLatestSession(db, this.projectDir), null),
+          sessions:    section('Sessions', () => querySessions(db, 10, this.projectDir), []),
+          council:     section('Council', () => queryLastCouncil(db, this.projectDir), null),
+          patterns:    section('Patterns', () => queryTopPatterns(db), []),
+          rate:        section('Rate', () => queryRate(db, budgets, this.dateKey()), []),
+          usage:       section('Usage', () => queryUsage(db), null),
+          health:      section('Health', () => queryHealth(db, dbPath), null),
+          learning:    section('Learning', () => queryLearning(db), null),
+          memory:      section('Memory', () => queryMemory(db, this.projectDir), null),
+          diagnostics: section('Diagnostics', () => queryDiagnostics(db, this.projectDir), []),
           generatedAt: Date.now(),
           lastSuccessfulRead: Date.now(),
           stale: false,
           staleReason: undefined,
           schemaVersion,
-          compatibilityWarning,
+          compatibilityWarning: [compatibilityWarning, ...warnings].filter(Boolean).join('\n') || undefined,
         };
       } finally {
         if (inTx) {
-          try { db.exec('COMMIT'); } catch { /* rollback if needed */ }
+          try { db.exec('COMMIT'); }
+          catch (error) { try { db.exec('ROLLBACK'); } catch { /* preserve original failure */ } throw error; }
         }
       }
 
@@ -321,7 +377,8 @@ export class VetoStore {
         }
       } catch { /* ignored */ }
 
-      this.lastDateKey = new Date().toISOString().slice(0, 10);
+      this.lastDateKey = this.dateKey();
+      this.lastBudgets = budgetsKey;
       this.lastProjectDir = this.projectDir;
       return snap;
     } catch (e) {
@@ -336,6 +393,7 @@ export class VetoStore {
     const base = this.last.installed ? this.last : emptySnapshot(true);
     const copy: VetoSnapshot = {
       ...base,
+      projectDir: this.projectDir,
       stale: true,
       staleReason: reason,
       lastSuccessfulRead: this.last.lastSuccessfulRead ?? (this.last.installed ? this.last.generatedAt : undefined),
@@ -346,6 +404,7 @@ export class VetoStore {
     // data under the newly selected project. Clear project-scoped fields.
     if (projectChanged) {
       copy.session = null;
+      copy.sessions = [];
       copy.council = null;
       copy.memory = null;
       copy.diagnostics = [];
@@ -356,6 +415,7 @@ export class VetoStore {
 
   // ── Connection management ─────────────────────────────────────────────────────
   private openDb(): DatabaseSync | null {
+    this.checkDbIdentity();
     if (this.db) return this.db;
     const sqlite = loadSqlite();
     if (!sqlite) return null;
@@ -379,6 +439,21 @@ export class VetoStore {
   private closeDb(): void {
     try { this.db?.close(); } catch { /* already closed */ }
     this.db = null;
+  }
+
+  /** A replaced file requires a new connection even when size/mtime were preserved. */
+  private checkDbIdentity(): void {
+    let identity = '';
+    try {
+      const stat = statSync(getDbPath());
+      identity = `${getDbPath()}:${stat.dev}:${stat.ino}:${stat.birthtimeMs}`;
+    } catch { /* removal also invalidates an already-open handle */ }
+    if (this.dbIdentity && this.dbIdentity !== identity) {
+      this.closeDb();
+      this.resetStats();
+      this.last = emptySnapshot(false);
+    }
+    this.dbIdentity = identity;
   }
 
   dispose(): void {

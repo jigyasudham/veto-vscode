@@ -35,6 +35,33 @@ jobs:
       - name: Upload .vsix artifact
         uses: actions/upload-artifact@v4
         with:
-          name: veto-vscode-${{ github.sha }}
+          name: veto-vscode-${{ matrix.os }}-${{ github.sha }}
           path: "*.vsix"
           retention-days: 14
+
+  extension-host:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        vscode: [minimum, stable]
+        trust: [trusted, restricted]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    env:
+      VSCODE_VERSION: ${{ matrix.vscode }}
+      VETO_SMOKE_TRUST: ${{ matrix.trust }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run package
+      - name: Smoke test packaged extension (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npm run test:host
+      - name: Smoke test packaged extension (Windows)
+        if: runner.os == 'Windows'
+        run: npm run test:host

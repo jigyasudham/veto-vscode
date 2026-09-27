@@ -14,6 +14,22 @@ export interface MemoryResult {
 }
 
 export const ALLOWED_HUD_COMMANDS = new Set([
+  'veto.backendVisibility',
+  'veto.backendDiagnostics',
+  'veto.searchTranscripts',
+  'veto.selectProject',
+  'veto.browseSessions',
+  'veto.browseMemory',
+  'veto.councilHistory',
+  'veto.decisionHistory',
+  'veto.decisionConstraints',
+  'veto.reviewDetails',
+  'veto.learningDetails',
+  'veto.browseTools',
+  'veto.browseAgents',
+  'veto.draftCommitMessage',
+  'veto.draftPrDescription',
+  'veto.setupDiagnostics',
   'veto.saveSession',
   'veto.councilDebate',
   'veto.reviewFile',
@@ -49,7 +65,7 @@ export function validateHudMessage(raw: unknown): HudMessage | null {
     }
     case 'searchMemory': {
       if (typeof msg.query !== 'string') return null;
-      const requestId = typeof msg.requestId === 'number' ? msg.requestId : undefined;
+      const requestId = typeof msg.requestId === 'number' && Number.isSafeInteger(msg.requestId) && msg.requestId >= 0 ? msg.requestId : undefined;
       return { type: 'searchMemory', query: msg.query.slice(0, 256), requestId };
     }
     default:

@@ -14,10 +14,27 @@
   <span id="stale" class="stale" hidden>⟳</span>
 </header>
 <div id="notInstalled" class="empty" hidden>
-  Veto not installed. Run <code>npm i -g @jigyasudham/veto</code> and use it once.
+  Veto database unavailable. Check the configured database path and extension host runtime.
   <div class="actions"><button class="btn" data-cmd="veto.openInstallDocs">Install docs</button></div>
 </div>
 <main id="cards"></main>
+<nav class="actions" aria-label="Browse Veto records and workflows">
+  <button class="btn sec" data-cmd="veto.backendVisibility">Load lessons / trial</button>
+  <button class="btn sec" data-cmd="veto.searchTranscripts">Search transcripts</button>
+  <button class="btn sec" data-cmd="veto.backendDiagnostics">Backend setup</button>
+  <button class="btn sec" data-cmd="veto.selectProject">Select project</button>
+  <button class="btn sec" data-cmd="veto.browseSessions">Sessions</button>
+  <button class="btn sec" data-cmd="veto.browseMemory">Memory details</button>
+  <button class="btn sec" data-cmd="veto.councilHistory">Council history</button>
+  <button class="btn sec" data-cmd="veto.reviewDetails">Review results</button>
+  <button class="btn sec" data-cmd="veto.decisionHistory">Decisions</button>
+  <button class="btn sec" data-cmd="veto.decisionConstraints">Constraints</button>
+  <button class="btn sec" data-cmd="veto.learningDetails">Learning</button>
+  <button class="btn sec" data-cmd="veto.browseTools">Tools</button>
+  <button class="btn sec" data-cmd="veto.browseAgents">Specialists</button>
+  <button class="btn sec" data-cmd="veto.draftCommitMessage">Draft commit</button>
+  <button class="btn sec" data-cmd="veto.draftPrDescription">Draft PR</button>
+</nav>
 <script nonce="NONCE_PLACEHOLDER">SCRIPT_PLACEHOLDER</script>
 </body>
 </html>

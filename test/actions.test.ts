@@ -5,6 +5,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   parseToolOutput,
+  extractToolResult,
+  npmShimEntry,
   resolveExecutable,
   spawnProcess,
   cancelAllProcesses,
@@ -37,26 +39,11 @@ test('F07: parseToolOutput extracts structured JSON verdicts accurately', () => 
   assert.equal(resDeadlock.isError, true);
 });
 
-test('F07: parseToolOutput prioritizes explicit Verdict pattern over historical prose', () => {
-  const output = 'Deliberation log: previously had RED outcome on commit abc. Current Verdict: GREEN.';
-  const res = parseToolOutput(output);
-  assert.equal(res.verdict, 'GREEN');
-  assert.equal(res.isSuccess, true);
-  assert.equal(res.isError, false);
-
-  const deadlockOutput = '### Council Outcome\n**Verdict:** DEADLOCK\nAgents could not agree.';
-  const resDl = parseToolOutput(deadlockOutput);
-  assert.equal(resDl.verdict, 'DEADLOCK');
-  assert.equal(resDl.isSuccess, false);
-  assert.equal(resDl.isError, true);
-});
-
-test('F07: parseToolOutput respects safety precedence DEADLOCK > RED > YELLOW > GREEN on mixed prose', () => {
-  const mixedOutput = 'Warning: RED detected in test suite, though GREEN in lint';
-  const res = parseToolOutput(mixedOutput);
-  assert.equal(res.verdict, 'RED');
-  assert.equal(res.isSuccess, false);
-  assert.equal(res.isError, true);
+test('F07: prose, malformed JSON, and empty output never imply completion', () => {
+  for (const text of ['', 'Verdict: GREEN', 'Warning: RED detected, GREEN in lint', '{"verdict":"GREEN"', 'I will run the tool']) {
+    assert.equal(parseToolOutput(text).isSuccess, false);
+    assert.equal(parseToolOutput(text).verdict, undefined);
+  }
 });
 
 test('F07: parseToolOutput detects pending Phase 2 / debate prompts', () => {
@@ -191,4 +178,49 @@ test('F07: vote parsing handles JSON objects without false green when reason men
   const resWarn = parseAgentVote(warnVote);
   assert.equal(resWarn.state, 'warn');
   assert.equal(resWarn.icon, '⚠ ');
+});
+
+
+test('F07: pending phase two overrides provisional approval', () => {
+  assert.equal(parseToolOutput(JSON.stringify({ verdict: 'GREEN', debate_prompt: 'reason' })).isSuccess, false);
+  assert.equal(parseToolOutput(JSON.stringify({ mode: 'agentic_loop', prompts: [], success: true })).isSuccess, false);
+});
+
+test('tool result correlation rejects changed arguments and permits phase-two response fields', () => {
+  const name = 'mcp__veto__veto_code_review';
+  const stream = (input: unknown) => [
+    { message: { content: [{ type: 'tool_use', name, id: 'r', input }] } },
+    { message: { content: [{ type: 'tool_result', tool_use_id: 'r', content: '{"success":true}' }] } },
+  ].map(e => JSON.stringify(e)).join('\n');
+  const requested = { code: 'real code', file_path: '/project/file.ts' };
+  assert.throws(() => extractToolResult(stream({ ...requested, code: 'other code' }),name,requested), /differed/);
+  assert.throws(() => extractToolResult(stream({ ...requested, project_dir: '/other' }),name,requested), /differed/);
+  assert.equal(extractToolResult(stream({ ...requested, agent_response: { verdict:'pass' } }),name,requested), '{"success":true}');
+});
+
+test('F07: stream results must match an actual tool call; last phase wins', () => {
+  const events = [
+    { message: { content: [{ type: 'tool_use', name: 'mcp__veto__veto_council_debate', id: 'a' }] } },
+    { message: { content: [{ type: 'tool_result', tool_use_id: 'unrelated', content: '{"verdict":"GREEN"}' }] } },
+    { message: { content: [{ type: 'tool_result', tool_use_id: 'a', content: [{ type: 'text', text: '{"debate_prompt":"reason"}' }] }] } },
+  ];
+  const stream = () => events.map(e => JSON.stringify(e)).join('\n');
+  assert.equal(extractToolResult(stream(), 'other'), undefined);
+  assert.equal(parseToolOutput(extractToolResult(stream(), 'mcp__veto__veto_council_debate')!).isPendingPhase2, true);
+  events.push({ message: { content: [{ type: 'tool_result', tool_use_id: 'a', content: '{"verdict":"GREEN"}' }] } } as any);
+  assert.equal(parseToolOutput(extractToolResult(stream(), 'mcp__veto__veto_council_debate')!).isSuccess, true);
+});
+
+test('F06: pre-cancelled action never launches and stdin is delivered without shell parsing', async () => {
+  await assert.rejects(spawnProcess(process.execPath, ['-e', 'process.exit(0)'], undefined, {
+    cancellationToken: { isCancellationRequested: true, onCancellationRequested: () => ({ dispose() {} }) },
+  }), /cancelled/);
+  const input = 'literal $() & `data` \n full content';
+  assert.equal(await spawnProcess(process.execPath, ['-e', 'process.stdin.pipe(process.stdout)'], undefined, { input }), input);
+});
+
+test('F06: only literal npm Node entries are extracted from launchers', () => {
+  assert.equal(npmShimEntry('malicious arbitrary batch file', process.cwd()), undefined);
+  assert.equal(npmShimEntry('SET dp0=%~dp0\nSET "_prog=node"\n"%_prog%" "%dp0%\\node_modules\\..\\evil.js" %*', process.cwd()), undefined);
+  assert.ok(npmShimEntry('SET dp0=%~dp0\nSET "_prog=node"\n"%_prog%" "%dp0%\\node_modules\\tool\\cli.js" %*', process.cwd())?.endsWith('cli.js'));
 });

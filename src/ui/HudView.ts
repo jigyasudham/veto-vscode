@@ -9,7 +9,10 @@
 // actions ({ resume, copyId, searchMemory, command }) routed to commands by the handler.
 
 import * as vscode from 'vscode';
+import { randomBytes } from 'node:crypto';
 import type { VetoSnapshot } from '../core/snapshot';
+import type { ApiEnvelope } from '../core/backend';
+import { pathsEqual } from '../core/paths';
 import htmlTemplate from './assets/hud.html';
 import styles from './assets/hud.css';
 import script from './assets/hud.js';
@@ -30,6 +33,7 @@ export {
 export class HudView implements vscode.WebviewViewProvider {
   static readonly viewType = 'veto-hud';
   private view: vscode.WebviewView | undefined;
+  private backend: ApiEnvelope | undefined;
 
   constructor(
     private readonly handler: (msg: HudMessage) => void,
@@ -50,7 +54,17 @@ export class HudView implements vscode.WebviewViewProvider {
 
   /** Push the latest snapshot to the webview (it diffs into the DOM). */
   render(snapshot: VetoSnapshot): void {
-    void this.view?.webview.postMessage({ type: 'snapshot', data: snapshot });
+    const backend = this.backend && (
+      (this.backend.state === 'ok' && pathsEqual(this.backend.data?.project?.dir, snapshot.projectDir)) ||
+      this.backend.state === 'db_mismatch' ||
+      this.backend.state === 'error'
+    ) ? this.backend : undefined;
+    void this.view?.webview.postMessage({ type: 'snapshot', data: { ...snapshot, backend } });
+  }
+
+  setBackendSnapshot(envelope?: ApiEnvelope): void {
+    this.backend = envelope;
+    this.render(this.getSnapshot());
   }
 
   /** Reply to a webview memory-search request. */
@@ -76,8 +90,5 @@ export class HudView implements vscode.WebviewViewProvider {
 }
 
 function makeNonce(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let s = '';
-  for (let i = 0; i < 32; i++) s += chars[Math.floor(Math.random() * chars.length)];
-  return s;
+  return randomBytes(24).toString('base64');
 }

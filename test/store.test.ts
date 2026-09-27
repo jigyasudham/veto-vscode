@@ -44,6 +44,23 @@ function buildFixture(): { dir: string; dbPath: string } {
   return { dir, dbPath };
 }
 
+test('budget changes and day rollover invalidate the snapshot without DB writes', () => {
+  const {dbPath} = buildFixture();
+  let today = new Date().toISOString().slice(0,10);
+  let budget = 100;
+  const store = new VetoStore({dbPath,readBudgets:()=>({claude:budget}),dateKey:()=>today});
+  try {
+    store.refresh(true);
+    assert.equal(store.getSnapshot().rate[0].daily_token_budget,100);
+    budget = 250;
+    store.refresh();
+    assert.equal(store.getSnapshot().rate[0].daily_token_budget,250);
+    today = '2099-01-01';
+    store.refresh();
+    assert.equal(store.getSnapshot().rate.length,0);
+  } finally { store.dispose(); }
+});
+
 test('fixture DB produces a valid snapshot', () => {
   const { dir, dbPath } = buildFixture();
   const store = new VetoStore({ dbPath });

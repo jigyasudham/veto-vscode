@@ -131,10 +131,19 @@ function parseAgentVote(raw) {
 
 let currentSearchQuery = '';
 let searchRequestId = 0;
-let lastRenderedRequestId = 0;
 let cachedSearchResults = null;
+let searchTimer;
+let renderedProject;
 
 function render(s) {
+  const projectChanged = renderedProject !== s.projectDir;
+  if (projectChanged) {
+    renderedProject = s.projectDir;
+    currentSearchQuery = '';
+    cachedSearchResults = null;
+    searchRequestId++;
+    clearTimeout(searchTimer);
+  }
   const installed = !!s.installed;
   $('notInstalled').hidden = installed;
   const verdict = ((s.council && s.council.verdict) || '').toUpperCase();
@@ -146,7 +155,7 @@ function render(s) {
   // Capture active search input state before rebuilding cards to maintain user typing focus
   const existingInput = $('memSearchInput');
   const hadFocus = document.activeElement === existingInput;
-  if (existingInput) {
+  if (existingInput && !projectChanged) {
     currentSearchQuery = existingInput.value;
   }
   const selStart = existingInput ? existingInput.selectionStart : currentSearchQuery.length;
@@ -154,6 +163,15 @@ function render(s) {
 
   const cards = $('cards');
   cards.textContent = '';
+  const setup = card('Setup and provenance', 'setup');
+  setup.appendTarget.appendChild(row('Selected project', s.projectDir || 'No workspace (global records)'));
+  setup.appendTarget.appendChild(row('Database', !installed ? 'Unavailable' : s.stale ? 'Read failed / cached' : 'Readable'));
+  setup.appendTarget.appendChild(row('Last read', s.lastSuccessfulRead ? new Date(s.lastSuccessfulRead).toLocaleString() : 'Unknown'));
+  if (s.compatibilityWarning) setup.appendTarget.appendChild(el('div', 'sub', s.compatibilityWarning));
+  if (s.staleReason) setup.appendTarget.appendChild(el('div', 'sub', s.staleReason));
+  setup.appendTarget.appendChild(el('div', 'sub', 'MCP server health and provider availability have not been checked.'));
+  setup.appendTarget.appendChild(btn('Setup details', () => vscode.postMessage({ type: 'command', command: 'veto.setupDiagnostics' }), true));
+  cards.appendChild(setup);
   if (!installed) return;
 
   // Session Section
@@ -177,22 +195,87 @@ function render(s) {
     });
     scTarget.appendChild(idRow);
     scTarget.appendChild(row('Created by', ss.platform || '—'));
-    scTarget.appendChild(row('Active in', ss.active_client || ss.platform || '—'));
+    scTarget.appendChild(row('Recorded provider', ss.active_client || ss.platform || 'Unknown'));
     if (ss.connection_type) scTarget.appendChild(row('Type', ss.connection_type));
     if (ss.started_at) scTarget.appendChild(row('Started', rel(ss.started_at)));
-    const win = ({ claude: 200000, gemini: 1000000, codex: 128000 })[(ss.active_client || ss.platform || '').toLowerCase()] || 200000;
-    const pct = Math.min(100, Math.round(((ss.token_count || 0) / win) * 100));
-    scTarget.appendChild(row('Tokens', Math.round((ss.token_count || 0) / 1000) + 'K/' + Math.round(win / 1000) + 'K', true));
-    scTarget.appendChild(row('', bar(pct) + ' ' + pct + '%', true));
+    scTarget.appendChild(row('Saved tokens', String(ss.token_count ?? 'Unknown'), true));
+    scTarget.appendChild(row('Live context / capacity', 'Unknown'));
+    scTarget.appendChild(el('div', 'sub', 'Source: saved session record. Refreshing the database does not measure live provider activity.'));
     if (ss.summary) scTarget.appendChild(row('Summary', ss.summary.slice(0, 60)));
     const act = el('div', 'actions');
     act.appendChild(btn('Resume', () => vscode.postMessage({ type: 'resume', id: ss.id, platform: ss.active_client || ss.platform })));
     act.appendChild(btn('Save', () => vscode.postMessage({ type: 'command', command: 'veto.saveSession' }), true));
     scTarget.appendChild(act);
   } else {
-    scTarget.appendChild(el('div', 'sub', 'No active session for this workspace.'));
+    scTarget.appendChild(el('div', 'sub', 'No saved session for this workspace.'));
   }
   cards.appendChild(sc);
+
+  if (s.backend && s.backend.state === 'db_mismatch') {
+    const mismatch = card('Database mismatch', 'db-mismatch');
+    mismatch.appendTarget.appendChild(row('Status', 'db_mismatch'));
+    mismatch.appendTarget.appendChild(el('div', 'sub', s.backend.message || 'Veto backend database does not match the extension database configuration.'));
+    if (s.backend.next_action) {
+      mismatch.appendTarget.appendChild(el('div', 'sub', 'Next action: ' + s.backend.next_action));
+    }
+    cards.appendChild(mismatch);
+  } else if (s.backend && s.backend.state !== 'ok') {
+    const errCard = card('Backend status (' + s.backend.state + ')', 'backend-error');
+    errCard.appendTarget.appendChild(row('Status', s.backend.state));
+    if (s.backend.message) errCard.appendTarget.appendChild(el('div', 'sub', s.backend.message));
+    if (s.backend.next_action) errCard.appendTarget.appendChild(el('div', 'sub', 'Next action: ' + s.backend.next_action));
+    cards.appendChild(errCard);
+  }
+
+  const recall = card('Transcript recall', 'transcripts');
+  recall.appendTarget.appendChild(el('div', 'sub', 'Search masked archives for the selected project. Requires the Veto API v1 backend; retained archives can be searched when capture is off.'));
+  recall.appendTarget.appendChild(btn('Search transcripts', () => vscode.postMessage({ type: 'command', command: 'veto.searchTranscripts' }), true));
+  const backend = s.backend && s.backend.data;
+  if (backend && backend.transcripts) {
+    const tr = backend.transcripts;
+    if (tr.state === 'ok') {
+      recall.appendTarget.appendChild(row('Capture', tr.capture));
+      recall.appendTarget.appendChild(row('Project archives', String(tr.archives_in_project)));
+    } else {
+      recall.appendTarget.appendChild(row('Transcripts', tr.state));
+      if (tr.message) recall.appendTarget.appendChild(el('div', 'sub', tr.message));
+    }
+  }
+  cards.appendChild(recall);
+  const lessons = card('Lessons and trial', 'lessons');
+  if (!backend) lessons.appendTarget.appendChild(row('Consent / progress', 'Unknown'));
+  lessons.appendTarget.appendChild(el('div', 'sub', 'Passive status requires backend support. Trial selection is shadow-only; this extension does not deliver lessons or harvest notes.'));
+  lessons.appendTarget.appendChild(btn('Load status', () => vscode.postMessage({ type: 'command', command: 'veto.backendVisibility' }), true));
+  if (backend) {
+    lessons.appendTarget.appendChild(row('Read at', s.backend.generated_at));
+    lessons.appendTarget.appendChild(row('Backend', s.backend.backend_version));
+    if (backend.database) {
+      const dbSec = backend.database;
+      lessons.appendTarget.appendChild(row('Database', dbSec.state === 'ok' ? 'ok' : dbSec.state));
+      if (dbSec.state !== 'ok' && dbSec.message) {
+        lessons.appendTarget.appendChild(el('div', 'sub', dbSec.message));
+      }
+    }
+    const l = backend.lessons, t = backend.trial;
+    if (l) {
+      lessons.appendTarget.appendChild(row('Sharing (all projects)', l.state === 'ok' ? l.sharing : l.state));
+      if (l.state === 'ok') {
+        lessons.appendTarget.appendChild(row('Notes / held (all projects)', l.notes + ' / ' + l.held));
+      } else if (l.message) {
+        lessons.appendTarget.appendChild(el('div', 'sub', l.message));
+      }
+    }
+    if (t) {
+      lessons.appendTarget.appendChild(row('Trial', t.state === 'ok' ? 'shadow-only' : t.state));
+      if (t.state === 'ok') {
+        lessons.appendTarget.appendChild(row('Qualifying / target', t.qualifying + ' / ' + t.target));
+        lessons.appendTarget.appendChild(row('Complete / drift', String(t.complete) + ' / ' + String(t.drift)));
+      } else if (t.message) {
+        lessons.appendTarget.appendChild(el('div', 'sub', t.message));
+      }
+    }
+  }
+  cards.appendChild(lessons);
 
   // Council Section
   const cc = card('Council — verdict before code', 'council');
@@ -266,15 +349,14 @@ function render(s) {
   input.setAttribute('aria-label', 'Search Veto memory');
   input.value = currentSearchQuery;
 
-  let t;
   input.addEventListener('input', () => {
-    clearTimeout(t);
+    clearTimeout(searchTimer);
     currentSearchQuery = input.value;
-    t = setTimeout(() => {
-      const q = input.value.trim();
+    const reqId = ++searchRequestId;
+    cachedSearchResults = null;
+    searchTimer = setTimeout(() => {
+      const q = currentSearchQuery.trim();
       if (q) {
-        searchRequestId++;
-        const reqId = searchRequestId;
         vscode.postMessage({ type: 'searchMemory', query: q, requestId: reqId });
       } else {
         cachedSearchResults = null;
@@ -309,7 +391,7 @@ function render(s) {
   // Health Section
   if (s.health) {
     const h = s.health;
-    const hc = card('Health', 'health');
+    const hc = card('Database statistics', 'health');
     const hcTarget = hc.appendTarget;
     hcTarget.appendChild(row('DB size', h.dbSizeMb + ' MB'));
     hcTarget.appendChild(row('Sessions', String(h.sessionCount)));
@@ -373,11 +455,8 @@ window.addEventListener('message', (ev) => {
   if (m.type === 'snapshot') {
     render(m.data);
   } else if (m.type === 'memoryResults') {
-    if (m.requestId != null && m.requestId < lastRenderedRequestId) {
+    if (m.requestId !== searchRequestId) {
       return; // Ignore stale out-of-order response
-    }
-    if (m.requestId != null) {
-      lastRenderedRequestId = m.requestId;
     }
     cachedSearchResults = m.results;
     renderMemoryList(m.results);

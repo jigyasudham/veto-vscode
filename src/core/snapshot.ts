@@ -32,6 +32,14 @@ export interface VetoMemoryEntry {
   created_at: string;
 }
 
+export type DetailScope = { projectDir: string } | { all: true };
+export interface DetailPage<T> { items: T[]; hasMore: boolean; }
+export interface VetoMemoryDetail extends VetoMemoryEntry { content: string | null; }
+export interface VetoConstraint {
+  id: string; project_dir: string | null; rule: string; why: string | null;
+  forbidden_patterns: string; file_scope: string | null; severity: string; active: number; created_at: string;
+}
+
 export interface VetoMemoryData {
   totalCount: number;
   entries: VetoMemoryEntry[];
@@ -105,6 +113,7 @@ export interface ScanDiagnosticRow {
 
 /** One consistent snapshot of Veto state — everything the UI needs in a single object. */
 export interface VetoSnapshot {
+  projectDir?: string;           // selected project; absent means explicitly global/no selection
   installed: boolean;            // Veto DB exists on disk
   session: VetoSession | null;   // session scoped to the active workspace
   sessions: VetoSessionSummary[];

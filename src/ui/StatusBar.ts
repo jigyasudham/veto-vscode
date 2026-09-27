@@ -17,7 +17,7 @@ export class StatusBar {
   render(snap: VetoSnapshot): void {
     if (!snap.installed) {
       this.item.text = '$(circle-slash) Veto';
-      this.item.tooltip = 'Veto not installed — click to set up';
+      this.item.tooltip = snap.compatibilityWarning ?? 'Veto database unavailable — click for setup details';
       this.item.command = 'veto.openHud';
       return;
     }
@@ -46,7 +46,7 @@ export class StatusBar {
     if (snap.session) {
       const s = snap.session;
       const client = s.active_client ?? s.platform ?? 'unknown';
-      md.appendMarkdown(`**Session:** \`${s.id.slice(0, 8)}…\` · `);
+      md.appendMarkdown(`**Saved session:** \`${s.id.slice(0, 8)}…\` · `);
       md.appendText(client);
       md.appendMarkdown('\n\n');
       if (s.summary) {
@@ -55,7 +55,7 @@ export class StatusBar {
         md.appendMarkdown('_\n\n');
       }
     } else {
-      md.appendMarkdown(`_No active session for this workspace_\n\n`);
+      md.appendMarkdown(`_No saved session for this workspace_\n\n`);
     }
 
     if (snap.council) {

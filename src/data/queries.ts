@@ -8,7 +8,7 @@ import { normPath, budgetFor, isSubpath, sqlPathCondition } from '../core/paths'
 import type {
   VetoSession, VetoSessionSummary, VetoMemoryData, VetoMemoryEntry,
   VetoCouncilOutcome, VetoPattern, VetoRateEntry, VetoUsageSummary,
-  VetoHealthStats, VetoLearningStats, ScanDiagnosticRow,
+  VetoHealthStats, VetoLearningStats, ScanDiagnosticRow, DetailScope, DetailPage, VetoMemoryDetail, VetoConstraint,
 } from '../core/snapshot';
 
 /** Cheap existence check so the extension degrades gracefully on schema drift. */
@@ -51,12 +51,6 @@ export function queryLatestSession(db: DatabaseSync, projectDir?: string): VetoS
     return (db.prepare(`SELECT ${SESSION_COLS} FROM sessions ORDER BY created_at DESC LIMIT 1`).get() as VetoSession | undefined) ?? null;
   }
 
-  // Fast path: exact match
-  const exact = db.prepare(
-    `SELECT ${SESSION_COLS} FROM sessions WHERE project_dir = ? ORDER BY created_at DESC LIMIT 1`
-  ).get(projectDir) as VetoSession | undefined;
-  if (exact) return exact;
-
   // Normalized SQL match across slashes and case (unbounded, no 200-row cutoff)
   const cond = sqlPathCondition('project_dir', projectDir);
   const match = db.prepare(
@@ -65,11 +59,90 @@ export function queryLatestSession(db: DatabaseSync, projectDir?: string): VetoS
   return match ?? null;
 }
 
-export function querySessions(db: DatabaseSync, limit = 10): VetoSessionSummary[] {
+export function querySessions(db: DatabaseSync, limit = 10, projectDir?: string): VetoSessionSummary[] {
   if (!hasTable(db, 'sessions')) return [];
+  const scope = projectDir ? sqlPathCondition('project_dir', projectDir) : { sql: '1=1', params: [] };
   return db.prepare(
-    'SELECT id, platform, active_client, started_at, summary, token_count, project_dir FROM sessions ORDER BY created_at DESC LIMIT ?'
-  ).all(limit) as unknown as VetoSessionSummary[];
+    `SELECT id, platform, active_client, started_at, summary, token_count, project_dir FROM sessions WHERE ${scope.sql} ORDER BY created_at DESC LIMIT ?`
+  ).all(...scope.params, limit) as unknown as VetoSessionSummary[];
+}
+
+function detailCondition(scope: DetailScope, column = 'project_dir') {
+  if ('all' in scope) return { sql: '1=1', params: [] as string[] };
+  if (!scope.projectDir.trim()) throw new Error('Select a project or explicitly choose All projects.');
+  return sqlPathCondition(column, scope.projectDir);
+}
+
+function page<T>(rows: T[], size: number): DetailPage<T> {
+  return { items: rows.slice(0, size), hasMore: rows.length > size };
+}
+
+export function querySessionPage(db: DatabaseSync, scope: DetailScope, offset = 0, size = 30, search = ''): DetailPage<VetoSessionSummary> {
+  const cond = detailCondition(scope);
+  if (!Number.isFinite(offset) || !Number.isFinite(size)) throw new Error('Page bounds must be finite numbers.');
+  if (!hasTable(db, 'sessions')) throw new Error('Session history is unavailable in this database.');
+  size = Math.max(1, Math.min(100, Math.floor(size)));
+  const rows = db.prepare(`SELECT id, platform, active_client, started_at, summary, token_count, project_dir
+    FROM sessions WHERE ${cond.sql} AND (COALESCE(summary, '') LIKE ? OR id LIKE ? OR platform LIKE ?)
+    ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?`).all(...cond.params, `%${search}%`, `%${search}%`, `%${search}%`, size + 1, Math.max(0, Math.floor(offset))) as unknown as VetoSessionSummary[];
+  return page(rows, size);
+}
+
+export function queryMemoryPage(db: DatabaseSync, scope: DetailScope, offset = 0, search = ''): DetailPage<VetoMemoryEntry> {
+  const cond = detailCondition(scope);
+  if (!hasTable(db, 'knowledge_base')) throw new Error('Memory is unavailable in this database.');
+  const rows = db.prepare(`SELECT ${MEMORY_COLS} FROM knowledge_base WHERE ${cond.sql}
+    AND (title LIKE ? OR tags LIKE ?) ORDER BY created_at DESC, id DESC LIMIT 31 OFFSET ?`)
+    .all(...cond.params, `%${search}%`, `%${search}%`, Math.max(0, Math.floor(offset))) as RawMemory[];
+  return page(rows.map(parseMemory), 30);
+}
+
+export function queryMemoryDetail(db: DatabaseSync, scope: DetailScope, id: string): VetoMemoryDetail | null {
+  const cond = detailCondition(scope);
+  if (!hasTable(db, 'knowledge_base') || !hasColumn(db, 'knowledge_base', 'content')) throw new Error('Memory content is unavailable in this database.');
+  const row = db.prepare(`SELECT ${MEMORY_COLS}, content FROM knowledge_base WHERE id = ? AND ${cond.sql}`)
+    .get(id, ...cond.params) as (RawMemory & { content: string | null }) | undefined;
+  return row ? { ...parseMemory(row), content: row.content } : null;
+}
+
+export function queryCouncilPage(db: DatabaseSync, scope: DetailScope, offset = 0): DetailPage<VetoCouncilOutcome> {
+  if (!hasTable(db, 'council_outcomes')) throw new Error('Council history is unavailable in this database.');
+  const direct = hasColumn(db, 'council_outcomes', 'project_dir');
+  const joined = !direct && hasTable(db, 'sessions');
+  if (!direct && !joined && !('all' in scope)) throw new Error('This database cannot scope council history to a project.');
+  const project = direct ? 'c.project_dir' : joined ? 's.project_dir' : 'NULL';
+  const cond = detailCondition(scope, project);
+  const rows = db.prepare(`SELECT c.id, c.task, c.verdict, c.lead_dev, c.pm, c.architect, c.ux,
+    c.devil, c.legal, c.security, c.recommended, c.debated_at, ${project} AS project_dir
+    FROM council_outcomes c ${joined ? 'LEFT JOIN sessions s ON s.id = c.session_id' : ''}
+    WHERE ${cond.sql} ORDER BY c.debated_at DESC, c.id DESC LIMIT 31 OFFSET ?`)
+    .all(...cond.params, Math.max(0, Math.floor(offset))) as unknown as VetoCouncilOutcome[];
+  return page(rows, 30);
+}
+
+export function queryConstraints(db: DatabaseSync, scope: DetailScope, offset = 0): DetailPage<VetoConstraint> {
+  const cond = detailCondition(scope);
+  if (!hasTable(db, 'decision_constraints')) throw new Error('Decision constraints are unavailable in this database.');
+  const rows = db.prepare(`SELECT id, project_dir, rule, why, forbidden_patterns, file_scope, severity, active, created_at
+    FROM decision_constraints WHERE ${cond.sql} ORDER BY created_at DESC, id DESC LIMIT 31 OFFSET ?`)
+    .all(...cond.params, Math.max(0, Math.floor(offset))) as unknown as VetoConstraint[];
+  return page(rows, 30);
+}
+
+export interface DecisionDetail {
+  id: string; session_id: string; made_at: string; decision: string; rationale: string | null;
+  council_verdict: string | null; files_affected: string | null; overridden: number; project_dir: string | null;
+}
+
+export function queryDecisionPage(db: DatabaseSync, scope: DetailScope, offset = 0): DetailPage<DecisionDetail> {
+  if (!hasTable(db, 'decisions') || !hasTable(db, 'sessions')) throw new Error('Decision history is unavailable in this database.');
+  const cond = detailCondition(scope, 's.project_dir');
+  const rows = db.prepare(`SELECT d.id, d.session_id, d.made_at, d.decision, d.rationale,
+    d.council_verdict, d.files_affected, d.overridden, s.project_dir FROM decisions d
+    LEFT JOIN sessions s ON d.session_id = s.id WHERE ${cond.sql}
+    ORDER BY d.made_at DESC, d.id DESC LIMIT 31 OFFSET ?`)
+    .all(...cond.params, Math.max(0, Math.floor(offset))) as unknown as DecisionDetail[];
+  return page(rows, 30);
 }
 
 type RawMemory = { id: string; title: string; tags: string | null; project_dir: string | null; type: string; created_at: string };
@@ -140,12 +213,6 @@ export function queryLastCouncil(db: DatabaseSync, projectDir?: string): VetoCou
   }
 
   if (useDirectColumn) {
-    // Exact match
-    const exact = db.prepare(
-      `SELECT ${councilCols} FROM council_outcomes WHERE project_dir = ? ORDER BY debated_at DESC LIMIT 1`
-    ).get(projectDir) as VetoCouncilOutcome | undefined;
-    if (exact) return exact;
-
     // Normalized match in SQL (unbounded)
     const cond = sqlPathCondition('project_dir', projectDir);
     const match = db.prepare(
@@ -157,14 +224,6 @@ export function queryLastCouncil(db: DatabaseSync, projectDir?: string): VetoCou
     if (!hasTable(db, 'sessions')) return null;
 
     const joinCols = 'c.id, c.session_id, c.task, c.verdict, c.lead_dev, c.pm, c.architect, c.ux, c.devil, c.legal, c.security, c.recommended, c.debated_at, s.project_dir';
-    const exact = db.prepare(`
-      SELECT ${joinCols} FROM council_outcomes c
-      JOIN sessions s ON c.session_id = s.id
-      WHERE s.project_dir = ?
-      ORDER BY c.debated_at DESC LIMIT 1
-    `).get(projectDir) as VetoCouncilOutcome | undefined;
-    if (exact) return exact;
-
     const cond = sqlPathCondition('s.project_dir', projectDir);
     const match = db.prepare(`
       SELECT ${joinCols} FROM council_outcomes c
@@ -186,9 +245,8 @@ export function queryTopPatterns(db: DatabaseSync): VetoPattern[] {
   ).all() as unknown as VetoPattern[];
 }
 
-export function queryRate(db: DatabaseSync, budgets: Record<string, number>): VetoRateEntry[] {
+export function queryRate(db: DatabaseSync, budgets: Record<string, number>, today = new Date().toISOString().slice(0, 10)): VetoRateEntry[] {
   if (!hasTable(db, 'rate_usage')) return [];
-  const today = new Date().toISOString().slice(0, 10);
   type RateRow = { platform: string; request_count: number; token_count: number };
   const rows = db.prepare(
     `SELECT platform, COALESCE(request_count, 0) as request_count, COALESCE(token_count, 0) as token_count

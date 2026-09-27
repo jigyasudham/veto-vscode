@@ -30,6 +30,10 @@ export function getDbPath(): string {
   return dbPath;
 }
 
+export function isCustomDbPath(): boolean {
+  return !pathsEqual(dbPath, join(homedir(), '.veto', 'veto.db'));
+}
+
 /** Check if a path looks like a Windows path (drive letter, UNC, or backslashes on win32). */
 export function isWindowsPath(p: string): boolean {
   if (!p) return false;
@@ -79,14 +83,15 @@ export function isSubpath(child: string, parent: string): boolean {
  */
 export function sqlPathCondition(columnName: string, path: string): { sql: string; params: string[] } {
   const norm = normPath(path);
+  const normalized = `CASE WHEN RTRIM(REPLACE(${columnName}, '\\', '/'), '/') = '' THEN '/' ELSE RTRIM(REPLACE(${columnName}, '\\', '/'), '/') END`;
   if (isWindowsPath(path)) {
     return {
-      sql: `LOWER(REPLACE(${columnName}, '\\', '/')) = ?`,
+      sql: `LOWER(${normalized}) = ?`,
       params: [norm],
     };
   }
   return {
-    sql: `REPLACE(${columnName}, '\\', '/') = ?`,
+    sql: `${normalized} = ?`,
     params: [norm],
   };
 }

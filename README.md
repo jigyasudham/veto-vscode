@@ -64,9 +64,9 @@ src/
 
 | Requirement | Details |
 |---|---|
-| **VS Code** | 1.97 or higher |
-| **Node.js** | 22 or higher (uses built-in `node:sqlite`) |
-| **Veto MCP server** | `npm i -g @jigyasudham/veto` — installed and used at least once |
+| **VS Code** | 1.101 or higher |
+| **Node.js** | Extension host Node 22.13+ with built-in `node:sqlite`; a system Node installation alone does not establish host support |
+| **Veto MCP server** | `npm i -g @jigyasudham/veto@latest` — Veto 3.8.0 or later required |
 
 The extension reads `~/.veto/veto.db` directly (read-only) — no server process needed to browse the HUD.
 
@@ -91,7 +91,7 @@ npm install
 npm run build        # bundle
 npm test             # smoke tests
 npm run package      # produce the .vsix
-code --install-extension veto-vscode-1.0.0.vsix
+code --install-extension veto-vscode-1.1.0.vsix
 ```
 
 Press **F5** to launch the Extension Development Host with the extension live.
@@ -111,6 +111,32 @@ renders a compact `⬡ veto GREEN · router 94% · claude 50% · mem 15` line be
 ---
 
 ## Changelog
+
+### v1.1.0 — Reliability, browsing, actions, and API v1
+
+The HUD distinguishes saved context from live provider activity. Use **Select
+Project** to pin a workspace folder or follow the active editor. Session, memory,
+council, decision and review browsers offer scoped records and full detail views.
+Routing and learning aggregates are explicitly global.
+
+Background actions require Workspace Trust and an authenticated Claude CLI with
+Veto MCP configured. They use bounded, cancellable subprocesses and verify actual
+tool results against the requested inputs. **Save Summary Checkpoint** saves only
+the supplied summary. **Resume** offers Claude, Gemini or Codex in an interactive
+terminal with the saved project directory. Commit-message and PR-description
+commands produce drafts in editor documents.
+
+**Search Transcripts**, **Load Backend Visibility**, and **Backend Setup
+Diagnostics** use the published Veto API v1 JSON CLI. They require an installed
+backend that supports `veto api`; older installations show an unavailable error.
+Search is explicitly initiated and may index retained archives. Masked excerpts
+retain source and historical-data provenance. Lesson/trial snapshots are loaded
+only on request, labelled with their timestamp, and never harvest or deliver
+lessons. Configuration-only setup diagnostics do not perform login or server probes.
+
+Passive saved-data browsing remains available in restricted workspaces. Remote
+workspace validation is on hold. See [upgrade status](docs/UPGRADE-STATUS.md) for
+validation evidence and remaining release gates.
 
 ### v1.0.0 — "Veto HUD"
 - **Rewrite:** seven tree panels → one live HUD (sidebar webview) + a status-bar pulse.
@@ -132,3 +158,6 @@ renders a compact `⬡ veto GREEN · router 94% · claude 50% · mem 15` line be
 ## License
 
 MIT © 2026 Jigyasu Dham
+## Backend API compatibility
+
+Backend visibility, transcript search and setup diagnostics require **Veto 3.8.0 or later with API v1** (`npm i -g @jigyasudham/veto@latest`). The extension checks `api version` first, requiring `data.contract === 1` and backend version 3.8.0 or later. Commands run via `node <cli_path> api <command> --stdin` with an argument array and no shell. By default it uses Veto on PATH. To test an isolated backend, set the machine setting `veto.cliPath` to its absolute `dist/cli.js` path.
