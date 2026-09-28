@@ -1,0 +1,16 @@
+{
+  "width": 167,
+  "height": 303,
+  "bodyWidth": 172,
+  "settings": {
+    "x": 9.997000694274902,
+    "y": -58.47526550292969,
+    "width": 139.6579132080078,
+    "height": 752.9698486328125,
+    "top": -58.47526550292969,
+    "right": 149.65491390228271,
+    "bottom": 694.4945831298828,
+    "left": 9.997000694274902
+  },
+  "text": "⬡ VETO\nYELLOW\n↻\n💻\nProject:\nFollow active editor\nworkspace\n‹\nDashboard\nExplorer\nWorkflows\nConsole !\nSettings\n›\nVETO CONFIGURATION\n▼\nVeto CLI Path:\nAuto-Detect\nRequires Veto 3.8.0 or later with API v1.\nDatabase Override Path:\n Using custom database override\nPoll Interval (ms):\nAction Timeout (ms):\nSave Configuration\nReset Defaults\nSYSTEM & HEALTH DIAGNOSTICS\n▼\nNode Runtime\n24.20.0\nSQLite Engine\nnode:sqlite (Ready)\nWorkspace Trust\nTrusted\nRun Backend Diagnostics\nView Data Provenance\nBackend Diagnostics\n✕"
+}

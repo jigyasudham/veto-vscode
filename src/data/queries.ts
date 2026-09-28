@@ -105,7 +105,7 @@ export function queryMemoryDetail(db: DatabaseSync, scope: DetailScope, id: stri
   return row ? { ...parseMemory(row), content: row.content } : null;
 }
 
-export function queryCouncilPage(db: DatabaseSync, scope: DetailScope, offset = 0): DetailPage<VetoCouncilOutcome> {
+export function queryCouncilPage(db: DatabaseSync, scope: DetailScope, offset = 0, search = ''): DetailPage<VetoCouncilOutcome> {
   if (!hasTable(db, 'council_outcomes')) throw new Error('Council history is unavailable in this database.');
   const direct = hasColumn(db, 'council_outcomes', 'project_dir');
   const joined = !direct && hasTable(db, 'sessions');
@@ -115,17 +115,19 @@ export function queryCouncilPage(db: DatabaseSync, scope: DetailScope, offset = 
   const rows = db.prepare(`SELECT c.id, c.task, c.verdict, c.lead_dev, c.pm, c.architect, c.ux,
     c.devil, c.legal, c.security, c.recommended, c.debated_at, ${project} AS project_dir
     FROM council_outcomes c ${joined ? 'LEFT JOIN sessions s ON s.id = c.session_id' : ''}
-    WHERE ${cond.sql} ORDER BY c.debated_at DESC, c.id DESC LIMIT 31 OFFSET ?`)
-    .all(...cond.params, Math.max(0, Math.floor(offset))) as unknown as VetoCouncilOutcome[];
+    WHERE ${cond.sql} AND (COALESCE(c.task, '') LIKE ? OR COALESCE(c.recommended, '') LIKE ?)
+    ORDER BY c.debated_at DESC, c.id DESC LIMIT 31 OFFSET ?`)
+    .all(...cond.params, `%${search}%`, `%${search}%`, Math.max(0, Math.floor(offset))) as unknown as VetoCouncilOutcome[];
   return page(rows, 30);
 }
 
-export function queryConstraints(db: DatabaseSync, scope: DetailScope, offset = 0): DetailPage<VetoConstraint> {
+export function queryConstraints(db: DatabaseSync, scope: DetailScope, offset = 0, search = ''): DetailPage<VetoConstraint> {
   const cond = detailCondition(scope);
   if (!hasTable(db, 'decision_constraints')) throw new Error('Decision constraints are unavailable in this database.');
   const rows = db.prepare(`SELECT id, project_dir, rule, why, forbidden_patterns, file_scope, severity, active, created_at
-    FROM decision_constraints WHERE ${cond.sql} ORDER BY created_at DESC, id DESC LIMIT 31 OFFSET ?`)
-    .all(...cond.params, Math.max(0, Math.floor(offset))) as unknown as VetoConstraint[];
+    FROM decision_constraints WHERE ${cond.sql} AND (COALESCE(rule, '') LIKE ? OR COALESCE(why, '') LIKE ?)
+    ORDER BY created_at DESC, id DESC LIMIT 31 OFFSET ?`)
+    .all(...cond.params, `%${search}%`, `%${search}%`, Math.max(0, Math.floor(offset))) as unknown as VetoConstraint[];
   return page(rows, 30);
 }
 
@@ -134,14 +136,15 @@ export interface DecisionDetail {
   council_verdict: string | null; files_affected: string | null; overridden: number; project_dir: string | null;
 }
 
-export function queryDecisionPage(db: DatabaseSync, scope: DetailScope, offset = 0): DetailPage<DecisionDetail> {
+export function queryDecisionPage(db: DatabaseSync, scope: DetailScope, offset = 0, search = ''): DetailPage<DecisionDetail> {
   if (!hasTable(db, 'decisions') || !hasTable(db, 'sessions')) throw new Error('Decision history is unavailable in this database.');
   const cond = detailCondition(scope, 's.project_dir');
   const rows = db.prepare(`SELECT d.id, d.session_id, d.made_at, d.decision, d.rationale,
     d.council_verdict, d.files_affected, d.overridden, s.project_dir FROM decisions d
     LEFT JOIN sessions s ON d.session_id = s.id WHERE ${cond.sql}
+    AND (COALESCE(d.decision, '') LIKE ? OR COALESCE(d.rationale, '') LIKE ?)
     ORDER BY d.made_at DESC, d.id DESC LIMIT 31 OFFSET ?`)
-    .all(...cond.params, Math.max(0, Math.floor(offset))) as unknown as DecisionDetail[];
+    .all(...cond.params, `%${search}%`, `%${search}%`, Math.max(0, Math.floor(offset))) as unknown as DecisionDetail[];
   return page(rows, 30);
 }
 

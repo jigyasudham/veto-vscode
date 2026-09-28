@@ -66,6 +66,10 @@ async function main() {
   if (path.dirname(fixtureRoot) !== path.resolve(os.tmpdir()) || !path.basename(fixtureRoot).startsWith('veto-host-')) {
     throw new Error('Refusing cleanup outside the generated temporary fixture');
   }
-  fs.rmSync(fixtureRoot, { recursive: true, force: true, maxRetries: 5, retryDelay: 500 });
+  try {
+    fs.rmSync(fixtureRoot, { recursive: true, force: true, maxRetries: 10, retryDelay: 500 });
+  } catch (cleanErr) {
+    console.warn('Temporary fixture cleanup deferred due to lock:', cleanErr && cleanErr.message ? cleanErr.message : cleanErr);
+  }
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });

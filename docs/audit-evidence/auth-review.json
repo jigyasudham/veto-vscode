@@ -1,0 +1,16 @@
+{
+  "scenario": "review",
+  "elapsedMs": 22194,
+  "result": {
+    "running": false,
+    "visible": true,
+    "action": "reviewFile",
+    "verdict": "COMPLETED",
+    "body": "{\n  \"mode\": \"agentic_fallback\",\n  \"llm_backed\": true,\n  \"generation\": \"complete\",\n  \"deterministic_findings\": {\n    \"agent\": \"reviewer\",\n    \"subject\": \"Code (5 lines)\",\n    \"findings\": [],\n    \"score\": 100,\n    \"verdict\": \"approved\",\n    \"summary\": \"Code looks clean — no significant issues detected.\",\n    \"critical_count\": 0,\n    \"high_count\": 0\n  },\n  \"agent\": \"reviewer\",\n  \"subject\": \"divide(a, b) utility function in example.js (4 lines)\",\n  \"findings\": [\n    {\n      \"severity\": \"low\",\n      \"category\": \"input-validation\",\n      \"description\": \"No type checking on a or b. Non-number arguments get coerced silently: divide('6', '3') returns 2, divide('a', 1) returns NaN, and divide(1, '0') skips the zero guard because '0' !== 0 and returns Infinity.\",\n      \"fix\": \"Validate inputs up front, e.g. if (typeof a !== 'number' || typeof b !== 'number') throw new TypeError('divide expects numbers'); or add TypeScript/JSDoc types.\",\n      \"location\": \"example.js:1-2\",\n      \"cwe\": \"CWE-20\"\n    },\n    {\n      \"severity\": \"info\",\n      \"category\": \"edge-cases\",\n      \"description\": \"NaN inputs go straight through and return NaN without an error. The b === 0 check does already catch -0, because -0 === 0 is true.\",\n      \"fix\": \"If NaN results should be rejected, add Number.isNaN checks (or Number.isFinite for both operands) and document the behavior.\",\n      \"location\": \"example.js:2-3\"\n    },\n    {\n      \"severity\": \"info\",\n      \"category\": \"error-handling\",\n      \"description\": \"A generic Error is thrown for division by zero, so callers can only tell it apart from other errors by matching the message string.\",\n      \"fix\": \"Throw a RangeError, or a custom DivisionByZeroError, so callers can check it with instanceof.\",\n      \"location\": \"example.js:2\"\n    }\n  ],\n  \"score\": 92,\n  \"verdict\": \"approved\",\n  \"summary\": \"Clean, correct division helper with an explicit zero guard; the only gaps are minor input-type validation and edge-case handling.\",\n  \"critical_count\": 0,\n  \"high_count\": 0\n}",
+    "console": "14:23:04[INFO]Veto HUD v1.2.0 active. DB: C:\\Users\\jigya\\AppData\\Local\\Temp\\veto-live-audit-N6zpUZ\\fixture.db14:24:49[INFO][Checkpoint] Saving summary: \"SYNTHETIC VETO EXTENSION AUDIT 2026-09-28: verify authenticated checkpoint end to end; disposable test project.\"...14:25:01[SUCCESS][Checkpoint] Saved successfully.14:25:03[INFO][Review File] Reviewing c:\\Users\\jigya\\AppData\\Local\\Temp\\veto-live-audit-N6zpUZ\\workspace\\example.js...14:25:24[SUCCESS][Review File] Review finished. Verdict: Completed"
+  },
+  "notifications": [
+    "Source: Veto MCP Dashboard\nOpen Log\nVeto: backend response received; completion status unavailable.",
+    "Reload and Enable Extensions\nAll installed extensions are temporarily disabled."
+  ]
+}

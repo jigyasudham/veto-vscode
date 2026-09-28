@@ -1,0 +1,7006 @@
+{
+  "results": [
+    {
+      "name": "dark-220-dashboard",
+      "width": 219,
+      "height": 712,
+      "theme": "Dark Modern",
+      "themeKind": "vscode-dark",
+      "bodyWidth": 204,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Dashboard",
+          "fg": "rgb(0, 120, 212)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".btn.sec",
+          "text": "Setup details",
+          "fg": "rgb(204, 204, 204)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "12px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(32, 32, 32)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dark-220-explorer",
+      "width": 219,
+      "height": 712,
+      "theme": "Dark Modern",
+      "themeKind": "vscode-dark",
+      "bodyWidth": 204,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Explorer",
+          "fg": "rgb(0, 120, 212)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.green",
+          "text": "codex",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(46, 204, 113, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(46, 204, 113, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(32, 32, 32)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".sub-pill.active",
+          "text": "Sessions",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(0, 120, 212)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(0, 120, 212)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected",
+          "text": "Synthetic UI audit session 9 — long summary f",
+          "fg": "rgb(204, 204, 204)",
+          "bg": "rgb(32, 32, 32)",
+          "fontSize": "13px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(32, 32, 32)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected .explorer-card-meta",
+          "text": "3m ago · 16000 tokens · audit-sess…",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "0.75",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "0.75"
+            },
+            {
+              "color": "rgb(32, 32, 32)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dark-220-workflows",
+      "width": 219,
+      "height": 712,
+      "theme": "Dark Modern",
+      "themeKind": "vscode-dark",
+      "bodyWidth": 204,
+      "overflowControls": [
+        {
+          "id": "closeResult",
+          "text": "✕",
+          "rect": {
+            "x": 223.6374969482422,
+            "y": 120,
+            "width": 21.8125,
+            "height": 22,
+            "top": 120,
+            "right": 245.4499969482422,
+            "bottom": 142,
+            "left": 223.6374969482422
+          }
+        }
+      ],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Workflows",
+          "fg": "rgb(0, 120, 212)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dark-220-console",
+      "width": 219,
+      "height": 712,
+      "theme": "Dark Modern",
+      "themeKind": "vscode-dark",
+      "bodyWidth": 233,
+      "overflowControls": [
+        {
+          "id": "btnCopyLog",
+          "text": "Copy",
+          "rect": {
+            "x": 193.5749969482422,
+            "y": 120.4000015258789,
+            "width": 39.22500228881836,
+            "height": 20,
+            "top": 120.4000015258789,
+            "right": 232.79999923706055,
+            "bottom": 140.4000015258789,
+            "left": 193.5749969482422
+          }
+        }
+      ],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Console ",
+          "fg": "rgb(0, 120, 212)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dark-220-settings",
+      "width": 219,
+      "height": 712,
+      "theme": "Dark Modern",
+      "themeKind": "vscode-dark",
+      "bodyWidth": 204,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Settings",
+          "fg": "rgb(0, 120, 212)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dark-300-dashboard",
+      "width": 300,
+      "height": 712,
+      "theme": "Dark Modern",
+      "themeKind": "vscode-dark",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Dashboard",
+          "fg": "rgb(0, 120, 212)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".btn.sec",
+          "text": "Setup details",
+          "fg": "rgb(204, 204, 204)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "12px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(32, 32, 32)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dark-300-explorer",
+      "width": 300,
+      "height": 712,
+      "theme": "Dark Modern",
+      "themeKind": "vscode-dark",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Explorer",
+          "fg": "rgb(0, 120, 212)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.green",
+          "text": "codex",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(46, 204, 113, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(46, 204, 113, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(32, 32, 32)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".sub-pill.active",
+          "text": "Sessions",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(0, 120, 212)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(0, 120, 212)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected",
+          "text": "Synthetic UI audit session 9 — long summary f",
+          "fg": "rgb(204, 204, 204)",
+          "bg": "rgb(32, 32, 32)",
+          "fontSize": "13px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(32, 32, 32)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected .explorer-card-meta",
+          "text": "3m ago · 16000 tokens · audit-sess…",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "0.75",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "0.75"
+            },
+            {
+              "color": "rgb(32, 32, 32)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dark-300-workflows",
+      "width": 300,
+      "height": 712,
+      "theme": "Dark Modern",
+      "themeKind": "vscode-dark",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Workflows",
+          "fg": "rgb(0, 120, 212)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dark-300-console",
+      "width": 300,
+      "height": 712,
+      "theme": "Dark Modern",
+      "themeKind": "vscode-dark",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Console ",
+          "fg": "rgb(0, 120, 212)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dark-300-settings",
+      "width": 300,
+      "height": 712,
+      "theme": "Dark Modern",
+      "themeKind": "vscode-dark",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Settings",
+          "fg": "rgb(0, 120, 212)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dark-480-dashboard",
+      "width": 480,
+      "height": 712,
+      "theme": "Dark Modern",
+      "themeKind": "vscode-dark",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Dashboard",
+          "fg": "rgb(0, 120, 212)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".btn.sec",
+          "text": "Setup details",
+          "fg": "rgb(204, 204, 204)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "12px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(32, 32, 32)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dark-480-explorer",
+      "width": 480,
+      "height": 712,
+      "theme": "Dark Modern",
+      "themeKind": "vscode-dark",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Explorer",
+          "fg": "rgb(0, 120, 212)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.green",
+          "text": "codex",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(46, 204, 113, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(46, 204, 113, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(32, 32, 32)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".sub-pill.active",
+          "text": "Sessions",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(0, 120, 212)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(0, 120, 212)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected",
+          "text": "Synthetic UI audit session 9 — long summary f",
+          "fg": "rgb(204, 204, 204)",
+          "bg": "rgb(32, 32, 32)",
+          "fontSize": "13px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(32, 32, 32)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected .explorer-card-meta",
+          "text": "4m ago · 16000 tokens · audit-sess…",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "0.75",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "0.75"
+            },
+            {
+              "color": "rgb(32, 32, 32)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dark-480-workflows",
+      "width": 480,
+      "height": 712,
+      "theme": "Dark Modern",
+      "themeKind": "vscode-dark",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Workflows",
+          "fg": "rgb(0, 120, 212)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dark-480-console",
+      "width": 480,
+      "height": 712,
+      "theme": "Dark Modern",
+      "themeKind": "vscode-dark",
+      "bodyWidth": 480,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Console ",
+          "fg": "rgb(0, 120, 212)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dark-480-settings",
+      "width": 480,
+      "height": 712,
+      "theme": "Dark Modern",
+      "themeKind": "vscode-dark",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Settings",
+          "fg": "rgb(0, 120, 212)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(24, 24, 24)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "light-220-dashboard",
+      "width": 220,
+      "height": 712,
+      "theme": "Light Modern",
+      "themeKind": "vscode-light",
+      "bodyWidth": 205,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Dashboard",
+          "fg": "rgb(0, 95, 184)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".btn.sec",
+          "text": "Setup details",
+          "fg": "rgb(59, 59, 59)",
+          "bg": "rgb(229, 229, 229)",
+          "fontSize": "12px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(229, 229, 229)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "light-220-explorer",
+      "width": 220,
+      "height": 712,
+      "theme": "Light Modern",
+      "themeKind": "vscode-light",
+      "bodyWidth": 205,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Explorer",
+          "fg": "rgb(0, 95, 184)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.green",
+          "text": "codex",
+          "fg": "rgb(0, 0, 0)",
+          "bg": "rgba(46, 204, 113, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(46, 204, 113, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".sub-pill.active",
+          "text": "Sessions",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(0, 95, 184)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(0, 95, 184)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected",
+          "text": "Synthetic UI audit session 9 — long summary f",
+          "fg": "rgb(59, 59, 59)",
+          "bg": "rgb(248, 248, 248)",
+          "fontSize": "13px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected .explorer-card-meta",
+          "text": "4m ago · 16000 tokens · audit-sess…",
+          "fg": "rgb(0, 0, 0)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "0.75",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "0.75"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "light-220-workflows",
+      "width": 220,
+      "height": 712,
+      "theme": "Light Modern",
+      "themeKind": "vscode-light",
+      "bodyWidth": 205,
+      "overflowControls": [
+        {
+          "id": "closeResult",
+          "text": "✕",
+          "rect": {
+            "x": 223.6374969482422,
+            "y": 120,
+            "width": 21.8125,
+            "height": 22,
+            "top": 120,
+            "right": 245.4499969482422,
+            "bottom": 142,
+            "left": 223.6374969482422
+          }
+        }
+      ],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Workflows",
+          "fg": "rgb(0, 95, 184)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "light-220-console",
+      "width": 220,
+      "height": 712,
+      "theme": "Light Modern",
+      "themeKind": "vscode-light",
+      "bodyWidth": 233,
+      "overflowControls": [
+        {
+          "id": "btnCopyLog",
+          "text": "Copy",
+          "rect": {
+            "x": 193.5749969482422,
+            "y": 120.4000015258789,
+            "width": 39.22500228881836,
+            "height": 20,
+            "top": 120.4000015258789,
+            "right": 232.79999923706055,
+            "bottom": 140.4000015258789,
+            "left": 193.5749969482422
+          }
+        }
+      ],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Console ",
+          "fg": "rgb(0, 95, 184)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "light-220-settings",
+      "width": 220,
+      "height": 712,
+      "theme": "Light Modern",
+      "themeKind": "vscode-light",
+      "bodyWidth": 205,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Settings",
+          "fg": "rgb(0, 95, 184)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "light-300-dashboard",
+      "width": 300,
+      "height": 712,
+      "theme": "Light Modern",
+      "themeKind": "vscode-light",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Dashboard",
+          "fg": "rgb(0, 95, 184)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".btn.sec",
+          "text": "Setup details",
+          "fg": "rgb(59, 59, 59)",
+          "bg": "rgb(229, 229, 229)",
+          "fontSize": "12px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(229, 229, 229)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "light-300-explorer",
+      "width": 300,
+      "height": 712,
+      "theme": "Light Modern",
+      "themeKind": "vscode-light",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Explorer",
+          "fg": "rgb(0, 95, 184)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.green",
+          "text": "codex",
+          "fg": "rgb(0, 0, 0)",
+          "bg": "rgba(46, 204, 113, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(46, 204, 113, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".sub-pill.active",
+          "text": "Sessions",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(0, 95, 184)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(0, 95, 184)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected",
+          "text": "Synthetic UI audit session 9 — long summary f",
+          "fg": "rgb(59, 59, 59)",
+          "bg": "rgb(248, 248, 248)",
+          "fontSize": "13px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected .explorer-card-meta",
+          "text": "4m ago · 16000 tokens · audit-sess…",
+          "fg": "rgb(0, 0, 0)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "0.75",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "0.75"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "light-300-workflows",
+      "width": 300,
+      "height": 712,
+      "theme": "Light Modern",
+      "themeKind": "vscode-light",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Workflows",
+          "fg": "rgb(0, 95, 184)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "light-300-console",
+      "width": 300,
+      "height": 712,
+      "theme": "Light Modern",
+      "themeKind": "vscode-light",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Console ",
+          "fg": "rgb(0, 95, 184)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "light-300-settings",
+      "width": 300,
+      "height": 712,
+      "theme": "Light Modern",
+      "themeKind": "vscode-light",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Settings",
+          "fg": "rgb(0, 95, 184)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "light-480-dashboard",
+      "width": 480,
+      "height": 712,
+      "theme": "Light Modern",
+      "themeKind": "vscode-light",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Dashboard",
+          "fg": "rgb(0, 95, 184)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".btn.sec",
+          "text": "Setup details",
+          "fg": "rgb(59, 59, 59)",
+          "bg": "rgb(229, 229, 229)",
+          "fontSize": "12px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(229, 229, 229)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "light-480-explorer",
+      "width": 480,
+      "height": 712,
+      "theme": "Light Modern",
+      "themeKind": "vscode-light",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Explorer",
+          "fg": "rgb(0, 95, 184)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.green",
+          "text": "codex",
+          "fg": "rgb(0, 0, 0)",
+          "bg": "rgba(46, 204, 113, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(46, 204, 113, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".sub-pill.active",
+          "text": "Sessions",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(0, 95, 184)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(0, 95, 184)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected",
+          "text": "Synthetic UI audit session 9 — long summary f",
+          "fg": "rgb(59, 59, 59)",
+          "bg": "rgb(248, 248, 248)",
+          "fontSize": "13px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected .explorer-card-meta",
+          "text": "4m ago · 16000 tokens · audit-sess…",
+          "fg": "rgb(0, 0, 0)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "0.75",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "0.75"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "light-480-workflows",
+      "width": 480,
+      "height": 712,
+      "theme": "Light Modern",
+      "themeKind": "vscode-light",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Workflows",
+          "fg": "rgb(0, 95, 184)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "light-480-console",
+      "width": 480,
+      "height": 712,
+      "theme": "Light Modern",
+      "themeKind": "vscode-light",
+      "bodyWidth": 480,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Console ",
+          "fg": "rgb(0, 95, 184)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "light-480-settings",
+      "width": 480,
+      "height": 712,
+      "theme": "Light Modern",
+      "themeKind": "vscode-light",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Settings",
+          "fg": "rgb(0, 95, 184)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(248, 248, 248)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-dark-220-dashboard",
+      "width": 220,
+      "height": 712,
+      "theme": "Default High Contrast",
+      "themeKind": "vscode-high-contrast",
+      "bodyWidth": 205,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Dashboard",
+          "fg": "rgb(111, 195, 223)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".btn.sec",
+          "text": "Setup details",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(58, 61, 65)",
+          "fontSize": "12px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(58, 61, 65)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(12, 20, 31)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-dark-220-explorer",
+      "width": 220,
+      "height": 712,
+      "theme": "Default High Contrast",
+      "themeKind": "vscode-high-contrast",
+      "bodyWidth": 205,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Explorer",
+          "fg": "rgb(111, 195, 223)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.green",
+          "text": "codex",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(46, 204, 113, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(46, 204, 113, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(12, 20, 31)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".sub-pill.active",
+          "text": "Sessions",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(111, 195, 223)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(111, 195, 223)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected",
+          "text": "Synthetic UI audit session 9 — long summary f",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(12, 20, 31)",
+          "fontSize": "13px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(12, 20, 31)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected .explorer-card-meta",
+          "text": "4m ago · 16000 tokens · audit-sess…",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "0.75",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "0.75"
+            },
+            {
+              "color": "rgb(12, 20, 31)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-dark-220-workflows",
+      "width": 220,
+      "height": 712,
+      "theme": "Default High Contrast",
+      "themeKind": "vscode-high-contrast",
+      "bodyWidth": 205,
+      "overflowControls": [
+        {
+          "id": "closeResult",
+          "text": "✕",
+          "rect": {
+            "x": 223.6374969482422,
+            "y": 120,
+            "width": 21.8125,
+            "height": 22,
+            "top": 120,
+            "right": 245.4499969482422,
+            "bottom": 142,
+            "left": 223.6374969482422
+          }
+        }
+      ],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Workflows",
+          "fg": "rgb(111, 195, 223)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-dark-220-console",
+      "width": 220,
+      "height": 712,
+      "theme": "Default High Contrast",
+      "themeKind": "vscode-high-contrast",
+      "bodyWidth": 233,
+      "overflowControls": [
+        {
+          "id": "btnCopyLog",
+          "text": "Copy",
+          "rect": {
+            "x": 193.5749969482422,
+            "y": 120.4000015258789,
+            "width": 39.22500228881836,
+            "height": 20,
+            "top": 120.4000015258789,
+            "right": 232.79999923706055,
+            "bottom": 140.4000015258789,
+            "left": 193.5749969482422
+          }
+        }
+      ],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Console ",
+          "fg": "rgb(111, 195, 223)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-dark-220-settings",
+      "width": 220,
+      "height": 712,
+      "theme": "Default High Contrast",
+      "themeKind": "vscode-high-contrast",
+      "bodyWidth": 205,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Settings",
+          "fg": "rgb(111, 195, 223)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-dark-300-dashboard",
+      "width": 300,
+      "height": 712,
+      "theme": "Default High Contrast",
+      "themeKind": "vscode-high-contrast",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Dashboard",
+          "fg": "rgb(111, 195, 223)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".btn.sec",
+          "text": "Setup details",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(58, 61, 65)",
+          "fontSize": "12px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(58, 61, 65)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(12, 20, 31)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-dark-300-explorer",
+      "width": 300,
+      "height": 712,
+      "theme": "Default High Contrast",
+      "themeKind": "vscode-high-contrast",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Explorer",
+          "fg": "rgb(111, 195, 223)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.green",
+          "text": "codex",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(46, 204, 113, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(46, 204, 113, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(12, 20, 31)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".sub-pill.active",
+          "text": "Sessions",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(111, 195, 223)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(111, 195, 223)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected",
+          "text": "Synthetic UI audit session 9 — long summary f",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(12, 20, 31)",
+          "fontSize": "13px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(12, 20, 31)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected .explorer-card-meta",
+          "text": "4m ago · 16000 tokens · audit-sess…",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "0.75",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "0.75"
+            },
+            {
+              "color": "rgb(12, 20, 31)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-dark-300-workflows",
+      "width": 300,
+      "height": 712,
+      "theme": "Default High Contrast",
+      "themeKind": "vscode-high-contrast",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Workflows",
+          "fg": "rgb(111, 195, 223)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-dark-300-console",
+      "width": 300,
+      "height": 712,
+      "theme": "Default High Contrast",
+      "themeKind": "vscode-high-contrast",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Console ",
+          "fg": "rgb(111, 195, 223)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-dark-300-settings",
+      "width": 300,
+      "height": 712,
+      "theme": "Default High Contrast",
+      "themeKind": "vscode-high-contrast",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Settings",
+          "fg": "rgb(111, 195, 223)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-dark-480-dashboard",
+      "width": 480,
+      "height": 712,
+      "theme": "Default High Contrast",
+      "themeKind": "vscode-high-contrast",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Dashboard",
+          "fg": "rgb(111, 195, 223)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".btn.sec",
+          "text": "Setup details",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(58, 61, 65)",
+          "fontSize": "12px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(58, 61, 65)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(12, 20, 31)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-dark-480-explorer",
+      "width": 480,
+      "height": 712,
+      "theme": "Default High Contrast",
+      "themeKind": "vscode-high-contrast",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Explorer",
+          "fg": "rgb(111, 195, 223)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.green",
+          "text": "codex",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(46, 204, 113, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(46, 204, 113, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(12, 20, 31)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".sub-pill.active",
+          "text": "Sessions",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(111, 195, 223)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(111, 195, 223)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected",
+          "text": "Synthetic UI audit session 9 — long summary f",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(12, 20, 31)",
+          "fontSize": "13px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(12, 20, 31)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected .explorer-card-meta",
+          "text": "4m ago · 16000 tokens · audit-sess…",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "0.75",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "0.75"
+            },
+            {
+              "color": "rgb(12, 20, 31)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-dark-480-workflows",
+      "width": 480,
+      "height": 712,
+      "theme": "Default High Contrast",
+      "themeKind": "vscode-high-contrast",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Workflows",
+          "fg": "rgb(111, 195, 223)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-dark-480-console",
+      "width": 480,
+      "height": 712,
+      "theme": "Default High Contrast",
+      "themeKind": "vscode-high-contrast",
+      "bodyWidth": 480,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Console ",
+          "fg": "rgb(111, 195, 223)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-dark-480-settings",
+      "width": 480,
+      "height": 712,
+      "theme": "Default High Contrast",
+      "themeKind": "vscode-high-contrast",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Settings",
+          "fg": "rgb(111, 195, 223)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-light-220-dashboard",
+      "width": 220,
+      "height": 712,
+      "theme": "Default High Contrast Light",
+      "themeKind": "vscode-high-contrast-light vscode-high-contrast",
+      "bodyWidth": 205,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Dashboard",
+          "fg": "rgb(15, 74, 133)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".btn.sec",
+          "text": "Setup details",
+          "fg": "rgb(41, 41, 41)",
+          "bg": "rgb(255, 255, 255)",
+          "fontSize": "12px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-light-220-explorer",
+      "width": 220,
+      "height": 712,
+      "theme": "Default High Contrast Light",
+      "themeKind": "vscode-high-contrast-light vscode-high-contrast",
+      "bodyWidth": 205,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Explorer",
+          "fg": "rgb(15, 74, 133)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.green",
+          "text": "codex",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(46, 204, 113, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(46, 204, 113, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".sub-pill.active",
+          "text": "Sessions",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(15, 74, 133)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(15, 74, 133)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected",
+          "text": "Synthetic UI audit session 9 — long summary f",
+          "fg": "rgb(41, 41, 41)",
+          "bg": "rgb(255, 255, 255)",
+          "fontSize": "13px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected .explorer-card-meta",
+          "text": "4m ago · 16000 tokens · audit-sess…",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "0.75",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "0.75"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-light-220-workflows",
+      "width": 220,
+      "height": 712,
+      "theme": "Default High Contrast Light",
+      "themeKind": "vscode-high-contrast-light vscode-high-contrast",
+      "bodyWidth": 205,
+      "overflowControls": [
+        {
+          "id": "closeResult",
+          "text": "✕",
+          "rect": {
+            "x": 223.6374969482422,
+            "y": 120,
+            "width": 21.8125,
+            "height": 22,
+            "top": 120,
+            "right": 245.4499969482422,
+            "bottom": 142,
+            "left": 223.6374969482422
+          }
+        }
+      ],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Workflows",
+          "fg": "rgb(15, 74, 133)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-light-220-console",
+      "width": 220,
+      "height": 712,
+      "theme": "Default High Contrast Light",
+      "themeKind": "vscode-high-contrast-light vscode-high-contrast",
+      "bodyWidth": 233,
+      "overflowControls": [
+        {
+          "id": "btnCopyLog",
+          "text": "Copy",
+          "rect": {
+            "x": 193.5749969482422,
+            "y": 120.4000015258789,
+            "width": 39.22500228881836,
+            "height": 20,
+            "top": 120.4000015258789,
+            "right": 232.79999923706055,
+            "bottom": 140.4000015258789,
+            "left": 193.5749969482422
+          }
+        }
+      ],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Console ",
+          "fg": "rgb(15, 74, 133)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-light-220-settings",
+      "width": 220,
+      "height": 712,
+      "theme": "Default High Contrast Light",
+      "themeKind": "vscode-high-contrast-light vscode-high-contrast",
+      "bodyWidth": 205,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Settings",
+          "fg": "rgb(15, 74, 133)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-light-300-dashboard",
+      "width": 300,
+      "height": 712,
+      "theme": "Default High Contrast Light",
+      "themeKind": "vscode-high-contrast-light vscode-high-contrast",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Dashboard",
+          "fg": "rgb(15, 74, 133)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".btn.sec",
+          "text": "Setup details",
+          "fg": "rgb(41, 41, 41)",
+          "bg": "rgb(255, 255, 255)",
+          "fontSize": "12px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-light-300-explorer",
+      "width": 300,
+      "height": 712,
+      "theme": "Default High Contrast Light",
+      "themeKind": "vscode-high-contrast-light vscode-high-contrast",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Explorer",
+          "fg": "rgb(15, 74, 133)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.green",
+          "text": "codex",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(46, 204, 113, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(46, 204, 113, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".sub-pill.active",
+          "text": "Sessions",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(15, 74, 133)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(15, 74, 133)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected",
+          "text": "Synthetic UI audit session 9 — long summary f",
+          "fg": "rgb(41, 41, 41)",
+          "bg": "rgb(255, 255, 255)",
+          "fontSize": "13px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected .explorer-card-meta",
+          "text": "4m ago · 16000 tokens · audit-sess…",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "0.75",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "0.75"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-light-300-workflows",
+      "width": 300,
+      "height": 712,
+      "theme": "Default High Contrast Light",
+      "themeKind": "vscode-high-contrast-light vscode-high-contrast",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Workflows",
+          "fg": "rgb(15, 74, 133)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-light-300-console",
+      "width": 300,
+      "height": 712,
+      "theme": "Default High Contrast Light",
+      "themeKind": "vscode-high-contrast-light vscode-high-contrast",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Console ",
+          "fg": "rgb(15, 74, 133)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-light-300-settings",
+      "width": 300,
+      "height": 712,
+      "theme": "Default High Contrast Light",
+      "themeKind": "vscode-high-contrast-light vscode-high-contrast",
+      "bodyWidth": 285,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Settings",
+          "fg": "rgb(15, 74, 133)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-light-480-dashboard",
+      "width": 480,
+      "height": 712,
+      "theme": "Default High Contrast Light",
+      "themeKind": "vscode-high-contrast-light vscode-high-contrast",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Dashboard",
+          "fg": "rgb(15, 74, 133)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".btn.sec",
+          "text": "Setup details",
+          "fg": "rgb(41, 41, 41)",
+          "bg": "rgb(255, 255, 255)",
+          "fontSize": "12px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-light-480-explorer",
+      "width": 480,
+      "height": 712,
+      "theme": "Default High Contrast Light",
+      "themeKind": "vscode-high-contrast-light vscode-high-contrast",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Explorer",
+          "fg": "rgb(15, 74, 133)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.green",
+          "text": "codex",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(46, 204, 113, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(46, 204, 113, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".sub-pill.active",
+          "text": "Sessions",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgb(15, 74, 133)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(15, 74, 133)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected",
+          "text": "Synthetic UI audit session 9 — long summary f",
+          "fg": "rgb(41, 41, 41)",
+          "bg": "rgb(255, 255, 255)",
+          "fontSize": "13px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".explorer-card.selected .explorer-card-meta",
+          "text": "4m ago · 16000 tokens · audit-sess…",
+          "fg": "rgb(255, 255, 255)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "0.75",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "0.75"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-light-480-workflows",
+      "width": 480,
+      "height": 712,
+      "theme": "Default High Contrast Light",
+      "themeKind": "vscode-high-contrast-light vscode-high-contrast",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Workflows",
+          "fg": "rgb(15, 74, 133)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-light-480-console",
+      "width": 480,
+      "height": 712,
+      "theme": "Default High Contrast Light",
+      "themeKind": "vscode-high-contrast-light vscode-high-contrast",
+      "bodyWidth": 480,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Console ",
+          "fg": "rgb(15, 74, 133)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hc-light-480-settings",
+      "width": 480,
+      "height": 712,
+      "theme": "Default High Contrast Light",
+      "themeKind": "vscode-high-contrast-light vscode-high-contrast",
+      "bodyWidth": 465,
+      "overflowControls": [],
+      "colors": [
+        {
+          "selector": ".tab-btn.active",
+          "text": "Settings",
+          "fg": "rgb(15, 74, 133)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "fontSize": "11px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        },
+        {
+          "selector": ".badge.yellow",
+          "text": "YELLOW",
+          "fg": "rgb(241, 196, 15)",
+          "bg": "rgba(241, 196, 15, 0.12)",
+          "fontSize": "10px",
+          "opacity": "1",
+          "backgrounds": [
+            {
+              "color": "rgba(241, 196, 15, 0.12)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgb(255, 255, 255)",
+              "opacity": "1"
+            },
+            {
+              "color": "rgba(0, 0, 0, 0)",
+              "opacity": "1"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "interactions": {
+    "enterOpens": false,
+    "escapeCloses": false,
+    "drawer": {
+      "ariaHidden": "true",
+      "focus": "explorer-card selected",
+      "hitAtNav": "<button class=\"tab-btn\" role=\"tab\" id=\"tabBtn-dashboard\" data-tab=\"dashboard\" aria-selected=\"false\" aria-controls=\"panel-dashboard\">Dashboard</button>"
+    },
+    "tabScroll": {
+      "before": 0,
+      "after": 64.80000305175781
+    }
+  },
+  "zoom": {
+    "width": 167,
+    "height": 303,
+    "theme": "Light Modern",
+    "themeKind": "vscode-light",
+    "bodyWidth": 172,
+    "overflowControls": [
+      {
+        "id": "btnQuickConsole",
+        "text": "💻",
+        "rect": {
+          "x": 143.6404571533203,
+          "y": 14.204619407653809,
+          "width": 28.471759796142578,
+          "height": 21.994651794433594,
+          "top": 14.204619407653809,
+          "right": 172.1122169494629,
+          "bottom": 36.1992712020874,
+          "left": 143.6404571533203
+        }
+      }
+    ],
+    "colors": [
+      {
+        "selector": ".tab-btn.active",
+        "text": "Settings",
+        "fg": "rgb(0, 95, 184)",
+        "bg": "rgba(0, 0, 0, 0)",
+        "fontSize": "11px",
+        "opacity": "1",
+        "backgrounds": [
+          {
+            "color": "rgba(0, 0, 0, 0)",
+            "opacity": "1"
+          },
+          {
+            "color": "rgba(0, 0, 0, 0)",
+            "opacity": "1"
+          },
+          {
+            "color": "rgb(248, 248, 248)",
+            "opacity": "1"
+          },
+          {
+            "color": "rgb(248, 248, 248)",
+            "opacity": "1"
+          },
+          {
+            "color": "rgba(0, 0, 0, 0)",
+            "opacity": "1"
+          }
+        ]
+      },
+      {
+        "selector": ".badge.yellow",
+        "text": "YELLOW",
+        "fg": "rgb(241, 196, 15)",
+        "bg": "rgba(241, 196, 15, 0.12)",
+        "fontSize": "10px",
+        "opacity": "1",
+        "backgrounds": [
+          {
+            "color": "rgba(241, 196, 15, 0.12)",
+            "opacity": "1"
+          },
+          {
+            "color": "rgba(0, 0, 0, 0)",
+            "opacity": "1"
+          },
+          {
+            "color": "rgba(0, 0, 0, 0)",
+            "opacity": "1"
+          },
+          {
+            "color": "rgba(0, 0, 0, 0)",
+            "opacity": "1"
+          },
+          {
+            "color": "rgb(248, 248, 248)",
+            "opacity": "1"
+          },
+          {
+            "color": "rgba(0, 0, 0, 0)",
+            "opacity": "1"
+          }
+        ]
+      }
+    ]
+  }
+}

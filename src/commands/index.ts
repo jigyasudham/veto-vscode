@@ -11,6 +11,8 @@ export interface CommandDeps {
   outputChannel: vscode.OutputChannel;
   openHud: () => void;
   getProjectDir?: () => string | undefined;
+  /** Throws when an AI workflow would write to a different database than the HUD reads (F18). */
+  beforeWorkflow?: (projectDir?: string) => Promise<void>;
 }
 
 export function registerCommands(context: vscode.ExtensionContext, deps: CommandDeps): void {
@@ -27,6 +29,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Command
     }));
   };
   const call = async (tool: string, input: Record<string, unknown>, title: string, cwd = project()) => {
+    await deps.beforeWorkflow?.(cwd);
     const result = await runStructuredTool(outputChannel, { title, cwd, tool, input });
     store.refresh(true);
     return result;
@@ -39,7 +42,7 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Command
 
   registerDetailCommands(context, { store, getProjectDir: project });
   registerCatalogCommands(context, project);
-  registerDraftWorkflows(context, outputChannel, project);
+  registerDraftWorkflows(context, outputChannel, project, deps.beforeWorkflow);
   register('veto.setupDiagnostics', async () => {
     const content = visibilityReport(store.getSnapshot(), {
       extensionVersion: context.extension.packageJSON.version ?? 'Unknown', runtimeVersion: process.versions.node,
@@ -101,4 +104,8 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Command
     await call('veto_secrets_scan', { text, ...(choice.scanKind === 'active' && editor ? { file_path: editor.document.uri.fsPath } : {}) }, 'Veto: scan secrets', choice.scanKind === 'active' && editor ? editorProject(editor) : cwd);
   }, true);
   register('veto.searchMemory', () => vscode.commands.executeCommand('veto.browseMemory'));
+  register('veto.openTerminal', () => {
+    const terminal = vscode.window.createTerminal({ name: 'Veto Terminal', cwd: project() });
+    terminal.show();
+  }, true);
 }

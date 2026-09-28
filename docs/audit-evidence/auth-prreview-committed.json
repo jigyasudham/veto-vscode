@@ -1,0 +1,15 @@
+{
+  "scenario": "prreview",
+  "elapsedMs": 18151,
+  "result": {
+    "running": false,
+    "visible": true,
+    "action": "reviewPR",
+    "verdict": "COMPLETED",
+    "body": "No result data",
+    "console": "14:23:04[INFO]Veto HUD v1.2.0 active. DB: C:\\Users\\jigya\\AppData\\Local\\Temp\\veto-live-audit-N6zpUZ\\fixture.db14:24:49[INFO][Checkpoint] Saving summary: \"SYNTHETIC VETO EXTENSION AUDIT 2026-09-28: verify authenticated checkpoint end to end; disposable test project.\"...14:25:01[SUCCESS][Checkpoint] Saved successfully.14:25:03[INFO][Review File] Reviewing c:\\Users\\jigya\\AppData\\Local\\Temp\\veto-live-audit-N6zpUZ\\workspace\\example.js...14:25:24[SUCCESS][Review File] Review finished. Verdict: Completed14:25:25[INFO][Scan Secrets] Scanning secrets with scope: active...14:25:42[SUCCESS][Scan Secrets] Scan complete. Verdict: Completed14:25:43[INFO][Council Debate] Starting debate: \"SYNTHETIC AUDIT ONLY: Assess adding an explicit division-by-zero error to a tiny JavaScript divide(a,b) utility in this disposable fixture. No deployment or external actions. Complete the normal council protocol.\"...14:26:09[SUCCESS][Council Debate] Finished. Verdict: Completed14:26:10[INFO][Draft Commit] Generating draft commit message...14:26:19[SUCCESS][Draft Commit] Finished.14:26:20[INFO][Draft PR] Generating draft PR description against main...14:26:40[SUCCESS][Draft PR] Finished.14:26:40[INFO][Diagnostics] Running backend diagnostics...14:26:41[SUCCESS][Diagnostics] Backend diagnostics completed.14:28:05[INFO][Draft Commit] Generating draft commit message...14:28:18[SUCCESS][Draft Commit] Finished.14:28:56[INFO][Draft PR] Generating draft PR description against main...14:29:19[SUCCESS][Draft PR] Finished.14:29:19[INFO][Review PR] Reviewing PR: https://github.com/jigyasudham/veto-vscode/pull/1...14:29:37[SUCCESS][Review PR] Finished. Verdict: Completed"
+  },
+  "notifications": [
+    "Source: Veto MCP Dashboard\nOpen Log\nVeto: backend error"
+  ]
+}

@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { spawnProcess } from './process';
 import { parseApiEnvelope, requireCompatibleBackend, type ApiCommand, type ApiEnvelope } from '../core/backend';
-import { isAbsolute, join } from 'node:path';
+import { join } from 'node:path';
+import { vetoInvocation } from '../core/cli';
 import { homedir } from 'node:os';
 import { pathsEqual, isCustomDbPath } from '../core/paths';
 
@@ -9,30 +10,35 @@ export function registerBackendCommands(context: vscode.ExtensionContext, deps: 
   getProjectDir: () => string | undefined; getDbPath: () => string;
   showSnapshot: (envelope: ApiEnvelope) => void;
   onSnapshotFetched?: (envelope: ApiEnvelope) => void;
-}): { refreshSnapshot: (silent?: boolean) => Promise<ApiEnvelope | undefined> } {
+}): { refreshSnapshot: (silent?: boolean) => Promise<ApiEnvelope | undefined>; callApi: (command: ApiCommand, input: Record<string, unknown>, project?: string) => Promise<ApiEnvelope> } {
   let request = 0;
+  let callSeq = 0;
   async function call(command: ApiCommand, input: Record<string, unknown>, project?: string): Promise<ApiEnvelope> {
     if (!vscode.workspace.isTrusted) throw new Error('Trust this workspace before calling the Veto backend.');
     return vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: `Veto: ${command}`, cancellable: true }, async (_, token) => {
       const configuredCli = vscode.workspace.getConfiguration('veto').get<string>('cliPath', '').trim();
-      if (configuredCli && (!isAbsolute(configuredCli) || !/\.js$/i.test(configuredCli))) {
-        throw new Error('veto.cliPath must be an absolute path to Veto cli.js.');
-      }
-      const initialExec = configuredCli ? 'node' : 'veto';
-      const initialPrefix = configuredCli ? [configuredCli] : [];
+      const { command: initialExec, prefix: initialPrefix } = vetoInvocation(configuredCli);
+      // API calls are read-only and short; overlapping calls (e.g. a newer Explorer search)
+      // must not reject each other, so each call gets its own job key.
+      const seq = ++callSeq;
       const options = {
         cwd: project, input: JSON.stringify(input), cancellationToken: token, timeoutMs: 60000,
-        jobKey: `api:${command}:${project ?? ''}`,
+        jobKey: `api:${command}:${project ?? ''}:${seq}`,
       };
 
       // 1. Version gate: Call api version first.
       let versionRaw: string;
       try {
         versionRaw = await spawnProcess(initialExec, [...initialPrefix, 'api', 'version', '--stdin'], undefined, {
-          ...options, input: '{}', jobKey: `api:version:${project ?? ''}`
+          ...options, input: '{}', jobKey: `api:version:${project ?? ''}:${seq}`
         });
-      } catch {
-        throw new Error('Veto 3.8.0 or later required. Run: npm i -g @jigyasudham/veto@latest');
+      } catch (error) {
+        // Only a missing CLI or one without `api` means an old/absent install; keep other causes.
+        const message = error instanceof Error ? error.message : String(error);
+        if (/ENOENT|not recognized|not found|exited with code|Cannot safely launch|Native Node executable/i.test(message)) {
+          throw new Error('Veto 3.8.0 or later required. Run: npm i -g @jigyasudham/veto@latest');
+        }
+        throw error;
       }
 
       let versionEnv: ApiEnvelope;
@@ -148,5 +154,5 @@ export function registerBackendCommands(context: vscode.ExtensionContext, deps: 
     if (!stale()) await show(expanded, project);
   });
 
-  return { refreshSnapshot: fetchSnapshot };
+  return { refreshSnapshot: fetchSnapshot, callApi: call };
 }

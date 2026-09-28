@@ -1,0 +1,16 @@
+{
+  "scenario": "checkpoint",
+  "elapsedMs": 13110,
+  "result": {
+    "running": false,
+    "visible": true,
+    "action": "saveCheckpoint",
+    "verdict": "COMPLETED",
+    "body": "{\n  \"success\": true,\n  \"message\": \"Session saved. Use this ID to restore on any AI platform.\",\n  \"session_id\": \"4667b6cc-30db-4d1a-b62b-0ae2d275c1c9\",\n  \"saved_at\": \"2026-09-28T14:24:55.898Z\",\n  \"updated\": false,\n  \"auto_summarized\": false,\n  \"usage_pct\": 0,\n  \"context_warning\": false,\n  \"transcript\": {\n    \"status\": \"archived\",\n    \"source\": \"claude\",\n    \"events\": 18,\n    \"secrets_redacted\": 0\n  }\n}",
+    "console": "14:23:04[INFO]Veto HUD v1.2.0 active. DB: C:\\Users\\jigya\\AppData\\Local\\Temp\\veto-live-audit-N6zpUZ\\fixture.db14:24:49[INFO][Checkpoint] Saving summary: \"SYNTHETIC VETO EXTENSION AUDIT 2026-09-28: verify authenticated checkpoint end to end; disposable test project.\"...14:25:01[SUCCESS][Checkpoint] Saved successfully."
+  },
+  "notifications": [
+    "Source: Veto MCP Dashboard\nOpen Log\nVeto: completed",
+    "Reload and Enable Extensions\nAll installed extensions are temporarily disabled."
+  ]
+}

@@ -135,14 +135,14 @@ export class VetoStore {
   memoryDetail(scope: DetailScope, id: string) {
     return this.readDetail(db => queryMemoryDetail(db, scope, id));
   }
-  councilPage(scope: DetailScope, offset = 0) {
-    return this.readDetail(db => queryCouncilPage(db, scope, offset));
+  councilPage(scope: DetailScope, offset = 0, search = '') {
+    return this.readDetail(db => queryCouncilPage(db, scope, offset, search));
   }
-  constraintPage(scope: DetailScope, offset = 0) {
-    return this.readDetail(db => queryConstraints(db, scope, offset));
+  constraintPage(scope: DetailScope, offset = 0, search = '') {
+    return this.readDetail(db => queryConstraints(db, scope, offset, search));
   }
-  decisionPage(scope: DetailScope, offset = 0) {
-    return this.readDetail(db => queryDecisionPage(db, scope, offset));
+  decisionPage(scope: DetailScope, offset = 0, search = '') {
+    return this.readDetail(db => queryDecisionPage(db, scope, offset, search));
   }
   reviewDetails(scope: DetailScope) {
     return this.readDetail(db => queryDiagnostics(db, 'projectDir' in scope ? scope.projectDir : undefined));

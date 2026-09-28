@@ -1,0 +1,23 @@
+{
+  "mode": "agentic_fallback",
+  "llm_backed": true,
+  "generation": "complete",
+  "deterministic_findings": {
+    "agent": "secrets",
+    "subject": "provided code",
+    "findings": [],
+    "score": 100,
+    "verdict": "approved",
+    "summary": "No credentials or secrets detected in provided code. Score: 100/100.",
+    "critical_count": 0,
+    "high_count": 0
+  },
+  "agent": "secrets",
+  "subject": "example.js — divide(a, b) utility function",
+  "findings": [],
+  "score": 100,
+  "verdict": "approved",
+  "summary": "No hardcoded secrets, API keys, tokens, passwords, connection strings, or private keys found; the code is a pure arithmetic helper with a static error message.",
+  "critical_count": 0,
+  "high_count": 0
+}

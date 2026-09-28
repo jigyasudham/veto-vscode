@@ -1,0 +1,16 @@
+{
+  "scenario": "scan",
+  "elapsedMs": 17177,
+  "result": {
+    "running": false,
+    "visible": true,
+    "action": "scanSecrets",
+    "verdict": "COMPLETED",
+    "body": "{\n  \"mode\": \"agentic_fallback\",\n  \"llm_backed\": true,\n  \"generation\": \"complete\",\n  \"deterministic_findings\": {\n    \"agent\": \"secrets\",\n    \"subject\": \"provided code\",\n    \"findings\": [],\n    \"score\": 100,\n    \"verdict\": \"approved\",\n    \"summary\": \"No credentials or secrets detected in provided code. Score: 100/100.\",\n    \"critical_count\": 0,\n    \"high_count\": 0\n  },\n  \"agent\": \"secrets\",\n  \"subject\": \"example.js — divide(a, b) utility function\",\n  \"findings\": [],\n  \"score\": 100,\n  \"verdict\": \"approved\",\n  \"summary\": \"No hardcoded secrets, API keys, tokens, passwords, connection strings, or private keys found; the code is a pure arithmetic helper with a static error message.\",\n  \"critical_count\": 0,\n  \"high_count\": 0\n}",
+    "console": "14:23:04[INFO]Veto HUD v1.2.0 active. DB: C:\\Users\\jigya\\AppData\\Local\\Temp\\veto-live-audit-N6zpUZ\\fixture.db14:24:49[INFO][Checkpoint] Saving summary: \"SYNTHETIC VETO EXTENSION AUDIT 2026-09-28: verify authenticated checkpoint end to end; disposable test project.\"...14:25:01[SUCCESS][Checkpoint] Saved successfully.14:25:03[INFO][Review File] Reviewing c:\\Users\\jigya\\AppData\\Local\\Temp\\veto-live-audit-N6zpUZ\\workspace\\example.js...14:25:24[SUCCESS][Review File] Review finished. Verdict: Completed14:25:25[INFO][Scan Secrets] Scanning secrets with scope: active...14:25:42[SUCCESS][Scan Secrets] Scan complete. Verdict: Completed"
+  },
+  "notifications": [
+    "Source: Veto MCP Dashboard\nOpen Log\nVeto: backend response received; completion status unavailable.",
+    "Reload and Enable Extensions\nAll installed extensions are temporarily disabled."
+  ]
+}

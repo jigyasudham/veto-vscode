@@ -1,0 +1,13 @@
+{
+  "message": "fix(example): throw error on division by zero in divide()\n\nPreviously divide(a, 0) silently returned Infinity/NaN. The function now\nguards against a zero divisor and throws \"Cannot divide by zero\", and is\nexpanded from a one-liner to a multi-line body.",
+  "type": "fix",
+  "scope": "example",
+  "subject": "throw error on division by zero in divide()",
+  "conventional": true,
+  "subject_length": 57,
+  "files_staged": [
+    "example.js"
+  ],
+  "generation": "complete",
+  "generated_by": "agent_response"
+}

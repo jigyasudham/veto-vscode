@@ -9,32 +9,329 @@
 </head>
 <body>
 <header id="hdr">
-  <span class="logo">⬡ VETO</span>
-  <span id="verdict" class="badge">—</span>
-  <span id="stale" class="stale" hidden>⟳</span>
+  <div class="hdr-top">
+    <div class="hdr-left">
+      <span class="logo">⬡ VETO</span>
+      <span id="verdict" class="badge">—</span>
+      <span id="stale" class="stale" title="Database sync status" hidden>⟳</span>
+    </div>
+    <div class="hdr-right">
+      <button id="btnRefresh" class="icon-btn" title="Refresh Snapshot" aria-label="Refresh Snapshot">↻</button>
+      <button id="btnQuickConsole" class="icon-btn" title="Jump to Console" aria-label="Jump to Console">💻</button>
+    </div>
+  </div>
+  <div class="project-bar">
+    <label for="projectSelect">Project:</label>
+    <select id="projectSelect" aria-label="Select Active Workspace Project"></select>
+  </div>
 </header>
-<div id="notInstalled" class="empty" hidden>
-  Veto database unavailable. Check the configured database path and extension host runtime.
-  <div class="actions"><button class="btn" data-cmd="veto.openInstallDocs">Install docs</button></div>
+
+<div class="tabs-wrapper" id="tabsWrapper">
+  <button id="tabScrollPrev" class="tab-nav-arrow" title="Scroll tabs left" aria-label="Scroll tabs left">‹</button>
+  <nav class="tabs-nav" id="tabsNav" role="tablist" aria-label="Veto Navigation Tabs">
+    <button class="tab-btn active" role="tab" id="tabBtn-dashboard" data-tab="dashboard" aria-selected="true" aria-controls="panel-dashboard">Dashboard</button>
+    <button class="tab-btn" role="tab" id="tabBtn-explorer" data-tab="explorer" aria-selected="false" aria-controls="panel-explorer">Explorer</button>
+    <button class="tab-btn" role="tab" id="tabBtn-workflows" data-tab="workflows" aria-selected="false" aria-controls="panel-workflows">Workflows</button>
+    <button class="tab-btn" role="tab" id="tabBtn-console" data-tab="console" aria-selected="false" aria-controls="panel-console">Console <span id="consoleBadge" class="tab-badge" hidden></span></button>
+    <button class="tab-btn" role="tab" id="tabBtn-settings" data-tab="settings" aria-selected="false" aria-controls="panel-settings">Settings</button>
+  </nav>
+  <button id="tabScrollNext" class="tab-nav-arrow" title="Scroll tabs right" aria-label="Scroll tabs right">›</button>
 </div>
-<main id="cards"></main>
-<nav class="actions" aria-label="Browse Veto records and workflows">
-  <button class="btn sec" data-cmd="veto.backendVisibility">Load lessons / trial</button>
-  <button class="btn sec" data-cmd="veto.searchTranscripts">Search transcripts</button>
-  <button class="btn sec" data-cmd="veto.backendDiagnostics">Backend setup</button>
-  <button class="btn sec" data-cmd="veto.selectProject">Select project</button>
-  <button class="btn sec" data-cmd="veto.browseSessions">Sessions</button>
-  <button class="btn sec" data-cmd="veto.browseMemory">Memory details</button>
-  <button class="btn sec" data-cmd="veto.councilHistory">Council history</button>
-  <button class="btn sec" data-cmd="veto.reviewDetails">Review results</button>
-  <button class="btn sec" data-cmd="veto.decisionHistory">Decisions</button>
-  <button class="btn sec" data-cmd="veto.decisionConstraints">Constraints</button>
-  <button class="btn sec" data-cmd="veto.learningDetails">Learning</button>
-  <button class="btn sec" data-cmd="veto.browseTools">Tools</button>
-  <button class="btn sec" data-cmd="veto.browseAgents">Specialists</button>
-  <button class="btn sec" data-cmd="veto.draftCommitMessage">Draft commit</button>
-  <button class="btn sec" data-cmd="veto.draftPrDescription">Draft PR</button>
-</nav>
+
+<main id="tabPanels">
+  <!-- TAB 1: DASHBOARD -->
+  <section id="panel-dashboard" class="tab-panel active" role="tabpanel" aria-labelledby="tabBtn-dashboard">
+    <div id="notInstalled" class="empty" hidden>
+      Veto database unavailable. Check the configured database path and extension host runtime.
+      <div class="actions"><button class="btn" data-cmd="veto.openInstallDocs">Install docs</button></div>
+    </div>
+    <div id="cards"></div>
+  </section>
+
+  <!-- TAB 2: EXPLORER -->
+  <section id="panel-explorer" class="tab-panel" role="tabpanel" aria-labelledby="tabBtn-explorer" hidden>
+    <div class="sub-nav" role="tablist" aria-label="Explorer Record Types">
+      <button class="sub-pill active" role="tab" aria-selected="true" tabindex="0" data-kind="sessions">Sessions</button>
+      <button class="sub-pill" role="tab" aria-selected="false" tabindex="-1" data-kind="memory">Memory</button>
+      <button class="sub-pill" role="tab" aria-selected="false" tabindex="-1" data-kind="council">Council</button>
+      <button class="sub-pill" role="tab" aria-selected="false" tabindex="-1" data-kind="decisions">Decisions</button>
+      <button class="sub-pill" role="tab" aria-selected="false" tabindex="-1" data-kind="reviews">Reviews</button>
+      <button class="sub-pill" role="tab" aria-selected="false" tabindex="-1" data-kind="tools">Tools</button>
+      <button class="sub-pill" role="tab" aria-selected="false" tabindex="-1" data-kind="agents">Specialists</button>
+      <button class="sub-pill" role="tab" aria-selected="false" tabindex="-1" data-kind="transcripts">Transcripts</button>
+    </div>
+
+    <div class="explorer-filter-bar">
+      <div class="scope-toggle" id="explorerScopeToggle">
+        <label><input type="radio" name="explorerScope" value="project" checked /> This Project</label>
+        <label><input type="radio" name="explorerScope" value="all" /> All Projects</label>
+      </div>
+      <div class="search">
+        <input id="explorerSearch" type="search" placeholder="Search records…" aria-label="Search records" />
+      </div>
+      <div id="transcriptFilter" class="transcript-source-bar hidden">
+        <label for="transcriptSource">Source:</label>
+        <select id="transcriptSource">
+          <option value="All sources">All sources</option>
+          <option value="claude">Claude</option>
+          <option value="gemini">Gemini</option>
+          <option value="codex">Codex</option>
+          <option value="antigravity">Antigravity</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="explorerItems" class="explorer-list"></div>
+  </section>
+
+  <!-- TAB 3: WORKFLOWS -->
+  <section id="panel-workflows" class="tab-panel" role="tabpanel" aria-labelledby="tabBtn-workflows" hidden>
+    <!-- Active Progress Card (Top of Workflows) -->
+    <div id="activeProgressCard" class="card progress-card hidden" role="region" aria-live="polite">
+      <div class="progress-header">
+        <div class="spinner" aria-hidden="true"></div>
+        <div class="progress-info">
+          <strong id="progressTitle">Executing Action…</strong>
+          <span id="progressTimer" class="progress-timer">00:00</span>
+        </div>
+      </div>
+      <div class="progress-actions">
+        <button id="btnCancelAction" class="btn danger">Cancel Action</button>
+        <button id="btnViewConsole" class="btn sec">View Live Console →</button>
+      </div>
+    </div>
+
+    <!-- Workflow Execution Result Card -->
+    <div id="workflowResultCard" class="card result-card hidden" role="region" aria-live="polite">
+      <div class="card-header">
+        <div class="res-title">
+          <span id="resultActionName">Result</span>
+          <span id="resultVerdict" class="badge"></span>
+        </div>
+        <button id="closeResult" class="icon-btn" title="Dismiss" aria-label="Dismiss result">✕</button>
+      </div>
+      <div class="card-body">
+        <div id="resultBody" class="result-text"></div>
+        <div class="actions">
+          <button id="btnCopyResult" class="btn sec">Copy Result</button>
+          <span id="copyResultStatus" class="sub status-text" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive Action Cards -->
+    <div class="wf-cards">
+      <!-- 1. Council Debate -->
+      <section class="card">
+        <header class="card-header" role="button" tabindex="0">
+          <h3>Council Debate</h3>
+          <span class="chevron">▼</span>
+        </header>
+        <div class="card-body">
+          <p class="sub">Debate architectural choices or risky changes with the 7 Veto specialists.</p>
+          <div class="form-group">
+            <label for="wfDebatePrompt">Task or Decision Topic:</label>
+            <textarea id="wfDebatePrompt" rows="3" placeholder="e.g. Refactor user session store to Redis or keep in SQLite?"></textarea>
+          </div>
+          <button id="btnStartDebate" data-action-button class="btn">Start Council Debate</button>
+        </div>
+      </section>
+
+      <!-- 2. Save Checkpoint -->
+      <section class="card">
+        <header class="card-header" role="button" tabindex="0">
+          <h3>Save Summary Checkpoint</h3>
+          <span class="chevron">▼</span>
+        </header>
+        <div class="card-body">
+          <p class="sub">Save a checkpoint summary for the current project session.</p>
+          <div class="form-group">
+            <label for="wfCheckpointSummary">Summary:</label>
+            <input id="wfCheckpointSummary" type="text" placeholder="e.g. Completed feature tests and upgraded dependencies" />
+          </div>
+          <button id="btnSaveCheckpoint" data-action-button class="btn sec">Save Checkpoint</button>
+        </div>
+      </section>
+
+      <!-- 3. Review Active File & Scan Secrets -->
+      <section class="card">
+        <header class="card-header" role="button" tabindex="0">
+          <h3>Code Intelligence & Security</h3>
+          <span class="chevron">▼</span>
+        </header>
+        <div class="card-body">
+          <p class="sub">Run code review or security and secret scans directly in this workspace.</p>
+          <div class="actions" style="margin-bottom: 10px;">
+            <button id="btnReviewActiveFile" data-action-button class="btn">Review Active Editor File</button>
+          </div>
+          <div class="form-group">
+            <label>Scan Secrets Scope:</label>
+            <div class="radio-group">
+              <label><input type="radio" name="secretsScope" value="active" /> Active editor file</label>
+              <label><input type="radio" name="secretsScope" value="staged" /> Staged git changes</label>
+              <label><input type="radio" name="secretsScope" value="working" checked /> All working diff vs HEAD</label>
+            </div>
+          </div>
+          <button id="btnScanSecrets" data-action-button class="btn sec">Scan for Secrets</button>
+        </div>
+      </section>
+
+      <!-- 4. Review Pull Request -->
+      <section class="card">
+        <header class="card-header" role="button" tabindex="0">
+          <h3>Review Pull Request</h3>
+          <span class="chevron">▼</span>
+        </header>
+        <div class="card-body">
+          <p class="sub">Perform an in-depth security, quality, and logic review of a GitHub PR.</p>
+          <div class="form-group">
+            <label for="wfPrUrl">GitHub PR URL:</label>
+            <div class="input-with-button">
+              <input id="wfPrUrl" type="url" placeholder="https://github.com/owner/repo/pull/123" />
+              <button id="btnDetectPr" class="btn sec" title="Detect the open pull request for the current branch (GitHub CLI)">Auto-Detect</button>
+            </div>
+            <span id="prDetectStatus" class="sub status-text" role="status" aria-live="polite"></span>
+          </div>
+          <button id="btnReviewPr" data-action-button class="btn">Review Pull Request</button>
+        </div>
+      </section>
+
+      <!-- 5. Drafting Workflows -->
+      <section class="card">
+        <header class="card-header" role="button" tabindex="0">
+          <h3>Draft Workflows</h3>
+          <span class="chevron">▼</span>
+        </header>
+        <div class="card-body">
+          <p class="sub">Generate conventional commits or pull request descriptions from current changes.</p>
+          <div class="actions" style="margin-bottom: 8px;">
+            <button id="btnDraftCommit" data-action-button class="btn sec">Draft Commit Message</button>
+          </div>
+          <div class="form-group">
+            <label for="wfPrBaseBranch">PR Base Branch:</label>
+            <input id="wfPrBaseBranch" type="text" value="main" />
+          </div>
+          <button id="btnDraftPr" data-action-button class="btn sec">Draft PR Description</button>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- TAB 4: CONSOLE -->
+  <section id="panel-console" class="tab-panel" role="tabpanel" aria-labelledby="tabBtn-console" hidden>
+    <div class="console-toolbar">
+      <div class="console-status-group">
+        <span id="consoleStatus" class="console-status-indicator">● Idle</span>
+      </div>
+      <div class="console-actions">
+        <button id="btnOpenTerminal" class="btn sec small" title="Open VS Code Terminal">💻 Terminal</button>
+        <label class="checkbox-label" title="Keep view scrolled to bottom">
+          <input type="checkbox" id="chkAutoScroll" checked /> Auto-scroll
+        </label>
+        <button id="btnClearLog" class="btn sec small">Clear</button>
+        <button id="btnCopyLog" class="btn sec small">Copy</button>
+      </div>
+    </div>
+    <div class="console-filter-bar">
+      <input id="consoleFilter" type="search" placeholder="Filter console logs…" aria-label="Filter console logs" />
+    </div>
+    <div id="consoleViewport" class="console-viewport" role="log" aria-live="polite" title="Live Veto Log Stream — click below to enter commands"></div>
+    <div class="console-input-bar">
+      <span class="console-prompt-sym">❯</span>
+      <input id="consoleInput" type="text" placeholder="Type a Veto command (status, tools, agents, help)…" aria-label="Console command input" />
+      <button id="btnConsoleSend" class="btn small">Run</button>
+    </div>
+  </section>
+
+  <!-- TAB 5: SETTINGS & DIAGNOSTICS -->
+  <section id="panel-settings" class="tab-panel" role="tabpanel" aria-labelledby="tabBtn-settings" hidden>
+    <section class="card">
+      <header class="card-header" role="button" tabindex="0">
+        <h3>Veto Configuration</h3>
+        <span class="chevron">▼</span>
+      </header>
+      <div class="card-body">
+        <div class="form-group">
+          <label for="settingCliPath">Veto CLI Path:</label>
+          <div class="input-with-button">
+            <input id="settingCliPath" type="text" placeholder="Leave empty to use veto from PATH, or an absolute path to cli.js" />
+            <button id="btnDetectCli" class="btn sec" title="Find the cli.js of the Veto installed on PATH">Auto-Detect</button>
+          </div>
+          <span id="cliDetectStatus" class="sub status-text" role="status" aria-live="polite"></span>
+          <span class="sub">Requires Veto 3.8.0 or later with API v1.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="settingDbPath">Database Override Path:</label>
+          <input id="settingDbPath" type="text" placeholder="~/.veto/veto.db (leave blank for default)" />
+          <span id="settingDbStatus" class="sub">Using default ~/.veto/veto.db</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="settingPollInterval">Poll Interval (ms):</label>
+            <input id="settingPollInterval" type="number" min="1000" max="600000" step="500" value="5000" />
+          </div>
+          <div class="form-group flex-1">
+            <label for="settingActionTimeout">Action Timeout (ms):</label>
+            <input id="settingActionTimeout" type="number" min="1000" max="600000" step="1000" value="120000" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="btnSaveSettings" class="btn">Save Configuration</button>
+          <button id="btnResetSettings" class="btn sec">Reset Defaults</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <header class="card-header" role="button" tabindex="0">
+        <h3>System & Health Diagnostics</h3>
+        <span class="chevron">▼</span>
+      </header>
+      <div class="card-body">
+        <div id="settingsHealthRows"></div>
+        <div class="actions" style="margin-top: 10px;">
+          <button id="btnRunDiagnostics" data-action-button class="btn sec">Run Backend Diagnostics</button>
+          <button id="btnViewProvenance" class="btn sec">View Data Provenance</button>
+        </div>
+        <div id="diagnosticsReportContainer" class="diagnostics-container hidden">
+          <div class="diag-header">
+            <h4 id="diagReportTitle">Report</h4>
+            <button id="closeDiagReport" class="icon-btn" title="Close report" aria-label="Close report">✕</button>
+          </div>
+          <pre id="diagReportContent" class="code-box"></pre>
+        </div>
+      </div>
+    </section>
+  </section>
+</main>
+
+<!-- In-Place Detail Drawer -->
+<div id="drawerBackdrop" class="drawer-backdrop hidden"></div>
+<aside id="detailDrawer" class="drawer hidden" aria-hidden="true" role="dialog" aria-labelledby="drawerTitle">
+  <div class="drawer-header">
+    <h3 id="drawerTitle">Details</h3>
+    <button id="closeDrawer" class="icon-btn" title="Close" aria-label="Close details">✕</button>
+  </div>
+  <div id="drawerActions" class="drawer-actions"></div>
+  <div id="drawerContent" class="drawer-content"></div>
+</aside>
+
+<!-- Resume Choice Modal -->
+<div id="resumeChoiceModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="resumeModalTitle">
+  <div class="modal">
+    <h3 id="resumeModalTitle">Resume Session</h3>
+    <p id="resumeSessionDesc">Choose how you want to continue this session:</p>
+    <div class="modal-buttons">
+      <button id="btnResumeConsole" data-action-button class="btn">▶ Run in Extension Console</button>
+      <button id="btnResumeTerminal" class="btn sec">💻 Open in VS Code Terminal</button>
+      <button id="btnCancelResume" class="btn text">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script nonce="NONCE_PLACEHOLDER">SCRIPT_PLACEHOLDER</script>
 </body>
 </html>

@@ -1,0 +1,7 @@
+{
+  "running": false,
+  "visible": true,
+  "action": "backendDiagnostics",
+  "verdict": "ERROR",
+  "body": "veto.cliPath must be an absolute path to Veto cli.js."
+}

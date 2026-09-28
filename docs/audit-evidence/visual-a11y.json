@@ -1,0 +1,33 @@
+{
+  "colors": [
+    {
+      "selector": ".explorer-card.selected .explorer-card-title span",
+      "foreground": "rgb(255, 255, 255)",
+      "background": "rgba(0, 0, 0, 0)",
+      "selectionVar": "",
+      "titleVar": ""
+    },
+    {
+      "selector": ".explorer-card.selected .explorer-card-meta",
+      "foreground": "rgb(255, 255, 255)",
+      "background": "rgba(0, 0, 0, 0)",
+      "selectionVar": "",
+      "titleVar": ""
+    },
+    {
+      "selector": ".explorer-card:not(.selected) .explorer-card-title",
+      "foreground": "rgb(255, 255, 255)",
+      "background": "rgba(0, 0, 0, 0)",
+      "selectionVar": "",
+      "titleVar": ""
+    },
+    {
+      "selector": ".logo",
+      "foreground": "rgb(255, 255, 255)",
+      "background": "rgba(0, 0, 0, 0)",
+      "selectionVar": "",
+      "titleVar": ""
+    }
+  ],
+  "dialogs": []
+}

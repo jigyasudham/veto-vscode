@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { spawnProcess } from './process';
 import { parseCatalog } from '../core/catalog';
+import { vetoInvocation } from '../core/cli';
 
 export function registerCatalogCommands(context: vscode.ExtensionContext, getProjectDir: () => string | undefined): void {
   for (const kind of ['tools', 'agents'] as const) {
@@ -11,7 +12,8 @@ export function registerCatalogCommands(context: vscode.ExtensionContext, getPro
       }
       try {
         const entries = await vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: `Veto: loading ${kind}`, cancellable: true }, async (_, token) => {
-          const raw = await spawnProcess('veto', [kind, '--json'], undefined, { cwd: getProjectDir(), cancellationToken: token, timeoutMs: 15000 });
+          const cli = vetoInvocation(vscode.workspace.getConfiguration('veto').get<string>('cliPath', ''));
+          const raw = await spawnProcess(cli.command, [...cli.prefix, kind, '--json'], undefined, { cwd: getProjectDir(), cancellationToken: token, timeoutMs: 15000 });
           return parseCatalog(raw, kind);
         });
         const choice = await vscode.window.showQuickPick(entries.map(entry => ({ label: entry.name, description: entry.category, detail: entry.description, entry })), {

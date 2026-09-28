@@ -10,13 +10,18 @@ import {
   cancelAllProcesses,
   resolveExecutable,
   parseToolOutput,
-  extractToolResult,
+  classifyToolStream,
+  outcomeFromError,
+  anyCancellation,
+  summarizeStreamLine,
   resolveInvocation,
   currentBranch,
   detectPrUrl,
   type CouncilVerdict,
   type ParsedToolResult,
+  type ProcessCancellationToken,
   type SpawnOptions,
+  type ToolOutcome,
 } from './process';
 
 export {
@@ -29,6 +34,7 @@ export {
   type CouncilVerdict,
   type ParsedToolResult,
   type SpawnOptions,
+  type ToolOutcome,
 };
 
 const SAFE_ID = /^[A-Za-z0-9_-]+$/;
@@ -50,13 +56,19 @@ export interface StructuredToolOptions {
   cwd?: string;
   tool: string;
   input: Record<string, unknown>;
+  /** Extra cancellation source, e.g. the HUD's Cancel button for this action only. */
+  cancellationToken?: ProcessCancellationToken;
+  /** Receives readable progress lines summarized from Claude's stream. */
+  onProgress?: (line: string) => void;
 }
 
-/** AI reasoning adapter. Completion requires an actual correlated backend tool result. */
-export async function runStructuredTool(outputChannel: vscode.OutputChannel, opts: StructuredToolOptions): Promise<string | undefined> {
+const UNTRUSTED: ToolOutcome = { status: 'error', message: 'Trust this workspace before running actions.' };
+
+/** AI reasoning adapter. Completion requires an actual correlated backend tool result (F01). */
+export async function runStructuredTool(outputChannel: vscode.OutputChannel, opts: StructuredToolOptions): Promise<ToolOutcome> {
   if (!vscode.workspace.isTrusted) {
     vscode.window.showWarningMessage('Veto: trust this workspace before running actions.');
-    return;
+    return UNTRUSTED;
   }
   if (!/^veto_[a-z_]+$/.test(opts.tool)) throw new Error('Invalid Veto tool name');
   const toolName = `mcp__veto__${opts.tool}`;
@@ -77,51 +89,64 @@ export async function runVetoTool(outputChannel: vscode.OutputChannel,
 }
 
 async function executeAction(outputChannel: vscode.OutputChannel,
-  opts: { title: string; cwd?: string; label?: string }, args: string[], prompt: string, tool: string, expectedInput?: Record<string, unknown>): Promise<string | undefined> {
-  if (!vscode.workspace.isTrusted) { vscode.window.showWarningMessage('Veto: trust this workspace before running actions.'); return; }
+  opts: { title: string; cwd?: string; label?: string; cancellationToken?: ProcessCancellationToken; onProgress?: (line: string) => void },
+  args: string[], prompt: string, tool: string, expectedInput?: Record<string, unknown>): Promise<ToolOutcome> {
+  if (!vscode.workspace.isTrusted) { vscode.window.showWarningMessage('Veto: trust this workspace before running actions.'); return UNTRUSTED; }
   const tag = opts.label ?? 'Veto';
+  let outcome: ToolOutcome;
   try {
-    return await vscode.window.withProgress(
-      { location: vscode.ProgressLocation.Notification, title: `${opts.title} (Claude ? ${opts.cwd ?? 'no project'})`, cancellable: true },
+    outcome = await vscode.window.withProgress(
+      { location: vscode.ProgressLocation.Notification, title: `${opts.title} (Claude → ${opts.cwd ?? 'no project'})`, cancellable: true },
       async (_progress, token) => {
         const stream = await spawnProcess('claude', [...args, '--tools', '', '--permission-mode', 'dontAsk', '--output-format', 'stream-json', '--verbose'],
-          line => outputChannel.appendLine(line), {
-            cwd: opts.cwd, cancellationToken: token, input: prompt,
+          line => {
+            outputChannel.appendLine(line);
+            const summary = summarizeStreamLine(line);
+            if (summary) opts.onProgress?.(summary);
+          }, {
+            cwd: opts.cwd, cancellationToken: anyCancellation([token, opts.cancellationToken]), input: prompt,
             timeoutMs: Math.max(1000, vscode.workspace.getConfiguration('veto').get<number>('actionTimeoutMs', 120000)),
             jobKey: `${opts.cwd ?? ''}:${tool}`,
           });
-        const out = extractToolResult(stream, tool, expectedInput);
-        if (out === undefined) {
-          vscode.window.showWarningMessage(`${tag}: no verified backend result. Check Claude authentication and the Veto MCP connection.`, 'Open Log').then(a => a && outputChannel.show(true));
-          outputChannel.appendLine(`[${tag}] No correlated tool result received.`);
-          return;
-        }
-        outputChannel.appendLine(`[${tag}] ${out}`);
-        const result = parseToolOutput(out);
-        if (result.isPendingPhase2) {
-          vscode.window.showWarningMessage(`${tag}: reasoning phase unfinished; no completed result.`, 'Open Log').then(a => a && outputChannel.show(true));
-          return;
-        }
-        if (result.isError) {
-          vscode.window.showErrorMessage(`${tag}: ${result.verdict ?? 'backend error'}`, 'Open Log').then(a => a && outputChannel.show(true));
-        } else if (result.verdict === 'YELLOW') {
-          vscode.window.showWarningMessage(`${tag}: YELLOW (warnings found)`, 'Open Log').then(a => a && outputChannel.show(true));
-        } else if (result.isSuccess) {
-          vscode.window.showInformationMessage(`${tag}: ${result.verdict ?? 'completed'}`, 'Open Log').then(a => a && outputChannel.show(true));
-        } else {
-          vscode.window.showWarningMessage(`${tag}: backend response received; completion status unavailable.`, 'Open Log').then(a => a && outputChannel.show(true));
-        }
-        // Keep full backend results accessible, including unknown contract shapes.
-        const document = await vscode.workspace.openTextDocument({ content: out, language: 'json' });
-        await vscode.window.showTextDocument(document, { preview: true, preserveFocus: true });
-        return result.isError ? undefined : out;
+        return classifyToolStream(stream, tool, expectedInput);
       });
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (msg.includes('cancelled')) vscode.window.showInformationMessage(`${tag}: cancelled`);
-    else vscode.window.showErrorMessage(`${tag}: ${msg}`);
-    return;
+    outcome = outcomeFromError(e);
   }
+  await reportOutcome(outputChannel, tag, outcome);
+  return outcome;
+}
+
+/** One notification per outcome; a failure is never presented as completion. */
+async function reportOutcome(outputChannel: vscode.OutputChannel, tag: string, outcome: ToolOutcome): Promise<void> {
+  const openLog = (a?: string) => { if (a) outputChannel.show(true); };
+  if ('output' in outcome && outcome.output !== undefined) outputChannel.appendLine(`[${tag}] ${outcome.output}`);
+  switch (outcome.status) {
+    case 'cancelled':
+      void vscode.window.showInformationMessage(`${tag}: cancelled`);
+      return;
+    case 'error':
+      outputChannel.appendLine(`[${tag}] ${outcome.message}`);
+      void vscode.window.showErrorMessage(`${tag}: ${outcome.message}`, 'Open Log').then(openLog);
+      return;
+    case 'pending':
+      void vscode.window.showWarningMessage(`${tag}: ${outcome.message}`, 'Open Log').then(openLog);
+      break;
+    case 'completed':
+      if (outcome.verdict === 'RED' || outcome.verdict === 'DEADLOCK') {
+        void vscode.window.showErrorMessage(`${tag}: ${outcome.verdict}`, 'Open Log').then(openLog);
+      } else if (outcome.verdict === 'YELLOW') {
+        void vscode.window.showWarningMessage(`${tag}: YELLOW (warnings found)`, 'Open Log').then(openLog);
+      } else if (outcome.parsed.isSuccess) {
+        void vscode.window.showInformationMessage(`${tag}: ${outcome.verdict ?? 'completed'}`, 'Open Log').then(openLog);
+      } else {
+        void vscode.window.showWarningMessage(`${tag}: backend response received; completion status unavailable.`, 'Open Log').then(openLog);
+      }
+      break;
+  }
+  // Keep full backend results accessible, including unknown contract shapes.
+  const document = await vscode.workspace.openTextDocument({ content: outcome.output, language: 'json' });
+  await vscode.window.showTextDocument(document, { preview: true, preserveFocus: true });
 }
 
 /** Resume in a fresh terminal process, so another session cannot consume the command. */

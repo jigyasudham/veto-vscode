@@ -134,3 +134,83 @@ test('F09: queryUsage reports totalEvents accurately alongside totalSessions ali
 
   db.close();
 });
+
+test('F11: validateHudMessage validates in-extension settings, explorer, actions, and console messages', () => {
+  // Resume with target
+  assert.deepEqual(
+    validateHudMessage({ type: 'resume', id: 'sess-123', platform: 'claude', target: 'console' }),
+    { type: 'resume', id: 'sess-123', platform: 'claude', target: 'console' },
+  );
+  assert.deepEqual(
+    validateHudMessage({ type: 'resume', id: 'sess-123', platform: 'gemini', target: 'terminal' }),
+    { type: 'resume', id: 'sess-123', platform: 'gemini', target: 'terminal' },
+  );
+
+  // Settings
+  assert.deepEqual(validateHudMessage({ type: 'getSettings' }), { type: 'getSettings' });
+  const validSettings = {
+    cliPath: 'd:/cli.js',
+    dbPath: 'd:/veto.db',
+    pollInterval: 3000,
+    actionTimeoutMs: 60000,
+  };
+  assert.deepEqual(
+    validateHudMessage({ type: 'saveSettings', settings: validSettings }),
+    { type: 'saveSettings', settings: validSettings },
+  );
+  // Negative / out of bounds pollInterval clamped
+  const clamped = validateHudMessage({ type: 'saveSettings', settings: { pollInterval: 500, actionTimeoutMs: 9999999 } });
+  assert.equal(clamped?.settings.pollInterval, 1000);
+  assert.equal(clamped?.settings.actionTimeoutMs, 600000);
+
+  // Projects
+  assert.deepEqual(validateHudMessage({ type: 'getProjects' }), { type: 'getProjects' });
+  assert.deepEqual(
+    validateHudMessage({ type: 'selectProject', projectDir: 'D:/repo' }),
+    { type: 'selectProject', projectDir: 'D:/repo' },
+  );
+
+  // Explorer queries
+  for (const kind of ['sessions', 'memory', 'council', 'decisions', 'constraints', 'reviews', 'learning', 'tools', 'agents', 'transcripts']) {
+    const res = validateHudMessage({ type: 'queryExplorer', kind, scope: 'project', search: 'auth', offset: 0, requestId: 10 });
+    assert.deepEqual(res, { type: 'queryExplorer', kind, scope: 'project', search: 'auth', source: undefined, offset: 0, requestId: 10 });
+  }
+  // Unknown kind rejected
+  assert.equal(validateHudMessage({ type: 'queryExplorer', kind: 'invalid_kind' }), null);
+
+  // Detail queries
+  assert.deepEqual(
+    validateHudMessage({ type: 'getMemoryDetail', id: 'm123', scope: 'project', requestId: 5 }),
+    { type: 'getMemoryDetail', id: 'm123', scope: 'project', requestId: 5 },
+  );
+  assert.deepEqual(
+    validateHudMessage({ type: 'expandTranscript', eventId: 'ev456', requestId: 7 }),
+    { type: 'expandTranscript', eventId: 'ev456', requestId: 7 },
+  );
+
+  // Actions
+  for (const act of ['debate', 'saveCheckpoint', 'reviewFile', 'reviewPR', 'scanSecrets', 'draftCommit', 'draftPR', 'backendDiagnostics', 'setupDiagnostics']) {
+    const res = validateHudMessage({ type: 'runAction', action: act, params: { test: true }, requestId: 1 });
+    assert.deepEqual(res, { type: 'runAction', action: act, params: { test: true }, requestId: 1 });
+  }
+  // Unknown action rejected
+  assert.equal(validateHudMessage({ type: 'runAction', action: 'dropDatabase' }), null);
+
+  // Control messages
+  assert.deepEqual(validateHudMessage({ type: 'cancelAction' }), { type: 'cancelAction', requestId: undefined });
+  assert.deepEqual(validateHudMessage({ type: 'clearLog' }), { type: 'clearLog' });
+});
+
+
+test('audit 1.2.0: validator accepts handshake, bounded copyText, detection and correlated cancel/resume', () => {
+  assert.deepEqual(validateHudMessage({ type: 'ready' }), { type: 'ready' });
+  const text = 'x'.repeat(5000);
+  assert.deepEqual(validateHudMessage({ type: 'copyText', text }), { type: 'copyText', text });
+  assert.equal(validateHudMessage({ type: 'copyText', text: 'x'.repeat(1_000_001) }), null);
+  assert.equal(validateHudMessage({ type: 'copyText', text: 42 }), null);
+  assert.deepEqual(validateHudMessage({ type: 'detectCli', requestId: 3 }), { type: 'detectCli', requestId: 3 });
+  assert.deepEqual(validateHudMessage({ type: 'detectPr', requestId: -1 }), { type: 'detectPr', requestId: undefined });
+  assert.deepEqual(validateHudMessage({ type: 'cancelAction', requestId: 9 }), { type: 'cancelAction', requestId: 9 });
+  assert.deepEqual(validateHudMessage({ type: 'resume', id: 's1', platform: 'claude', target: 'console', requestId: 4 }),
+    { type: 'resume', id: 's1', platform: 'claude', target: 'console', requestId: 4 });
+});

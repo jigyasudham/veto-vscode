@@ -1,0 +1,46 @@
+{
+  "mode": "agentic_fallback",
+  "llm_backed": true,
+  "generation": "complete",
+  "deterministic_findings": {
+    "agent": "reviewer",
+    "subject": "Code (5 lines)",
+    "findings": [],
+    "score": 100,
+    "verdict": "approved",
+    "summary": "Code looks clean — no significant issues detected.",
+    "critical_count": 0,
+    "high_count": 0
+  },
+  "agent": "reviewer",
+  "subject": "divide(a, b) utility function in example.js (4 lines)",
+  "findings": [
+    {
+      "severity": "low",
+      "category": "input-validation",
+      "description": "No type checking on a or b. Non-number arguments get coerced silently: divide('6', '3') returns 2, divide('a', 1) returns NaN, and divide(1, '0') skips the zero guard because '0' !== 0 and returns Infinity.",
+      "fix": "Validate inputs up front, e.g. if (typeof a !== 'number' || typeof b !== 'number') throw new TypeError('divide expects numbers'); or add TypeScript/JSDoc types.",
+      "location": "example.js:1-2",
+      "cwe": "CWE-20"
+    },
+    {
+      "severity": "info",
+      "category": "edge-cases",
+      "description": "NaN inputs go straight through and return NaN without an error. The b === 0 check does already catch -0, because -0 === 0 is true.",
+      "fix": "If NaN results should be rejected, add Number.isNaN checks (or Number.isFinite for both operands) and document the behavior.",
+      "location": "example.js:2-3"
+    },
+    {
+      "severity": "info",
+      "category": "error-handling",
+      "description": "A generic Error is thrown for division by zero, so callers can only tell it apart from other errors by matching the message string.",
+      "fix": "Throw a RangeError, or a custom DivisionByZeroError, so callers can check it with instanceof.",
+      "location": "example.js:2"
+    }
+  ],
+  "score": 92,
+  "verdict": "approved",
+  "summary": "Clean, correct division helper with an explicit zero guard; the only gaps are minor input-type validation and edge-case handling.",
+  "critical_count": 0,
+  "high_count": 0
+}
