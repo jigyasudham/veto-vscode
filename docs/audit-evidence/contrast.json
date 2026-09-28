@@ -1,0 +1,118 @@
+[
+  {
+    "theme": "Dark Modern",
+    "ratios": [
+      {
+        "selector": ".tab-btn.active",
+        "ratio": 3.92
+      },
+      {
+        "selector": ".badge.yellow",
+        "ratio": 8.33
+      },
+      {
+        "selector": ".badge.green",
+        "ratio": 13.1
+      },
+      {
+        "selector": ".sub-pill.active",
+        "ratio": 4.53
+      },
+      {
+        "selector": ".explorer-card.selected",
+        "ratio": 10.15
+      },
+      {
+        "selector": ".explorer-card.selected .explorer-card-meta",
+        "ratio": 9.66
+      }
+    ]
+  },
+  {
+    "theme": "Light Modern",
+    "ratios": [
+      {
+        "selector": ".tab-btn.active",
+        "ratio": 5.94
+      },
+      {
+        "selector": ".badge.yellow",
+        "ratio": 1.48
+      },
+      {
+        "selector": ".badge.green",
+        "ratio": 18.11
+      },
+      {
+        "selector": ".sub-pill.active",
+        "ratio": 6.31
+      },
+      {
+        "selector": ".explorer-card.selected",
+        "ratio": 10.55
+      },
+      {
+        "selector": ".explorer-card.selected .explorer-card-meta",
+        "ratio": 10.07
+      }
+    ]
+  },
+  {
+    "theme": "Default High Contrast",
+    "ratios": [
+      {
+        "selector": ".tab-btn.active",
+        "ratio": 10.55
+      },
+      {
+        "selector": ".badge.yellow",
+        "ratio": 10.72
+      },
+      {
+        "selector": ".badge.green",
+        "ratio": 15.15
+      },
+      {
+        "selector": ".sub-pill.active",
+        "ratio": 1.99
+      },
+      {
+        "selector": ".explorer-card.selected",
+        "ratio": 18.49
+      },
+      {
+        "selector": ".explorer-card.selected .explorer-card-meta",
+        "ratio": 10.61
+      }
+    ]
+  },
+  {
+    "theme": "Default High Contrast Light",
+    "ratios": [
+      {
+        "selector": ".tab-btn.active",
+        "ratio": 8.98
+      },
+      {
+        "selector": ".badge.yellow",
+        "ratio": 1.56
+      },
+      {
+        "selector": ".badge.green",
+        "ratio": 1.1
+      },
+      {
+        "selector": ".sub-pill.active",
+        "ratio": 8.98
+      },
+      {
+        "selector": ".explorer-card.selected",
+        "ratio": 14.55
+      },
+      {
+        "selector": ".explorer-card.selected .explorer-card-meta",
+        "ratio": 1
+      }
+    ]
+  }
+]

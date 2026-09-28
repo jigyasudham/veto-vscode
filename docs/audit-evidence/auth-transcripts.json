@@ -1,0 +1,7 @@
+{
+  "text": "No transcripts records found.",
+  "notifications": [
+    "Veto recall search (invalid_request): limit: Too big: expected number to be <=20. See the request schema in contracts/api-v1 of the @jigyasudham/veto package.",
+    "Source: Veto MCP Dashboard\nOpen Log\nVeto: backend error"
+  ]
+}
