@@ -1,0 +1,12 @@
+Session restored from claude (saved 2026-09-28T14:24).
+Summary: SYNTHETIC VETO EXTENSION AUDIT 2026-09-28: verify authenticated checkpoint end to end; disposable test project.
+Continue exactly where you left off. Nothing needs to be re-explained.
+
+
+{
+  "session_id": "4667b6cc-30db-4d1a-b62b-0ae2d275c1c9",
+  "saved_by": "claude",
+  "active_client": "claude",
+  "summary": "SYNTHETIC VETO EXTENSION AUDIT 2026-09-28: verify authenticated checkpoint end to end; disposable test project.",
+  "restored_at": "2026-09-28T14:30:44.518Z"
+}

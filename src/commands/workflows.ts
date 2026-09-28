@@ -6,6 +6,7 @@ export function registerDraftWorkflows(
   context: vscode.ExtensionContext,
   outputChannel: vscode.OutputChannel,
   getProjectDir: () => string | undefined,
+  beforeWorkflow?: (projectDir?: string) => Promise<void>,
 ): void {
   for (const kind of ['commit', 'pr'] as const) {
     context.subscriptions.push(vscode.commands.registerCommand(
@@ -23,6 +24,12 @@ export function registerDraftWorkflows(
             validateInput: value => /^[A-Za-z0-9][A-Za-z0-9._/-]*$/.test(value) && !value.includes('..') ? null : 'Enter a branch name' });
           if (!base) return;
           input.base_branch = base;
+        }
+        try {
+          await beforeWorkflow?.(project);
+        } catch (error) {
+          vscode.window.showErrorMessage(`Veto: ${error instanceof Error ? error.message : String(error)}`);
+          return;
         }
         await runStructuredTool(outputChannel, {
           title: kind === 'commit' ? 'Veto: drafting commit message' : 'Veto: drafting PR description',

@@ -1,0 +1,1 @@
+Error: result (601,395 characters across 2,091 lines) exceeds maximum allowed tokens. Output has been saved to C:\Users\user\.claude\projects\workspace\tool-results\mcp-veto-veto_pr_review.txt.

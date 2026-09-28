@@ -1,0 +1,33 @@
+{
+  "verdict": "pass",
+  "exit_code": 0,
+  "pr": {
+    "title": "Engineering - Fix Release Stage NPM Configuration to Match Publish Stage",
+    "author": "lszomoru",
+    "url": "https://github.com/microsoft/vscode/pull/338378",
+    "base": "main",
+    "head": "lszomoru/agents/fix-product-pipeline-permissions-error",
+    "additions": 16,
+    "deletions": 0,
+    "changed_files": 1
+  },
+  "checks": {
+    "code_review": {
+      "score": 92,
+      "critical": 0,
+      "high": 0
+    },
+    "security": {
+      "score": 93,
+      "critical": 0,
+      "high": 0
+    },
+    "secrets": {
+      "clean": true,
+      "findings": []
+    }
+  },
+  "blocking_issues": [],
+  "review_comment": "## ✅ Veto Review — PASS\n\n| Check | Score | Status |\n|---|---|---|\n| Code Review | 92% | ✅ |\n| Security Scan | 93% | ✅ |\n| Secrets Scan | — | ✅ Clean |\n\nNo blocking issues found.\n\n> Reviewed by [Veto](https://github.com/jigyasudham/veto) · 1 files · +16/-0 · 182ms",
+  "duration_ms": 183
+}

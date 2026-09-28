@@ -25,6 +25,7 @@ import {
   type ActionStatusMessage,
   type ExplorerResponse,
   type ExplorerDetailResponse,
+  type DetectionResult,
   ALLOWED_HUD_COMMANDS,
   validateHudMessage,
 } from './messages';
@@ -46,8 +47,6 @@ export class HudView implements vscode.WebviewViewProvider {
   static readonly viewType = 'veto-hud';
   private view: vscode.WebviewView | undefined;
   private backend: ApiEnvelope | undefined;
-  private currentSettings: SettingsPayload | undefined;
-  private currentProjects: ProjectItem[] | undefined;
   private recentLogs: LogEntry[] = [];
   private static readonly MAX_RECENT_LOGS = 300;
 
@@ -65,16 +64,25 @@ export class HudView implements vscode.WebviewViewProvider {
       if (msg) this.handler(msg);
     });
     view.onDidDispose(() => { this.view = undefined; });
-    this.render(this.getSnapshot());
-    if (this.currentSettings) {
-      void this.view.webview.postMessage({ type: 'settings', settings: this.currentSettings });
-    }
-    if (this.currentProjects) {
-      void this.view.webview.postMessage({ type: 'projectsList', projects: this.currentProjects });
-    }
+    // State is sent when the webview posts { type: 'ready' }; messages posted before its
+    // listener exists would be lost (F10).
+  }
+
+  /** Replay buffered console lines after the webview (re)loads. */
+  replayLogs(): void {
     if (this.recentLogs.length > 0) {
-      void this.view.webview.postMessage({ type: 'recentLogs', logs: this.recentLogs });
+      void this.view?.webview.postMessage({ type: 'recentLogs', logs: this.recentLogs });
     }
+  }
+
+  /** Reply to an Auto-Detect request for the CLI path or the current branch PR. */
+  postDetection(kind: 'cli' | 'pr', result: DetectionResult, requestId?: number): void {
+    void this.view?.webview.postMessage({ type: 'detection', kind, ...result, requestId });
+  }
+
+  /** The selected project or database changed; cached Explorer results are stale. */
+  postScopeChanged(): void {
+    void this.view?.webview.postMessage({ type: 'scopeChanged' });
   }
 
   /** Push the latest snapshot to the webview (it diffs into the DOM). */
@@ -99,13 +107,11 @@ export class HudView implements vscode.WebviewViewProvider {
 
   /** Push current extension settings payload. */
   postSettings(settings: SettingsPayload): void {
-    this.currentSettings = settings;
     void this.view?.webview.postMessage({ type: 'settings', settings });
   }
 
   /** Push available workspace projects list. */
   postProjects(projects: ProjectItem[]): void {
-    this.currentProjects = projects;
     void this.view?.webview.postMessage({ type: 'projectsList', projects });
   }
 

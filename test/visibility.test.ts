@@ -68,7 +68,8 @@ function renderFixture(installed: boolean) {
 test('setup stays usable without a database and passive rendering emits no commands', () => {
   for (const installed of [false, true]) {
     const { all, messages } = renderFixture(installed);
-    assert.equal(messages.length, 0);
+    // Startup posts only the ready handshake; rendering itself emits nothing.
+    assert.equal(JSON.stringify(messages.splice(0)), '[{"type":"ready"}]');
     const button = all.find(n => n.textContent === 'Setup details');
     assert.ok(button);
     button.listeners.click();

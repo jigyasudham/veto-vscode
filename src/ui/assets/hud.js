@@ -47,38 +47,71 @@ function card(title, id) {
     c.appendChild(header);
 
     const body = el('div', 'card-body');
-    const bodyId = 'card-body-' + id;
-    body.id = bodyId;
-    header.setAttribute('aria-controls', bodyId);
     c.appendChild(body);
-
-    const isCollapsed = getUiState('collapse_' + id, false);
-    header.setAttribute('aria-expanded', String(!isCollapsed));
-    if (isCollapsed) {
-      body.classList.add('collapsed');
-      chevron.classList.add('collapsed');
-    }
-
-    const toggle = () => {
-      const collapsedNow = body.classList.toggle('collapsed');
-      chevron.classList.toggle('collapsed', collapsedNow);
-      header.setAttribute('aria-expanded', String(!collapsedNow));
-      setUiState('collapse_' + id, collapsedNow);
-    };
-
-    header.addEventListener('click', toggle);
-    header.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        toggle();
-      }
-    });
-
+    makeCollapsible(header, body, chevron, id);
     c.appendTarget = body;
   } else {
     c.appendTarget = c;
   }
   return c;
+}
+
+/** Wire a card header (role=button) to collapse its body; state persists per id. */
+function makeCollapsible(header, body, chevron, id) {
+  const bodyId = 'card-body-' + id;
+  body.id = bodyId;
+  header.setAttribute('aria-controls', bodyId);
+
+  const isCollapsed = getUiState('collapse_' + id, false);
+  header.setAttribute('aria-expanded', String(!isCollapsed));
+  if (isCollapsed) {
+    body.classList.add('collapsed');
+    if (chevron) chevron.classList.add('collapsed');
+  }
+
+  const toggle = () => {
+    const collapsedNow = body.classList.toggle('collapsed');
+    if (chevron) chevron.classList.toggle('collapsed', collapsedNow);
+    header.setAttribute('aria-expanded', String(!collapsedNow));
+    setUiState('collapse_' + id, collapsedNow);
+  };
+
+  header.addEventListener('click', toggle);
+  header.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggle();
+    }
+  });
+}
+
+/** Activate a role=button element with Enter or Space, like a native button. */
+function keyActivate(node, onActivate) {
+  node.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onActivate();
+    }
+  });
+}
+
+/** Arrow/Home/End navigation across a tablist with a roving tabindex. */
+function rovingTabs(container, selector, activate) {
+  if (!container || typeof container.addEventListener !== 'function') return;
+  container.addEventListener('keydown', (e) => {
+    const items = queryAll(selector);
+    const index = items.indexOf(document.activeElement);
+    if (index < 0) return;
+    let next = -1;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (index + 1) % items.length;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (index - 1 + items.length) % items.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = items.length - 1;
+    if (next < 0) return;
+    e.preventDefault();
+    activate(items[next]);
+    items[next].focus();
+  });
 }
 
 function btn(label, onClick, sec) {
@@ -144,13 +177,27 @@ let explorerKind = 'sessions';
 let explorerScope = 'project';
 let explorerSearchQuery = '';
 let explorerSearchTimer;
+// Every list or detail request gets a new id; only the latest reply is rendered (F05).
 let explorerRequestId = 0;
-let lastExplorerResults = [];
+let latestListRequestId = null;
+let pendingDetailRequestId = null;
+let explorerItemsShown = [];
 
 let activeProgressTimerInterval = null;
 let activeProgressStartTime = null;
 
+// One HUD action runs at a time; replies for other request ids are ignored.
+let actionSeq = 0;
+let currentAction = null;
+let provenanceRequestId = null;
+let detectSeq = 0;
+const pendingDetections = { cli: null, pr: null };
+
+const MAX_COPY_TEXT = 1000000;
+
 let pendingResumeSession = null;
+let drawerOpen = false;
+let drawerReturnFocus = null;
 let allLogs = [];
 
 // ── Tab Management ───────────────────────────────────────────────────────────
@@ -163,6 +210,7 @@ function switchTab(tabId) {
     const isTarget = b.dataset.tab === tabId;
     b.classList.toggle('active', isTarget);
     b.setAttribute('aria-selected', String(isTarget));
+    b.setAttribute('tabindex', isTarget ? '0' : '-1');
     if (isTarget && typeof b.scrollIntoView === 'function') {
       try { b.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' }); } catch {}
     }
@@ -186,6 +234,21 @@ function switchTab(tabId) {
 
 queryAll('.tab-btn').forEach((b) => {
   b.addEventListener('click', () => switchTab(b.dataset.tab));
+});
+rovingTabs($('tabsNav'), '.tab-btn', (b) => switchTab(b.dataset.tab));
+
+// Static cards in the Workflows and Settings panels collapse like rendered cards.
+queryAll('.tab-panel > .card > .card-header[role="button"], .wf-cards > .card > .card-header[role="button"]').forEach((header, i) => {
+  const body = header.parentElement && header.parentElement.querySelector('.card-body');
+  if (!body) return;
+  const title = header.querySelector('h3');
+  const slug = (title ? title.textContent : String(i)).toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  makeCollapsible(header, body, header.querySelector('.chevron'), 'static-' + slug);
+});
+
+// Buttons that name a command in data-cmd (e.g. Install docs) dispatch it (F11).
+queryAll('[data-cmd]').forEach((b) => {
+  b.addEventListener('click', () => vscode.postMessage({ type: 'command', command: b.dataset.cmd }));
 });
 
 safeOn('tabScrollPrev', 'click', () => {
@@ -233,26 +296,41 @@ function updateProjectsList(projects) {
 }
 
 // ── Resume Choice Modal ──────────────────────────────────────────────────────
+let resumeReturnFocus = null;
 function openResumeModal(sessionId, platform) {
   pendingResumeSession = { id: sessionId, platform: platform || 'claude' };
   const desc = $('resumeSessionDesc');
   if (desc) desc.textContent = 'Session: ' + (sessionId.length > 24 ? sessionId.slice(0, 24) + '…' : sessionId);
   const modal = $('resumeChoiceModal');
-  if (modal) modal.classList.remove('hidden');
+  if (!modal) return;
+  resumeReturnFocus = document.activeElement;
+  modal.classList.remove('hidden');
+  const first = $('btnResumeConsole');
+  if (first && typeof first.focus === 'function') first.focus();
 }
 function closeResumeModal() {
   pendingResumeSession = null;
   const modal = $('resumeChoiceModal');
-  if (modal) modal.classList.add('hidden');
+  if (!modal || modal.classList.contains('hidden')) return;
+  modal.classList.add('hidden');
+  restoreFocus(resumeReturnFocus);
+  resumeReturnFocus = null;
 }
 safeOn('btnCancelResume', 'click', closeResumeModal);
 safeOn('resumeChoiceModal', 'click', (e) => {
   if (e.target === $('resumeChoiceModal')) closeResumeModal();
 });
+safeOn('resumeChoiceModal', 'keydown', (e) => {
+  if (e.key === 'Escape') { e.preventDefault(); closeResumeModal(); return; }
+  trapFocus(e, $('resumeChoiceModal'));
+});
 safeOn('btnResumeConsole', 'click', () => {
   if (pendingResumeSession) {
-    vscode.postMessage({ type: 'resume', id: pendingResumeSession.id, platform: pendingResumeSession.platform, target: 'console' });
+    const { id, platform } = pendingResumeSession;
     closeResumeModal();
+    closeDetailDrawer();
+    switchTab('workflows');
+    beginAction('Resuming Session', { type: 'resume', id, platform, target: 'console' });
   }
 });
 safeOn('btnResumeTerminal', 'click', () => {
@@ -428,7 +506,13 @@ function renderDashboard(s) {
   }
   const cact = el('div', 'actions');
   cact.appendChild(btn('New Debate…', () => switchTab('workflows')));
-  cact.appendChild(btn('Review file', () => vscode.postMessage({ type: 'runAction', action: 'reviewFile' }), true));
+  const reviewBtn = btn('Review file', () => {
+    switchTab('workflows');
+    beginAction('Reviewing Active File', { type: 'runAction', action: 'reviewFile' });
+  }, true);
+  reviewBtn.setAttribute('data-action-button', '');
+  reviewBtn.disabled = !!currentAction;
+  cact.appendChild(reviewBtn);
   cact.appendChild(btn('Council history', () => {
     switchTab('explorer');
     setExplorerKind('council');
@@ -486,7 +570,10 @@ function render(s) {
 function setExplorerKind(kind) {
   explorerKind = kind;
   queryAll('.sub-pill').forEach((p) => {
-    p.classList.toggle('active', p.dataset.kind === kind);
+    const isTarget = p.dataset.kind === kind;
+    p.classList.toggle('active', isTarget);
+    p.setAttribute('aria-selected', String(isTarget));
+    p.setAttribute('tabindex', isTarget ? '0' : '-1');
   });
   const tf = $('transcriptFilter');
   if (tf) tf.classList.toggle('hidden', kind !== 'transcripts');
@@ -496,6 +583,8 @@ function setExplorerKind(kind) {
 queryAll('.sub-pill').forEach((p) => {
   p.addEventListener('click', () => setExplorerKind(p.dataset.kind));
 });
+rovingTabs(typeof document !== 'undefined' && document.querySelector ? document.querySelector('.sub-nav') : null,
+  '.sub-pill', (p) => setExplorerKind(p.dataset.kind));
 
 queryAll('input[name="explorerScope"]').forEach((r) => {
   r.addEventListener('change', () => {
@@ -509,28 +598,40 @@ if (explorerSearchInput) {
   explorerSearchInput.addEventListener('input', () => {
     clearTimeout(explorerSearchTimer);
     explorerSearchQuery = explorerSearchInput.value.trim();
-    explorerSearchTimer = setTimeout(loadExplorerData, 250);
+    latestListRequestId = null; // results for the previous query are stale now
+    explorerSearchTimer = setTimeout(() => loadExplorerData(), 250);
   });
 }
 
-safeOn('transcriptSource', 'change', loadExplorerData);
+safeOn('transcriptSource', 'change', () => loadExplorerData());
 
-function loadExplorerData() {
+/** Request the first page, or with append=true the next page after the shown items (F04). */
+function loadExplorerData(append) {
   const reqId = ++explorerRequestId;
+  latestListRequestId = reqId;
+  pendingDetailRequestId = null;
   const srcEl = $('transcriptSource');
   const source = srcEl ? srcEl.value : 'All sources';
+  if (!append) explorerItemsShown = [];
   vscode.postMessage({
     type: 'queryExplorer',
     kind: explorerKind,
     scope: explorerScope,
     search: explorerSearchQuery,
     source,
-    offset: 0,
+    offset: append ? explorerItemsShown.length : 0,
     requestId: reqId
   });
 }
 
-function renderExplorerItems(items, kind, error) {
+function receiveExplorerData(m) {
+  if (m.requestId !== latestListRequestId || m.kind !== explorerKind) return;
+  const items = Array.isArray(m.items) ? m.items : [];
+  explorerItemsShown = m.offset > 0 && !m.error ? explorerItemsShown.concat(items) : items;
+  renderExplorerItems(explorerItemsShown, m.kind, m.error, m.notice, !!m.hasMore && !m.error);
+}
+
+function renderExplorerItems(items, kind, error, notice, hasMore) {
   const container = $('explorerItems');
   if (!container) return;
   container.textContent = '';
@@ -540,7 +641,7 @@ function renderExplorerItems(items, kind, error) {
     return;
   }
   if (!items || !items.length) {
-    container.appendChild(el('div', 'empty', 'No ' + kind + ' records found.'));
+    container.appendChild(el('div', 'empty', notice || 'No ' + kind + ' records found.'));
     return;
   }
 
@@ -548,6 +649,7 @@ function renderExplorerItems(items, kind, error) {
     const cardEl = el('div', 'explorer-card');
     cardEl.setAttribute('role', 'button');
     cardEl.setAttribute('tabindex', '0');
+    keyActivate(cardEl, () => cardEl.click());
 
     const selectThisCard = () => {
       queryAll('.explorer-card').forEach((c) => c.classList.remove('selected'));
@@ -576,7 +678,8 @@ function renderExplorerItems(items, kind, error) {
       cardEl.appendChild(el('div', 'explorer-card-meta', `${tagStr || 'No tags'} · ${item.project_dir ? 'project' : 'global'}`));
       cardEl.addEventListener('click', () => {
         selectThisCard();
-        vscode.postMessage({ type: 'getMemoryDetail', id: item.id, scope: explorerScope, requestId: ++explorerRequestId });
+        drawerReturnFocus = cardEl;
+        vscode.postMessage({ type: 'getMemoryDetail', id: item.id, scope: explorerScope, requestId: requestDetail() });
       });
     } else if (kind === 'council') {
       const title = el('div', 'explorer-card-title');
@@ -650,12 +753,29 @@ function renderExplorerItems(items, kind, error) {
       cardEl.appendChild(el('div', 'explorer-card-meta', `${item.ts || ''} · ${item.source_session_id ? item.source_session_id.slice(0, 10) + '…' : ''}`));
       cardEl.addEventListener('click', () => {
         selectThisCard();
-        vscode.postMessage({ type: 'expandTranscript', eventId: item.event_id || item.id, requestId: ++explorerRequestId });
+        drawerReturnFocus = cardEl;
+        vscode.postMessage({ type: 'expandTranscript', eventId: item.event_id || item.id, requestId: requestDetail() });
       });
     }
 
     container.appendChild(cardEl);
   }
+
+  if (hasMore) {
+    const more = btn('Load more', () => {
+      more.disabled = true;
+      more.textContent = 'Loading…';
+      loadExplorerData(true);
+    }, true);
+    more.id = 'explorerLoadMore';
+    more.classList.add('load-more');
+    container.appendChild(more);
+  }
+}
+
+function requestDetail() {
+  pendingDetailRequestId = ++explorerRequestId;
+  return pendingDetailRequestId;
 }
 
 // ── In-Place Detail Drawer & Human-Readable Rendering ────────────────────────
@@ -938,22 +1058,93 @@ function openDetailDrawer(title, data, actionButtons, kind) {
     renderDetailContent(kind, data, dContent);
   }
 
-  if (drawer) drawer.classList.remove('hidden');
+  if (!drawer) return;
+  if (!drawerOpen && !drawerReturnFocus) drawerReturnFocus = document.activeElement;
+  drawerOpen = true;
+  drawer.classList.remove('hidden');
+  drawer.setAttribute('aria-hidden', 'false');
+  drawer.setAttribute('aria-modal', 'true');
   if (backdrop) backdrop.classList.remove('hidden');
+  setBackgroundInert(true);
+  const close = $('closeDrawer');
+  if (close && typeof close.focus === 'function') close.focus();
 }
 
 function closeDetailDrawer() {
+  pendingDetailRequestId = null;
   const drawer = $('detailDrawer');
   const backdrop = $('drawerBackdrop');
-  if (drawer) drawer.classList.add('hidden');
+  if (drawer) {
+    drawer.classList.add('hidden');
+    drawer.setAttribute('aria-hidden', 'true');
+  }
   if (backdrop) backdrop.classList.add('hidden');
+  if (!drawerOpen) {
+    drawerReturnFocus = null;
+    return;
+  }
+  drawerOpen = false;
+  setBackgroundInert(false);
+  restoreFocus(drawerReturnFocus);
+  drawerReturnFocus = null;
+}
+
+/** While a dialog is open, the page behind it cannot be clicked or focused (F14). */
+function setBackgroundInert(on) {
+  for (const node of [$('hdr'), $('tabsWrapper'), $('tabPanels')]) {
+    if (!node) continue;
+    if (on) node.setAttribute('inert', '');
+    else if (typeof node.removeAttribute === 'function') node.removeAttribute('inert');
+  }
+}
+
+function restoreFocus(target) {
+  if (target && typeof target.focus === 'function' && target.isConnected !== false) {
+    try { target.focus(); } catch {}
+  }
+}
+
+/** Keep Tab / Shift+Tab inside an open dialog. */
+function trapFocus(e, container) {
+  if (e.key !== 'Tab' || !container || typeof container.querySelectorAll !== 'function') return;
+  const focusable = Array.from(container.querySelectorAll('button, [href], input, select, textarea, summary, [tabindex]:not([tabindex="-1"])'))
+    .filter((n) => !n.disabled && !n.hidden);
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const lastEl = focusable[focusable.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); lastEl.focus(); }
+  else if (!e.shiftKey && document.activeElement === lastEl) { e.preventDefault(); first.focus(); }
 }
 
 safeOn('closeDrawer', 'click', closeDetailDrawer);
 safeOn('drawerBackdrop', 'click', closeDetailDrawer);
+safeOn('detailDrawer', 'keydown', (e) => {
+  if (e.key === 'Escape') { e.preventDefault(); closeDetailDrawer(); return; }
+  trapFocus(e, $('detailDrawer'));
+});
 
 // ── Workflows Tab & Active Progress Management ──────────────────────────────
 let lastActionResultText = '';
+
+const nowTs = () => new Date().toISOString().slice(11, 19);
+
+function setActionButtonsDisabled(disabled) {
+  queryAll('[data-action-button]').forEach((b) => { b.disabled = disabled; });
+}
+
+/** Start one tracked action; refuses while another action is still running. */
+function beginAction(label, message) {
+  if (currentAction) {
+    appendLogLine({ id: Date.now(), timestamp: nowTs(), level: 'warn', text: `"${label}" was not started: ${currentAction.label} is still running.` });
+    return false;
+  }
+  const requestId = ++actionSeq;
+  currentAction = { requestId, label };
+  setActionButtonsDisabled(true);
+  startProgress(label);
+  vscode.postMessage(Object.assign({}, message, { requestId }));
+  return true;
+}
 
 function startProgress(actionLabel) {
   const pTitle = $('progressTitle');
@@ -961,9 +1152,14 @@ function startProgress(actionLabel) {
   const progressCard = $('activeProgressCard');
   const resultCard = $('workflowResultCard');
   const cStatus = $('consoleStatus');
+  const cancel = $('btnCancelAction');
 
   if (pTitle) pTitle.textContent = actionLabel;
   if (pTimer) pTimer.textContent = '00:00';
+  if (cancel) {
+    cancel.disabled = false;
+    cancel.textContent = 'Cancel Action';
+  }
   activeProgressStartTime = Date.now();
   clearInterval(activeProgressTimerInterval);
   activeProgressTimerInterval = setInterval(() => {
@@ -981,6 +1177,7 @@ function startProgress(actionLabel) {
   }
 }
 
+/** Show the settled action: COMPLETED/verdict, ERROR, or CANCELLED — never success by default (F01). */
 function finishProgress(actionName, status, verdict, result, message) {
   clearInterval(activeProgressTimerInterval);
   const progressCard = $('activeProgressCard');
@@ -989,6 +1186,7 @@ function finishProgress(actionName, status, verdict, result, message) {
   const rVerdict = $('resultVerdict');
   const rBody = $('resultBody');
   const cStatus = $('consoleStatus');
+  const copyStatus = $('copyResultStatus');
 
   if (progressCard) progressCard.classList.add('hidden');
   if (cStatus) {
@@ -996,51 +1194,92 @@ function finishProgress(actionName, status, verdict, result, message) {
     cStatus.classList.remove('active');
   }
 
-  if (status === 'cancelled') return;
-
   if (resultCard) resultCard.classList.remove('hidden');
   if (rAction) rAction.textContent = actionName;
 
   if (rVerdict) {
-    rVerdict.textContent = verdict || (status === 'error' ? 'ERROR' : 'COMPLETED');
-    rVerdict.className = 'badge ' + (verdict === 'GREEN' ? 'green' : verdict === 'RED' || status === 'error' ? 'red' : verdict === 'DEADLOCK' ? 'deadlock' : verdict === 'YELLOW' ? 'yellow' : 'green');
+    rVerdict.textContent = status === 'cancelled' ? 'CANCELLED' : status === 'error' ? 'ERROR' : (verdict || 'COMPLETED');
+    rVerdict.className = 'badge ' + (status === 'cancelled' ? 'neutral'
+      : status === 'error' || verdict === 'RED' ? 'red'
+        : verdict === 'DEADLOCK' ? 'deadlock'
+          : verdict === 'YELLOW' ? 'yellow' : 'green');
   }
 
-  const text = typeof result === 'string' ? result : result ? JSON.stringify(result, null, 2) : (message || 'No result data');
+  const resultText = typeof result === 'string' ? result : result ? JSON.stringify(result, null, 2) : '';
+  const text = status === 'done'
+    ? (resultText || message || 'Completed with no result data.')
+    : ([message, resultText].filter(Boolean).join('\n\n') ||
+      (status === 'cancelled' ? 'Cancelled.' : 'The action failed without details. Open the Veto log for more information.'));
   lastActionResultText = text;
   if (rBody) rBody.textContent = text;
+  if (copyStatus) copyStatus.textContent = '';
 }
 
-safeOn('btnCancelAction', 'click', () => vscode.postMessage({ type: 'cancelAction' }));
+function receiveActionStatus(m) {
+  if (m.action === 'setupDiagnostics') {
+    if (m.requestId === provenanceRequestId && m.status !== 'running') {
+      provenanceRequestId = null;
+      showDiagnosticsReport('Setup Provenance', m.status === 'error' ? m.message : m.result);
+    }
+    return;
+  }
+  if (!currentAction || (m.requestId !== undefined && m.requestId !== currentAction.requestId)) return;
+  if (m.status === 'running') return;
+  const label = currentAction.label;
+  currentAction = null;
+  setActionButtonsDisabled(false);
+  finishProgress(label, m.status, m.verdict, m.result, m.message);
+  if (m.action === 'backendDiagnostics') {
+    showDiagnosticsReport('Backend Diagnostics', m.result || m.message || m.status);
+  }
+}
+
+/** Copy through the extension; text beyond the message limit gets explicit feedback (F06). */
+function copyText(text, statusEl) {
+  if (!text) return;
+  if (text.length > MAX_COPY_TEXT) {
+    const msg = `Too large to copy (${text.length.toLocaleString()} characters; limit ${MAX_COPY_TEXT.toLocaleString()}). Open the Veto log instead.`;
+    if (statusEl) statusEl.textContent = msg;
+    else appendLogLine({ id: Date.now(), timestamp: nowTs(), level: 'warn', text: msg });
+    return;
+  }
+  if (statusEl) statusEl.textContent = '';
+  vscode.postMessage({ type: 'copyText', text });
+}
+
+safeOn('btnCancelAction', 'click', () => {
+  if (!currentAction) return;
+  vscode.postMessage({ type: 'cancelAction', requestId: currentAction.requestId });
+  const b = $('btnCancelAction');
+  if (b) {
+    b.disabled = true;
+    b.textContent = 'Cancelling…';
+  }
+});
 safeOn('btnViewConsole', 'click', () => switchTab('console'));
 safeOn('closeResult', 'click', () => {
   const rc = $('workflowResultCard');
   if (rc) rc.classList.add('hidden');
 });
-safeOn('btnCopyResult', 'click', () => {
-  if (lastActionResultText) vscode.postMessage({ type: 'copyId', id: lastActionResultText });
-});
+safeOn('btnCopyResult', 'click', () => copyText(lastActionResultText, $('copyResultStatus')));
 
 // Interactive Form Actions
 safeOn('btnStartDebate', 'click', () => {
   const elPrompt = $('wfDebatePrompt');
   const task = elPrompt ? elPrompt.value.trim() : '';
   if (!task) return;
-  startProgress('Council Debate');
-  vscode.postMessage({ type: 'runAction', action: 'debate', params: { task } });
+  beginAction('Council Debate', { type: 'runAction', action: 'debate', params: { task } });
 });
 
 safeOn('btnSaveCheckpoint', 'click', () => {
   const elSummary = $('wfCheckpointSummary');
   const summary = elSummary ? elSummary.value.trim() : '';
   if (!summary) return;
-  startProgress('Saving Checkpoint');
-  vscode.postMessage({ type: 'runAction', action: 'saveCheckpoint', params: { summary } });
+  beginAction('Saving Checkpoint', { type: 'runAction', action: 'saveCheckpoint', params: { summary } });
 });
 
 safeOn('btnReviewActiveFile', 'click', () => {
-  startProgress('Reviewing Active File');
-  vscode.postMessage({ type: 'runAction', action: 'reviewFile' });
+  beginAction('Reviewing Active File', { type: 'runAction', action: 'reviewFile' });
 });
 
 safeOn('btnScanSecrets', 'click', () => {
@@ -1048,33 +1287,66 @@ safeOn('btnScanSecrets', 'click', () => {
   queryAll('input[name="secretsScope"]').forEach((r) => {
     if (r.checked) scope = r.value;
   });
-  startProgress('Scanning Secrets (' + scope + ')');
-  vscode.postMessage({ type: 'runAction', action: 'scanSecrets', params: { scope } });
+  beginAction('Scanning Secrets (' + scope + ')', { type: 'runAction', action: 'scanSecrets', params: { scope } });
 });
 
-safeOn('btnDetectPr', 'click', () => {
-  const prInput = $('wfPrUrl');
-  if (prInput) prInput.placeholder = 'Detecting PR...';
-});
+/** Ask the extension to detect the CLI path or the branch PR (F03, F08). */
+function requestDetection(kind) {
+  const ids = DETECTION_IDS[kind];
+  const requestId = ++detectSeq;
+  pendingDetections[kind] = requestId;
+  const b = $(ids.button);
+  if (b) b.disabled = true;
+  const s = $(ids.status);
+  if (s) {
+    s.textContent = kind === 'cli' ? 'Detecting the Veto CLI…' : 'Detecting the pull request for this branch…';
+    s.classList.remove('error');
+  }
+  vscode.postMessage({ type: kind === 'cli' ? 'detectCli' : 'detectPr', requestId });
+}
+
+const DETECTION_IDS = {
+  cli: { button: 'btnDetectCli', status: 'cliDetectStatus', input: 'settingCliPath' },
+  pr: { button: 'btnDetectPr', status: 'prDetectStatus', input: 'wfPrUrl' },
+};
+
+function receiveDetection(m) {
+  const ids = DETECTION_IDS[m.kind];
+  if (!ids || m.requestId !== pendingDetections[m.kind]) return;
+  pendingDetections[m.kind] = null;
+  const b = $(ids.button);
+  if (b) b.disabled = false;
+  const s = $(ids.status);
+  if (m.value) {
+    const input = $(ids.input);
+    if (input) input.value = m.value;
+    if (s) {
+      s.textContent = m.kind === 'cli' ? 'Detected. Save Configuration to use this path.' : 'Detected the open pull request for this branch.';
+      s.classList.remove('error');
+    }
+  } else if (s) {
+    s.textContent = m.error || 'Detection failed.';
+    s.classList.add('error');
+  }
+}
+
+safeOn('btnDetectPr', 'click', () => requestDetection('pr'));
 
 safeOn('btnReviewPr', 'click', () => {
   const prInput = $('wfPrUrl');
   const prUrl = prInput ? prInput.value.trim() : '';
   if (!prUrl) return;
-  startProgress('Reviewing Pull Request');
-  vscode.postMessage({ type: 'runAction', action: 'reviewPR', params: { prUrl } });
+  beginAction('Reviewing Pull Request', { type: 'runAction', action: 'reviewPR', params: { prUrl } });
 });
 
 safeOn('btnDraftCommit', 'click', () => {
-  startProgress('Drafting Commit Message');
-  vscode.postMessage({ type: 'runAction', action: 'draftCommit' });
+  beginAction('Drafting Commit Message', { type: 'runAction', action: 'draftCommit' });
 });
 
 safeOn('btnDraftPr', 'click', () => {
   const baseEl = $('wfPrBaseBranch');
   const baseBranch = baseEl ? baseEl.value.trim() || 'main' : 'main';
-  startProgress('Drafting PR Description');
-  vscode.postMessage({ type: 'runAction', action: 'draftPR', params: { baseBranch } });
+  beginAction('Drafting PR Description', { type: 'runAction', action: 'draftPR', params: { baseBranch } });
 });
 
 // ── Console Tab Management ───────────────────────────────────────────────────
@@ -1091,7 +1363,7 @@ safeOn('consoleFilter', 'input', () => {
   const filterEl = $('consoleFilter');
   const q = filterEl ? filterEl.value.toLowerCase() : '';
   queryAll('.log-line').forEach((line) => {
-    line.style.display = !q || line.textContent.toLowerCase().includes(q) ? 'flex' : 'none';
+    line.style.display = !q || line.textContent.toLowerCase().includes(q) ? '' : 'none';
   });
 });
 
@@ -1104,7 +1376,7 @@ safeOn('btnClearLog', 'click', () => {
 
 safeOn('btnCopyLog', 'click', () => {
   const fullText = allLogs.map((l) => `[${l.timestamp}] [${l.level.toUpperCase()}] ${l.text}`).join('\n');
-  vscode.postMessage({ type: 'copyId', id: fullText });
+  copyText(fullText, null);
 });
 
 function handleConsoleCommand() {
@@ -1114,12 +1386,7 @@ function handleConsoleCommand() {
   if (!raw) return;
   inp.value = '';
 
-  appendLogLine({
-    id: Date.now(),
-    timestamp: new Date().toISOString().slice(11, 19),
-    level: 'info',
-    text: `❯ ${raw}`
-  });
+  appendLogLine({ id: Date.now(), timestamp: nowTs(), level: 'info', text: `❯ ${raw}` });
 
   const cmd = raw.toLowerCase();
   if (cmd === 'clear') {
@@ -1130,7 +1397,7 @@ function handleConsoleCommand() {
   } else if (cmd === 'help') {
     appendLogLine({
       id: Date.now(),
-      timestamp: new Date().toISOString().slice(11, 19),
+      timestamp: nowTs(),
       level: 'info',
       text: 'Available commands: status, refresh, tools, agents, terminal, clear, help. Use the Workflows tab to run Council Debates and Code Reviews.'
     });
@@ -1147,9 +1414,9 @@ function handleConsoleCommand() {
   } else {
     appendLogLine({
       id: Date.now(),
-      timestamp: new Date().toISOString().slice(11, 19),
+      timestamp: nowTs(),
       level: 'warn',
-      text: `Command "${raw}" submitted. To run interactive CLI commands, click "💻 Terminal" to use the integrated terminal.`
+      text: `Unknown command "${raw}"; nothing was run. Type help for console commands, or click 💻 Terminal to use the Veto CLI.`
     });
   }
 }
@@ -1173,9 +1440,10 @@ function appendLogLine(entry) {
   if (!vp) return;
 
   const line = el('div', 'log-line');
-  line.appendChild(el('span', 'log-ts', entry.timestamp || ''));
-  const tag = el('span', 'log-tag ' + (entry.level || 'info'), `[${(entry.level || 'info').toUpperCase()}]`);
-  line.appendChild(tag);
+  const meta = el('span', 'log-meta');
+  meta.appendChild(el('span', 'log-ts', entry.timestamp || ''));
+  meta.appendChild(el('span', 'log-tag ' + (entry.level || 'info'), `[${(entry.level || 'info').toUpperCase()}]`));
+  line.appendChild(meta);
   line.appendChild(el('span', 'log-msg', entry.text || ''));
 
   const filterEl = $('consoleFilter');
@@ -1216,7 +1484,7 @@ function renderSettings(s) {
   if (db) db.value = s.dbPath || '';
   if (poll) poll.value = s.pollInterval || 5000;
   if (timeout) timeout.value = s.actionTimeoutMs || 120000;
-  if (dbStatus) dbStatus.textContent = s.isCustomDb ? 'Using custom database override' : `Using default: ${s.defaultDbPath}`;
+  if (dbStatus) dbStatus.textContent = s.isCustomDb ? 'Using custom database override. AI workflows are blocked unless Veto uses this same database.' : `Using default: ${s.defaultDbPath}`;
 
   if (hr) {
     hr.textContent = '';
@@ -1249,18 +1517,17 @@ safeOn('btnResetSettings', 'click', () => {
   });
 });
 
-safeOn('btnDetectCli', 'click', () => {
-  const cli = $('settingCliPath');
-  if (cli) cli.value = 'veto';
-});
+safeOn('btnDetectCli', 'click', () => requestDetection('cli'));
 
 safeOn('btnRunDiagnostics', 'click', () => {
-  startProgress('Running Backend Diagnostics');
-  vscode.postMessage({ type: 'runAction', action: 'backendDiagnostics' });
+  if (beginAction('Running Backend Diagnostics', { type: 'runAction', action: 'backendDiagnostics' })) {
+    showDiagnosticsReport('Backend Diagnostics', 'Running…');
+  }
 });
 
 safeOn('btnViewProvenance', 'click', () => {
-  vscode.postMessage({ type: 'runAction', action: 'setupDiagnostics' });
+  provenanceRequestId = ++actionSeq;
+  vscode.postMessage({ type: 'runAction', action: 'setupDiagnostics', requestId: provenanceRequestId });
 });
 
 safeOn('closeDiagReport', 'click', () => {
@@ -1275,6 +1542,16 @@ function showDiagnosticsReport(title, content) {
   if (dTitle) dTitle.textContent = title;
   if (dContent) dContent.textContent = typeof content === 'string' ? content : JSON.stringify(content, null, 2);
   if (dCont) dCont.classList.remove('hidden');
+}
+
+/** The selected project or database changed: cached lists and details are stale (F05). */
+function onScopeChanged() {
+  explorerItemsShown = [];
+  latestListRequestId = null;
+  closeDetailDrawer();
+  const container = $('explorerItems');
+  if (container) container.textContent = '';
+  if (currentTab === 'explorer') loadExplorerData();
 }
 
 // ── Global Message Dispatcher ────────────────────────────────────────────────
@@ -1294,23 +1571,21 @@ if (typeof window !== 'undefined' && window.addEventListener) {
         updateProjectsList(m.projects);
         break;
       case 'explorerData':
-        if (m.kind === explorerKind) {
-          lastExplorerResults = m.items || [];
-          renderExplorerItems(m.items, m.kind, m.error);
-        }
+        receiveExplorerData(m);
         break;
       case 'explorerDetail':
-        openDetailDrawer(`${m.kind.toUpperCase()}: ${m.id}`, m.detail || m.error, [], m.kind);
+        if (m.requestId !== pendingDetailRequestId) break;
+        pendingDetailRequestId = null;
+        openDetailDrawer(`${String(m.kind).toUpperCase()}: ${m.id}`, m.error ? 'Error: ' + m.error : m.detail, [], m.kind);
         break;
       case 'actionStatus':
-        if (m.status === 'running') {
-          startProgress(m.action);
-        } else {
-          finishProgress(m.action, m.status, m.verdict, m.result, m.message);
-          if (m.action === 'backendDiagnostics' || m.action === 'setupDiagnostics') {
-            showDiagnosticsReport(m.action === 'backendDiagnostics' ? 'Backend Diagnostics' : 'Setup Provenance', m.result);
-          }
-        }
+        receiveActionStatus(m);
+        break;
+      case 'detection':
+        receiveDetection(m);
+        break;
+      case 'scopeChanged':
+        onScopeChanged();
         break;
       case 'logEntry':
         appendLogLine(m.entry);
@@ -1330,5 +1605,7 @@ if (typeof window !== 'undefined' && window.addEventListener) {
   });
 }
 
-// Restore previous tab on startup
+// Restore previous tab on startup, then ask the extension for state now that the
+// message listener exists (F10).
 switchTab(currentTab);
+vscode.postMessage({ type: 'ready' });

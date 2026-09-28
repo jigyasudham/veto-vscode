@@ -67,3 +67,23 @@ test('direct council project column takes precedence over session attribution', 
     assert.equal(queryCouncilPage(db, { projectDir: '/other' }).items.length, 0);
   } finally { db.close(); }
 });
+
+test('council, decision, and constraint pages filter by search text before paging', () => {
+  const db = fixture();
+  try {
+    db.exec(`CREATE TABLE decision_constraints (id TEXT, project_dir TEXT, rule TEXT, why TEXT, forbidden_patterns TEXT, file_scope TEXT, severity TEXT, active INTEGER, created_at TEXT)`);
+    db.prepare('INSERT INTO council_outcomes (id, session_id, task, verdict, recommended, debated_at) VALUES (?, ?, ?, ?, ?, ?)').run('c1', 's001', 'Move sessions to Redis', 'GREEN', 'Proceed', 'now');
+    db.prepare('INSERT INTO council_outcomes (id, session_id, task, verdict, recommended, debated_at) VALUES (?, ?, ?, ?, ?, ?)').run('c2', 's001', 'Rename a button', 'GREEN', 'Use Redis cache later', 'now');
+    db.prepare('INSERT INTO council_outcomes (id, session_id, task, verdict, recommended, debated_at) VALUES (?, ?, ?, ?, ?, ?)').run('c3', 's001', 'Upgrade TypeScript', 'GREEN', 'Proceed', 'now');
+    db.prepare('INSERT INTO decisions (id, session_id, decision, rationale, made_at) VALUES (?, ?, ?, ?, ?)').run('d1', 's001', 'Adopt a cache', 'latency', 'now');
+    db.prepare('INSERT INTO decisions (id, session_id, decision, rationale, made_at) VALUES (?, ?, ?, ?, ?)').run('d2', 's001', 'Drop IE support', 'cache busting is hard', 'now');
+    db.prepare('INSERT INTO decisions (id, session_id, decision, rationale, made_at) VALUES (?, ?, ?, ?, ?)').run('d3', 's001', 'Use pnpm', 'speed', 'now');
+    db.prepare('INSERT INTO decision_constraints VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').run('k1', 'D:/Repo', 'No eval', 'injection risk', null, null, 'error', 1, 'now');
+    db.prepare('INSERT INTO decision_constraints VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').run('k2', 'D:/Repo', 'Prefer const', 'style', null, null, 'warning', 1, 'now');
+    const scope = { projectDir: 'D:/Repo' };
+    assert.deepEqual(queryCouncilPage(db, scope, 0, 'redis').items.map(row => row.id).sort(), ['c1', 'c2']);
+    assert.deepEqual(queryDecisionPage(db, scope, 0, 'cache').items.map(row => row.id).sort(), ['d1', 'd2']);
+    assert.deepEqual(queryConstraints(db, scope, 0, 'injection').items.map(row => row.id), ['k1']);
+    assert.equal(queryCouncilPage(db, scope, 0, '').items.length, 3);
+  } finally { db.close(); }
+});

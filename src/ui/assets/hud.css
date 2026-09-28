@@ -23,6 +23,7 @@ body {
 
 .hdr-top {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 6px;
@@ -44,7 +45,7 @@ body {
   font-weight: 700;
   letter-spacing: 1px;
   font-size: 13px;
-  color: var(--vscode-sideBarTitle-foreground, #ffffff);
+  color: var(--vscode-sideBarTitle-foreground, var(--vscode-foreground));
 }
 
 .badge {
@@ -179,11 +180,11 @@ body {
 }
 .tab-btn:hover {
   opacity: 0.95;
-  color: var(--vscode-sideBarTitle-foreground, #ffffff);
+  color: var(--vscode-sideBarTitle-foreground, var(--vscode-foreground));
 }
 .tab-btn.active {
   opacity: 1;
-  color: var(--vscode-activityBar-activeBorder, #007acc);
+  color: var(--vscode-foreground);
   border-bottom-color: var(--vscode-activityBar-activeBorder, #007acc);
   font-weight: 600;
 }
@@ -218,7 +219,7 @@ body {
   align-items: center;
   padding: 6px 10px;
   cursor: pointer;
-  background: var(--vscode-sideBarSectionHeader-background, #333333);
+  background: var(--vscode-sideBarSectionHeader-background, transparent);
   user-select: none;
   border-bottom: 1px solid transparent;
   transition: background 0.1s ease;
@@ -233,7 +234,7 @@ body {
   letter-spacing: .5px;
   opacity: .8;
   font-weight: 600;
-  color: var(--vscode-sideBarTitle-foreground, #f3f3f3);
+  color: var(--vscode-sideBarTitle-foreground, var(--vscode-foreground));
 }
 .card-body {
   padding: 8px 10px;
@@ -361,7 +362,11 @@ body {
 }
 .form-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+}
+.form-row .form-group {
+  min-width: 120px;
 }
 .flex-1 { flex: 1; }
 
@@ -387,10 +392,12 @@ input:focus, textarea:focus, select:focus {
 
 .input-with-button {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
 }
 .input-with-button input {
-  flex: 1;
+  flex: 1 1 140px;
+  min-width: 0;
 }
 
 .radio-group {
@@ -428,8 +435,8 @@ input:focus, textarea:focus, select:focus {
   background: var(--vscode-list-hoverBackground, #3c3c3c);
 }
 .sub-pill.active {
-  background: var(--vscode-activityBar-activeBorder, #007acc);
-  color: #ffffff;
+  background: var(--vscode-button-background, #0e639c);
+  color: var(--vscode-button-foreground, #ffffff);
   border-color: transparent;
   font-weight: 600;
 }
@@ -480,18 +487,18 @@ input:focus, textarea:focus, select:focus {
 .explorer-card:active,
 .explorer-card.selected {
   outline: 1px solid var(--vscode-focusBorder, #007acc) !important;
-  background: var(--vscode-list-activeSelectionBackground, #04395e) !important;
+  background: var(--vscode-list-activeSelectionBackground, transparent) !important;
   border-color: var(--vscode-focusBorder, #007acc) !important;
 }
 .explorer-card:focus *,
 .explorer-card:active *,
 .explorer-card.selected * {
-  color: var(--vscode-list-activeSelectionForeground, #ffffff) !important;
+  color: var(--vscode-list-activeSelectionForeground, var(--vscode-foreground)) !important;
 }
 .explorer-card-title {
   font-weight: 600;
   font-size: 12px;
-  color: var(--vscode-sideBarTitle-foreground, #ffffff);
+  color: var(--vscode-sideBarTitle-foreground, var(--vscode-foreground));
   margin-bottom: 3px;
   display: flex;
   align-items: center;
@@ -508,7 +515,7 @@ input:focus, textarea:focus, select:focus {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
-  z-index: 90;
+  z-index: 130;
 }
 .drawer-backdrop.hidden { display: none !important; }
 
@@ -522,7 +529,7 @@ input:focus, textarea:focus, select:focus {
   background: var(--vscode-sideBar-background, #1e1e1e);
   color: var(--vscode-foreground, #cccccc);
   border-left: 1px solid var(--vscode-panel-border, #3c3c3c);
-  z-index: 100;
+  z-index: 140;
   display: flex;
   flex-direction: column;
   box-shadow: -6px 0 24px rgba(0, 0, 0, 0.45);
@@ -541,13 +548,13 @@ input:focus, textarea:focus, select:focus {
   justify-content: space-between;
   padding: 8px 12px;
   border-bottom: 1px solid var(--vscode-panel-border, #3c3c3c);
-  background: var(--vscode-sideBarSectionHeader-background, #252526);
+  background: var(--vscode-sideBarSectionHeader-background, transparent);
 }
 .drawer-header h3 {
   margin: 0;
   font-size: 12px;
   font-weight: 600;
-  color: var(--vscode-sideBarTitle-foreground, #ffffff);
+  color: var(--vscode-sideBarTitle-foreground, var(--vscode-foreground));
 }
 .drawer-actions {
   padding: 6px 12px;
@@ -741,6 +748,7 @@ input:focus, textarea:focus, select:focus {
 }
 .progress-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 8px;
 }
@@ -762,10 +770,19 @@ input:focus, textarea:focus, select:focus {
   border-left: 3px solid #2ecc71;
 }
 .result-card.hidden { display: none; }
+.result-card .card-header {
+  gap: 6px;
+}
+.result-card .card-header .icon-btn {
+  flex-shrink: 0;
+}
 .res-title {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 4px 8px;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .result-text {
   font-size: 12px;
@@ -781,6 +798,8 @@ input:focus, textarea:focus, select:focus {
 /* ── Console Tab ───────────────────────────────────────────────────── */
 .console-toolbar {
   display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 6px;
@@ -797,6 +816,7 @@ input:focus, textarea:focus, select:focus {
 }
 .console-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
 }
@@ -810,8 +830,8 @@ input:focus, textarea:focus, select:focus {
   margin-bottom: 6px;
 }
 .console-viewport {
-  background: var(--vscode-terminal-background, #181818);
-  color: var(--vscode-terminal-foreground, #cccccc);
+  background: var(--vscode-terminal-background, var(--vscode-editor-background));
+  color: var(--vscode-terminal-foreground, var(--vscode-foreground));
   border: 1px solid var(--vscode-panel-border, #333333);
   border-radius: 4px 4px 0 0;
   padding: 8px;
@@ -853,9 +873,15 @@ input:focus, textarea:focus, select:focus {
 
 .log-line {
   display: flex;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 0 6px;
   word-break: break-word;
   padding: 1px 0;
+}
+.log-meta {
+  display: inline-flex;
+  gap: 6px;
+  flex-shrink: 0;
 }
 .log-ts {
   opacity: 0.5;
@@ -870,7 +896,8 @@ input:focus, textarea:focus, select:focus {
 .log-tag.warn { color: #f1c40f; }
 .log-tag.error { color: var(--vscode-errorForeground, #f48771); }
 .log-msg {
-  flex: 1;
+  flex: 1 1 160px;
+  min-width: 0;
 }
 
 /* ── Resume Modal ──────────────────────────────────────────────────── */
@@ -927,6 +954,64 @@ input:focus, textarea:focus, select:focus {
 }
 
 .hidden { display: none !important; }
+
+.status-text:empty { display: none; }
+.status-text { display: block; margin-top: 3px; }
+.status-text.error { color: var(--vscode-errorForeground, #f48771); }
+.load-more { align-self: center; margin-top: 4px; }
+.badge.neutral {
+  color: var(--vscode-descriptionForeground, var(--vscode-foreground));
+  border-color: currentColor;
+  background: transparent;
+}
+
+/* Very narrow sidebars or high zoom: stack each console line's metadata above its text. */
+@media (max-width: 260px) {
+  body { padding: 6px; }
+  .log-msg { flex-basis: 100%; }
+  .project-bar { flex-wrap: wrap; }
+  .progress-actions .btn, .modal-buttons .btn { width: 100%; }
+}
+
+/* ── Theme-aware status colors (F12, F13) ─────────────────────────── */
+/* The palette above is tuned for dark themes; light themes need darker ink for 4.5:1. */
+body.vscode-light .badge.green,
+body.vscode-light .vote.ok,
+body.vscode-light .log-tag.success,
+body.vscode-light .console-status-indicator.active,
+body.vscode-light .console-prompt-sym { color: #0e7a3a; border-color: #0e7a3a; }
+body.vscode-light .badge.yellow,
+body.vscode-light .vote.warn,
+body.vscode-light .log-tag.warn { color: #7a5a00; border-color: #7a5a00; }
+body.vscode-light .badge.deadlock { color: #b0281a; border-color: #b0281a; }
+body.vscode-light .log-tag.info { color: #1a5f99; }
+
+/* High contrast: text uses the theme foreground; color survives only in borders and outlines. */
+body.vscode-high-contrast .badge,
+body.vscode-high-contrast-light .badge,
+body.vscode-high-contrast .vote,
+body.vscode-high-contrast-light .vote,
+body.vscode-high-contrast .log-tag,
+body.vscode-high-contrast-light .log-tag,
+body.vscode-high-contrast-light .console-status-indicator.active,
+body.vscode-high-contrast-light .console-prompt-sym {
+  color: var(--vscode-foreground);
+  background: transparent;
+}
+body.vscode-high-contrast .sub-pill.active,
+body.vscode-high-contrast-light .sub-pill.active {
+  background: transparent;
+  color: var(--vscode-foreground);
+  outline: 1px solid var(--vscode-contrastActiveBorder, var(--vscode-focusBorder, currentColor));
+  text-decoration: underline;
+}
+body.vscode-high-contrast .explorer-card.selected,
+body.vscode-high-contrast-light .explorer-card.selected {
+  outline: 2px solid var(--vscode-contrastActiveBorder, var(--vscode-focusBorder, currentColor)) !important;
+}
+body.vscode-high-contrast-light .logo,
+body.vscode-high-contrast-light .explorer-card-title,
+body.vscode-high-contrast-light .drawer-header h3 { color: var(--vscode-foreground); }
 
 /* ── Accessibility & Focus ─────────────────────────────────────────── */
 :focus-visible {

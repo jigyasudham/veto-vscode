@@ -2,8 +2,10 @@
 // Decoupled from VS Code APIs to allow full unit testability under Node.js test runner.
 
 export type HudMessage =
-  | { type: 'resume'; id: string; platform: string; target?: 'terminal' | 'console' }
+  | { type: 'ready' }
+  | { type: 'resume'; id: string; platform: string; target?: 'terminal' | 'console'; requestId?: number }
   | { type: 'copyId'; id: string }
+  | { type: 'copyText'; text: string }
   | { type: 'searchMemory'; query: string; requestId?: number }
   | { type: 'command'; command: string }
   | { type: 'getSettings' }
@@ -27,7 +29,9 @@ export type HudMessage =
       params?: Record<string, unknown>;
       requestId?: number;
     }
-  | { type: 'cancelAction' }
+  | { type: 'cancelAction'; requestId?: number }
+  | { type: 'detectCli'; requestId?: number }
+  | { type: 'detectPr'; requestId?: number }
   | { type: 'clearLog' };
 
 export interface MemoryResult {
@@ -79,6 +83,8 @@ export interface ExplorerResponse {
   offset?: number;
   requestId?: number;
   error?: string;
+  /** Informational empty state, e.g. no transcript archive for this project. */
+  notice?: string;
 }
 
 export interface ExplorerDetailResponse {
@@ -119,7 +125,17 @@ export const ALLOWED_HUD_COMMANDS = new Set([
   'veto.openTerminal',
 ]);
 
+/** Upper bound for Copy Result / Copy Log text; larger payloads are refused with feedback. */
+export const MAX_COPY_TEXT = 1_000_000;
+
+export interface DetectionResult {
+  value?: string;
+  error?: string;
+}
+
 const SAFE_ID = /^[A-Za-z0-9_-]+$/;
+const requestIdOf = (value: unknown) =>
+  typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : undefined;
 const ALLOWED_EXPLORER_KINDS = new Set([
   'sessions', 'memory', 'council', 'decisions', 'constraints', 'reviews', 'learning', 'tools', 'agents', 'transcripts'
 ]);
@@ -137,7 +153,19 @@ export function validateHudMessage(raw: unknown): HudMessage | null {
       if (typeof msg.id !== 'string' || !SAFE_ID.test(msg.id) || msg.id.length > 128) return null;
       const platform = typeof msg.platform === 'string' ? msg.platform.slice(0, 32) : 'claude';
       const target = msg.target === 'console' || msg.target === 'terminal' ? msg.target : undefined;
-      return { type: 'resume', id: msg.id, platform, ...(target ? { target } : {}) };
+      const requestId = requestIdOf(msg.requestId);
+      return { type: 'resume', id: msg.id, platform, ...(target ? { target } : {}), ...(requestId !== undefined ? { requestId } : {}) };
+    }
+    case 'ready': {
+      return { type: 'ready' };
+    }
+    case 'copyText': {
+      if (typeof msg.text !== 'string' || !msg.text || msg.text.length > MAX_COPY_TEXT) return null;
+      return { type: 'copyText', text: msg.text };
+    }
+    case 'detectCli':
+    case 'detectPr': {
+      return { type: msg.type, requestId: requestIdOf(msg.requestId) };
     }
     case 'copyId': {
       if (typeof msg.id !== 'string' || msg.id.length > 512) return null;
@@ -205,7 +233,7 @@ export function validateHudMessage(raw: unknown): HudMessage | null {
       return { type: 'runAction', action, params, requestId };
     }
     case 'cancelAction': {
-      return { type: 'cancelAction' };
+      return { type: 'cancelAction', requestId: requestIdOf(msg.requestId) };
     }
     case 'clearLog': {
       return { type: 'clearLog' };

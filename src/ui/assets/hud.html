@@ -26,7 +26,7 @@
   </div>
 </header>
 
-<div class="tabs-wrapper">
+<div class="tabs-wrapper" id="tabsWrapper">
   <button id="tabScrollPrev" class="tab-nav-arrow" title="Scroll tabs left" aria-label="Scroll tabs left">‹</button>
   <nav class="tabs-nav" id="tabsNav" role="tablist" aria-label="Veto Navigation Tabs">
     <button class="tab-btn active" role="tab" id="tabBtn-dashboard" data-tab="dashboard" aria-selected="true" aria-controls="panel-dashboard">Dashboard</button>
@@ -51,14 +51,14 @@
   <!-- TAB 2: EXPLORER -->
   <section id="panel-explorer" class="tab-panel" role="tabpanel" aria-labelledby="tabBtn-explorer" hidden>
     <div class="sub-nav" role="tablist" aria-label="Explorer Record Types">
-      <button class="sub-pill active" data-kind="sessions">Sessions</button>
-      <button class="sub-pill" data-kind="memory">Memory</button>
-      <button class="sub-pill" data-kind="council">Council</button>
-      <button class="sub-pill" data-kind="decisions">Decisions</button>
-      <button class="sub-pill" data-kind="reviews">Reviews</button>
-      <button class="sub-pill" data-kind="tools">Tools</button>
-      <button class="sub-pill" data-kind="agents">Specialists</button>
-      <button class="sub-pill" data-kind="transcripts">Transcripts</button>
+      <button class="sub-pill active" role="tab" aria-selected="true" tabindex="0" data-kind="sessions">Sessions</button>
+      <button class="sub-pill" role="tab" aria-selected="false" tabindex="-1" data-kind="memory">Memory</button>
+      <button class="sub-pill" role="tab" aria-selected="false" tabindex="-1" data-kind="council">Council</button>
+      <button class="sub-pill" role="tab" aria-selected="false" tabindex="-1" data-kind="decisions">Decisions</button>
+      <button class="sub-pill" role="tab" aria-selected="false" tabindex="-1" data-kind="reviews">Reviews</button>
+      <button class="sub-pill" role="tab" aria-selected="false" tabindex="-1" data-kind="tools">Tools</button>
+      <button class="sub-pill" role="tab" aria-selected="false" tabindex="-1" data-kind="agents">Specialists</button>
+      <button class="sub-pill" role="tab" aria-selected="false" tabindex="-1" data-kind="transcripts">Transcripts</button>
     </div>
 
     <div class="explorer-filter-bar">
@@ -114,6 +114,7 @@
         <div id="resultBody" class="result-text"></div>
         <div class="actions">
           <button id="btnCopyResult" class="btn sec">Copy Result</button>
+          <span id="copyResultStatus" class="sub status-text" role="status" aria-live="polite"></span>
         </div>
       </div>
     </div>
@@ -132,7 +133,7 @@
             <label for="wfDebatePrompt">Task or Decision Topic:</label>
             <textarea id="wfDebatePrompt" rows="3" placeholder="e.g. Refactor user session store to Redis or keep in SQLite?"></textarea>
           </div>
-          <button id="btnStartDebate" class="btn">Start Council Debate</button>
+          <button id="btnStartDebate" data-action-button class="btn">Start Council Debate</button>
         </div>
       </section>
 
@@ -148,7 +149,7 @@
             <label for="wfCheckpointSummary">Summary:</label>
             <input id="wfCheckpointSummary" type="text" placeholder="e.g. Completed feature tests and upgraded dependencies" />
           </div>
-          <button id="btnSaveCheckpoint" class="btn sec">Save Checkpoint</button>
+          <button id="btnSaveCheckpoint" data-action-button class="btn sec">Save Checkpoint</button>
         </div>
       </section>
 
@@ -161,7 +162,7 @@
         <div class="card-body">
           <p class="sub">Run code review or security and secret scans directly in this workspace.</p>
           <div class="actions" style="margin-bottom: 10px;">
-            <button id="btnReviewActiveFile" class="btn">Review Active Editor File</button>
+            <button id="btnReviewActiveFile" data-action-button class="btn">Review Active Editor File</button>
           </div>
           <div class="form-group">
             <label>Scan Secrets Scope:</label>
@@ -171,7 +172,7 @@
               <label><input type="radio" name="secretsScope" value="working" checked /> All working diff vs HEAD</label>
             </div>
           </div>
-          <button id="btnScanSecrets" class="btn sec">Scan for Secrets</button>
+          <button id="btnScanSecrets" data-action-button class="btn sec">Scan for Secrets</button>
         </div>
       </section>
 
@@ -187,10 +188,11 @@
             <label for="wfPrUrl">GitHub PR URL:</label>
             <div class="input-with-button">
               <input id="wfPrUrl" type="url" placeholder="https://github.com/owner/repo/pull/123" />
-              <button id="btnDetectPr" class="btn sec" title="Detect from git branch">Auto-Detect</button>
+              <button id="btnDetectPr" class="btn sec" title="Detect the open pull request for the current branch (GitHub CLI)">Auto-Detect</button>
             </div>
+            <span id="prDetectStatus" class="sub status-text" role="status" aria-live="polite"></span>
           </div>
-          <button id="btnReviewPr" class="btn">Review Pull Request</button>
+          <button id="btnReviewPr" data-action-button class="btn">Review Pull Request</button>
         </div>
       </section>
 
@@ -203,13 +205,13 @@
         <div class="card-body">
           <p class="sub">Generate conventional commits or pull request descriptions from current changes.</p>
           <div class="actions" style="margin-bottom: 8px;">
-            <button id="btnDraftCommit" class="btn sec">Draft Commit Message</button>
+            <button id="btnDraftCommit" data-action-button class="btn sec">Draft Commit Message</button>
           </div>
           <div class="form-group">
             <label for="wfPrBaseBranch">PR Base Branch:</label>
             <input id="wfPrBaseBranch" type="text" value="main" />
           </div>
-          <button id="btnDraftPr" class="btn sec">Draft PR Description</button>
+          <button id="btnDraftPr" data-action-button class="btn sec">Draft PR Description</button>
         </div>
       </section>
     </div>
@@ -252,9 +254,10 @@
         <div class="form-group">
           <label for="settingCliPath">Veto CLI Path:</label>
           <div class="input-with-button">
-            <input id="settingCliPath" type="text" placeholder="veto (PATH default) or absolute path to cli.js" />
-            <button id="btnDetectCli" class="btn sec">Auto-Detect</button>
+            <input id="settingCliPath" type="text" placeholder="Leave empty to use veto from PATH, or an absolute path to cli.js" />
+            <button id="btnDetectCli" class="btn sec" title="Find the cli.js of the Veto installed on PATH">Auto-Detect</button>
           </div>
+          <span id="cliDetectStatus" class="sub status-text" role="status" aria-live="polite"></span>
           <span class="sub">Requires Veto 3.8.0 or later with API v1.</span>
         </div>
 
@@ -290,13 +293,13 @@
       <div class="card-body">
         <div id="settingsHealthRows"></div>
         <div class="actions" style="margin-top: 10px;">
-          <button id="btnRunDiagnostics" class="btn sec">Run Backend Diagnostics</button>
+          <button id="btnRunDiagnostics" data-action-button class="btn sec">Run Backend Diagnostics</button>
           <button id="btnViewProvenance" class="btn sec">View Data Provenance</button>
         </div>
         <div id="diagnosticsReportContainer" class="diagnostics-container hidden">
           <div class="diag-header">
             <h4 id="diagReportTitle">Report</h4>
-            <button id="closeDiagReport" class="icon-btn">✕</button>
+            <button id="closeDiagReport" class="icon-btn" title="Close report" aria-label="Close report">✕</button>
           </div>
           <pre id="diagReportContent" class="code-box"></pre>
         </div>
@@ -322,7 +325,7 @@
     <h3 id="resumeModalTitle">Resume Session</h3>
     <p id="resumeSessionDesc">Choose how you want to continue this session:</p>
     <div class="modal-buttons">
-      <button id="btnResumeConsole" class="btn">▶ Run in Extension Console</button>
+      <button id="btnResumeConsole" data-action-button class="btn">▶ Run in Extension Console</button>
       <button id="btnResumeTerminal" class="btn sec">💻 Open in VS Code Terminal</button>
       <button id="btnCancelResume" class="btn text">Cancel</button>
     </div>

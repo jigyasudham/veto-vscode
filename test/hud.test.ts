@@ -197,7 +197,20 @@ test('F11: validateHudMessage validates in-extension settings, explorer, actions
   assert.equal(validateHudMessage({ type: 'runAction', action: 'dropDatabase' }), null);
 
   // Control messages
-  assert.deepEqual(validateHudMessage({ type: 'cancelAction' }), { type: 'cancelAction' });
+  assert.deepEqual(validateHudMessage({ type: 'cancelAction' }), { type: 'cancelAction', requestId: undefined });
   assert.deepEqual(validateHudMessage({ type: 'clearLog' }), { type: 'clearLog' });
 });
 
+
+test('audit 1.2.0: validator accepts handshake, bounded copyText, detection and correlated cancel/resume', () => {
+  assert.deepEqual(validateHudMessage({ type: 'ready' }), { type: 'ready' });
+  const text = 'x'.repeat(5000);
+  assert.deepEqual(validateHudMessage({ type: 'copyText', text }), { type: 'copyText', text });
+  assert.equal(validateHudMessage({ type: 'copyText', text: 'x'.repeat(1_000_001) }), null);
+  assert.equal(validateHudMessage({ type: 'copyText', text: 42 }), null);
+  assert.deepEqual(validateHudMessage({ type: 'detectCli', requestId: 3 }), { type: 'detectCli', requestId: 3 });
+  assert.deepEqual(validateHudMessage({ type: 'detectPr', requestId: -1 }), { type: 'detectPr', requestId: undefined });
+  assert.deepEqual(validateHudMessage({ type: 'cancelAction', requestId: 9 }), { type: 'cancelAction', requestId: 9 });
+  assert.deepEqual(validateHudMessage({ type: 'resume', id: 's1', platform: 'claude', target: 'console', requestId: 4 }),
+    { type: 'resume', id: 's1', platform: 'claude', target: 'console', requestId: 4 });
+});
