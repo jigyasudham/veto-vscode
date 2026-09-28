@@ -101,4 +101,8 @@ export function registerCommands(context: vscode.ExtensionContext, deps: Command
     await call('veto_secrets_scan', { text, ...(choice.scanKind === 'active' && editor ? { file_path: editor.document.uri.fsPath } : {}) }, 'Veto: scan secrets', choice.scanKind === 'active' && editor ? editorProject(editor) : cwd);
   }, true);
   register('veto.searchMemory', () => vscode.commands.executeCommand('veto.browseMemory'));
+  register('veto.openTerminal', () => {
+    const terminal = vscode.window.createTerminal({ name: 'Veto Terminal', cwd: project() });
+    terminal.show();
+  });
 }

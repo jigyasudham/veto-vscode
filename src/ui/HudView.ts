@@ -19,6 +19,12 @@ import script from './assets/hud.js';
 import {
   type HudMessage,
   type MemoryResult,
+  type SettingsPayload,
+  type ProjectItem,
+  type LogEntry,
+  type ActionStatusMessage,
+  type ExplorerResponse,
+  type ExplorerDetailResponse,
   ALLOWED_HUD_COMMANDS,
   validateHudMessage,
 } from './messages';
@@ -26,6 +32,12 @@ import {
 export {
   type HudMessage,
   type MemoryResult,
+  type SettingsPayload,
+  type ProjectItem,
+  type LogEntry,
+  type ActionStatusMessage,
+  type ExplorerResponse,
+  type ExplorerDetailResponse,
   ALLOWED_HUD_COMMANDS,
   validateHudMessage,
 };
@@ -34,6 +46,10 @@ export class HudView implements vscode.WebviewViewProvider {
   static readonly viewType = 'veto-hud';
   private view: vscode.WebviewView | undefined;
   private backend: ApiEnvelope | undefined;
+  private currentSettings: SettingsPayload | undefined;
+  private currentProjects: ProjectItem[] | undefined;
+  private recentLogs: LogEntry[] = [];
+  private static readonly MAX_RECENT_LOGS = 300;
 
   constructor(
     private readonly handler: (msg: HudMessage) => void,
@@ -50,6 +66,15 @@ export class HudView implements vscode.WebviewViewProvider {
     });
     view.onDidDispose(() => { this.view = undefined; });
     this.render(this.getSnapshot());
+    if (this.currentSettings) {
+      void this.view.webview.postMessage({ type: 'settings', settings: this.currentSettings });
+    }
+    if (this.currentProjects) {
+      void this.view.webview.postMessage({ type: 'projectsList', projects: this.currentProjects });
+    }
+    if (this.recentLogs.length > 0) {
+      void this.view.webview.postMessage({ type: 'recentLogs', logs: this.recentLogs });
+    }
   }
 
   /** Push the latest snapshot to the webview (it diffs into the DOM). */
@@ -70,6 +95,48 @@ export class HudView implements vscode.WebviewViewProvider {
   /** Reply to a webview memory-search request. */
   postMemoryResults(results: MemoryResult[], requestId?: number): void {
     void this.view?.webview.postMessage({ type: 'memoryResults', results, requestId });
+  }
+
+  /** Push current extension settings payload. */
+  postSettings(settings: SettingsPayload): void {
+    this.currentSettings = settings;
+    void this.view?.webview.postMessage({ type: 'settings', settings });
+  }
+
+  /** Push available workspace projects list. */
+  postProjects(projects: ProjectItem[]): void {
+    this.currentProjects = projects;
+    void this.view?.webview.postMessage({ type: 'projectsList', projects });
+  }
+
+  /** Push explorer data query results (sessions, memory, council, etc.). */
+  postExplorerData(data: ExplorerResponse): void {
+    void this.view?.webview.postMessage({ type: 'explorerData', ...data });
+  }
+
+  /** Push explorer detailed record inspection. */
+  postExplorerDetail(data: ExplorerDetailResponse): void {
+    void this.view?.webview.postMessage({ type: 'explorerDetail', ...data });
+  }
+
+  /** Push action execution lifecycle update (running, completed, failed, cancelled). */
+  postActionStatus(status: ActionStatusMessage): void {
+    void this.view?.webview.postMessage({ type: 'actionStatus', ...status });
+  }
+
+  /** Append a live log entry to the in-extension console stream. */
+  postLogEntry(entry: LogEntry): void {
+    this.recentLogs.push(entry);
+    if (this.recentLogs.length > HudView.MAX_RECENT_LOGS) {
+      this.recentLogs.shift();
+    }
+    void this.view?.webview.postMessage({ type: 'logEntry', entry });
+  }
+
+  /** Clear the in-extension console log buffer. */
+  clearLogs(): void {
+    this.recentLogs = [];
+    void this.view?.webview.postMessage({ type: 'clearLogs' });
   }
 
   // ── HTML shell (rendered once; data arrives via postMessage) ─────────────────

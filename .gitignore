@@ -9,3 +9,4 @@ dist/
 .vscode/
 AGENTS.md
 docs/PLAN-A-extension.md
+.env

@@ -9,7 +9,7 @@ export function registerBackendCommands(context: vscode.ExtensionContext, deps: 
   getProjectDir: () => string | undefined; getDbPath: () => string;
   showSnapshot: (envelope: ApiEnvelope) => void;
   onSnapshotFetched?: (envelope: ApiEnvelope) => void;
-}): { refreshSnapshot: (silent?: boolean) => Promise<ApiEnvelope | undefined> } {
+}): { refreshSnapshot: (silent?: boolean) => Promise<ApiEnvelope | undefined>; callApi: (command: ApiCommand, input: Record<string, unknown>, project?: string) => Promise<ApiEnvelope> } {
   let request = 0;
   async function call(command: ApiCommand, input: Record<string, unknown>, project?: string): Promise<ApiEnvelope> {
     if (!vscode.workspace.isTrusted) throw new Error('Trust this workspace before calling the Veto backend.');
@@ -148,5 +148,5 @@ export function registerBackendCommands(context: vscode.ExtensionContext, deps: 
     if (!stale()) await show(expanded, project);
   });
 
-  return { refreshSnapshot: fetchSnapshot };
+  return { refreshSnapshot: fetchSnapshot, callApi: call };
 }
