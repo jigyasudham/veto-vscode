@@ -58,9 +58,9 @@ body {
   letter-spacing: 0.5px;
 }
 .badge.green    { color: #2ecc71; border-color: #2ecc71; background: rgba(46, 204, 113, 0.12); }
-.badge.red      { color: var(--vscode-errorForeground, #f48771); border-color: currentColor; background: rgba(244, 135, 113, 0.15); }
+.badge.red      { color: var(--vscode-errorForeground, #ff8585); border-color: currentColor; background: rgba(255, 133, 133, 0.08); }
 .badge.yellow   { color: #f1c40f; border-color: #f1c40f; background: rgba(241, 196, 15, 0.12); }
-.badge.deadlock { color: #e74c3c; border-color: #e74c3c; background: rgba(231, 76, 60, 0.2); }
+.badge.deadlock { color: #ff8585; border-color: #ff8585; background: rgba(255, 133, 133, 0.08); }
 
 .stale {
   font-size: 12px;
@@ -91,7 +91,7 @@ body {
   font-size: 11px;
 }
 .project-bar label {
-  opacity: 0.65;
+  opacity: 0.8;
   flex-shrink: 0;
 }
 .project-bar select {
@@ -169,7 +169,7 @@ body {
   border: none;
   border-bottom: 2px solid transparent;
   color: var(--vscode-foreground, #cccccc);
-  opacity: 0.65;
+  opacity: 0.82;
   padding: 4px 6px;
   font-size: 11px;
   font-weight: 500;
@@ -232,7 +232,7 @@ body {
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: .5px;
-  opacity: .8;
+  opacity: .88;
   font-weight: 600;
   color: var(--vscode-sideBarTitle-foreground, var(--vscode-foreground));
 }
@@ -279,7 +279,7 @@ body {
 }
 .vote.ok { color: #2ecc71; border-color: rgba(46, 204, 113, 0.4); }
 .vote.warn { color: #f1c40f; border-color: rgba(241, 196, 15, 0.4); }
-.vote.block { color: var(--vscode-errorForeground, #f48771); border-color: rgba(244, 135, 113, 0.4); }
+.vote.block { color: var(--vscode-errorForeground, #ff8585); border-color: rgba(255, 133, 133, 0.4); }
 
 .recommend {
   margin-top: 7px;
@@ -507,7 +507,7 @@ input:focus, textarea:focus, select:focus {
 }
 .explorer-card-meta {
   font-size: 11px;
-  opacity: 0.75;
+  opacity: 0.82;
 }
 
 /* ── In-Place Detail Drawer ────────────────────────────────────────── */
@@ -891,10 +891,10 @@ input:focus, textarea:focus, select:focus {
   font-weight: 700;
   flex-shrink: 0;
 }
-.log-tag.info { color: #3498db; }
+.log-tag.info { color: #58a6ff; }
 .log-tag.success { color: #2ecc71; }
 .log-tag.warn { color: #f1c40f; }
-.log-tag.error { color: var(--vscode-errorForeground, #f48771); }
+.log-tag.error { color: var(--vscode-errorForeground, #ff8585); }
 .log-msg {
   flex: 1 1 160px;
   min-width: 0;
@@ -957,7 +957,7 @@ input:focus, textarea:focus, select:focus {
 
 .status-text:empty { display: none; }
 .status-text { display: block; margin-top: 3px; }
-.status-text.error { color: var(--vscode-errorForeground, #f48771); }
+.status-text.error { color: var(--vscode-errorForeground, #ff8585); }
 .load-more { align-self: center; margin-top: 4px; }
 .badge.neutral {
   color: var(--vscode-descriptionForeground, var(--vscode-foreground));
@@ -980,11 +980,26 @@ body.vscode-light .vote.ok,
 body.vscode-light .log-tag.success,
 body.vscode-light .console-status-indicator.active,
 body.vscode-light .console-prompt-sym { color: #0e7a3a; border-color: #0e7a3a; }
+body.vscode-light .badge.green { background: rgba(14, 122, 58, 0.10); }
+
 body.vscode-light .badge.yellow,
 body.vscode-light .vote.warn,
 body.vscode-light .log-tag.warn { color: #7a5a00; border-color: #7a5a00; }
-body.vscode-light .badge.deadlock { color: #b0281a; border-color: #b0281a; }
+body.vscode-light .badge.yellow { background: rgba(122, 90, 0, 0.10); }
+
+body.vscode-light .badge.red,
+body.vscode-light .badge.deadlock,
+body.vscode-light .vote.block,
+body.vscode-light .log-tag.error,
+body.vscode-light .status-text.error { color: #b0281a; border-color: #b0281a; }
+body.vscode-light .badge.red,
+body.vscode-light .badge.deadlock { background: rgba(176, 40, 26, 0.08); }
+
 body.vscode-light .log-tag.info { color: #1a5f99; }
+body.vscode-light .detail-callout.recommend { border-left-color: #0e7a3a; background: rgba(14, 122, 58, 0.06); }
+body.vscode-light .detail-callout.warn { border-left-color: #7a5a00; background: rgba(122, 90, 0, 0.06); }
+body.vscode-light .chat-turn.assistant { border-left-color: #0e7a3a; }
+body.vscode-light .result-card { border-left-color: #0e7a3a; }
 
 /* High contrast: text uses the theme foreground; color survives only in borders and outlines. */
 body.vscode-high-contrast .badge,

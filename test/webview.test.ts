@@ -341,3 +341,23 @@ test('a11y: regions, status badges, and controls define valid accessible names',
   assert.equal(h.$('detailDrawer').getAttribute('aria-modal'), 'true');
 });
 
+test('theme resilience: status badges, tags, and callouts define hardened light/dark colors', () => {
+  // Light mode status ink assertions
+  assert.match(CSS, /body\.vscode-light[^{]*\.badge\.red/);
+  assert.match(CSS, /body\.vscode-light[^{]*\.badge\.deadlock/);
+  assert.match(CSS, /body\.vscode-light[^{]*\.vote\.block/);
+  assert.match(CSS, /body\.vscode-light[^{]*\.detail-callout\.recommend/);
+  assert.match(CSS, /body\.vscode-light[^{]*\.chat-turn\.assistant/);
+
+  // Dark mode fallback assertions
+  assert.match(CSS, /\.badge\.red\s*\{[^}]*#ff8585/);
+  assert.match(CSS, /\.badge\.deadlock\s*\{[^}]*#ff8585/);
+  assert.match(CSS, /\.log-tag\.info\s*\{[^}]*#58a6ff/);
+
+  // Readability / opacity assertions for inactive text
+  const tabBtnOpacity = Number(/\.tab-btn\s*\{[^}]*opacity:\s*([\d.]+)/.exec(CSS)?.[1]);
+  assert.ok(tabBtnOpacity >= 0.8, 'inactive tab opacity >= 0.8 for contrast');
+  const cardMetaOpacity = Number(/\.explorer-card-meta\s*\{[^}]*opacity:\s*([\d.]+)/.exec(CSS)?.[1]);
+  assert.ok(cardMetaOpacity >= 0.8, 'card meta opacity >= 0.8 for contrast');
+});
+
