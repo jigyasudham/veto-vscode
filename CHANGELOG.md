@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.2.1
+### Accessibility (a11y) & Multi-Client Resume
+- **Screen Reader & ARIA Accessibility**: Added accessible names (`aria-labelledby`) to active progress and workflow result regions per WCAG 2.1; added `role="status"` and live regions to the verdict badge, sync status, and console status indicator; added `role="radiogroup"` to scope selectors; added accessible labels to action and copy buttons; initialized collapsible card headers with `aria-expanded="true"`.
+- **Dialog Inert Trapping**: Resume choice modal now sets `inert` across background elements when opened and restores interaction cleanly on dismiss.
+- **Antigravity CLI Resume**: Added Antigravity to supported terminal resume providers (`PLATFORMS`) in `resumeSessionInTerminal()`, allowing direct continuation of sessions via the Antigravity CLI alongside Claude, Gemini, and Codex.
+- **Windows Process Headroom**: Improved subprocess timeout margin in actions deduplication test to prevent CI/load flakiness.
+
 ## 1.2.0
 ### Features & UI/UX Overhaul
 - **5-Tab Integrated Layout**: Replaced popups and redirects with five dedicated tabs: Dashboard, Explorer, Workflows, Console, and Settings. Tab state persists across panel collapses.

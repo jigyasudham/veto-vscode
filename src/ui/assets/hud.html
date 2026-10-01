@@ -12,8 +12,8 @@
   <div class="hdr-top">
     <div class="hdr-left">
       <span class="logo">⬡ VETO</span>
-      <span id="verdict" class="badge">—</span>
-      <span id="stale" class="stale" title="Database sync status" hidden>⟳</span>
+      <span id="verdict" class="badge" role="status" aria-label="Current Council Verdict">—</span>
+      <span id="stale" class="stale" title="Database sync status" role="status" aria-label="Database sync status" hidden>⟳</span>
     </div>
     <div class="hdr-right">
       <button id="btnRefresh" class="icon-btn" title="Refresh Snapshot" aria-label="Refresh Snapshot">↻</button>
@@ -62,7 +62,7 @@
     </div>
 
     <div class="explorer-filter-bar">
-      <div class="scope-toggle" id="explorerScopeToggle">
+      <div class="scope-toggle" id="explorerScopeToggle" role="radiogroup" aria-label="Explorer Scope">
         <label><input type="radio" name="explorerScope" value="project" checked /> This Project</label>
         <label><input type="radio" name="explorerScope" value="all" /> All Projects</label>
       </div>
@@ -87,7 +87,7 @@
   <!-- TAB 3: WORKFLOWS -->
   <section id="panel-workflows" class="tab-panel" role="tabpanel" aria-labelledby="tabBtn-workflows" hidden>
     <!-- Active Progress Card (Top of Workflows) -->
-    <div id="activeProgressCard" class="card progress-card hidden" role="region" aria-live="polite">
+    <div id="activeProgressCard" class="card progress-card hidden" role="region" aria-live="polite" aria-labelledby="progressTitle">
       <div class="progress-header">
         <div class="spinner" aria-hidden="true"></div>
         <div class="progress-info">
@@ -102,7 +102,7 @@
     </div>
 
     <!-- Workflow Execution Result Card -->
-    <div id="workflowResultCard" class="card result-card hidden" role="region" aria-live="polite">
+    <div id="workflowResultCard" class="card result-card hidden" role="region" aria-live="polite" aria-labelledby="resultActionName">
       <div class="card-header">
         <div class="res-title">
           <span id="resultActionName">Result</span>
@@ -113,7 +113,7 @@
       <div class="card-body">
         <div id="resultBody" class="result-text"></div>
         <div class="actions">
-          <button id="btnCopyResult" class="btn sec">Copy Result</button>
+          <button id="btnCopyResult" class="btn sec" aria-label="Copy execution result">Copy Result</button>
           <span id="copyResultStatus" class="sub status-text" role="status" aria-live="polite"></span>
         </div>
       </div>
@@ -123,7 +123,7 @@
     <div class="wf-cards">
       <!-- 1. Council Debate -->
       <section class="card">
-        <header class="card-header" role="button" tabindex="0">
+        <header class="card-header" role="button" tabindex="0" aria-expanded="true">
           <h3>Council Debate</h3>
           <span class="chevron">▼</span>
         </header>
@@ -139,7 +139,7 @@
 
       <!-- 2. Save Checkpoint -->
       <section class="card">
-        <header class="card-header" role="button" tabindex="0">
+        <header class="card-header" role="button" tabindex="0" aria-expanded="true">
           <h3>Save Summary Checkpoint</h3>
           <span class="chevron">▼</span>
         </header>
@@ -155,7 +155,7 @@
 
       <!-- 3. Review Active File & Scan Secrets -->
       <section class="card">
-        <header class="card-header" role="button" tabindex="0">
+        <header class="card-header" role="button" tabindex="0" aria-expanded="true">
           <h3>Code Intelligence & Security</h3>
           <span class="chevron">▼</span>
         </header>
@@ -166,7 +166,7 @@
           </div>
           <div class="form-group">
             <label>Scan Secrets Scope:</label>
-            <div class="radio-group">
+            <div class="radio-group" role="radiogroup" aria-label="Scan Secrets Scope">
               <label><input type="radio" name="secretsScope" value="active" /> Active editor file</label>
               <label><input type="radio" name="secretsScope" value="staged" /> Staged git changes</label>
               <label><input type="radio" name="secretsScope" value="working" checked /> All working diff vs HEAD</label>
@@ -178,7 +178,7 @@
 
       <!-- 4. Review Pull Request -->
       <section class="card">
-        <header class="card-header" role="button" tabindex="0">
+        <header class="card-header" role="button" tabindex="0" aria-expanded="true">
           <h3>Review Pull Request</h3>
           <span class="chevron">▼</span>
         </header>
@@ -198,7 +198,7 @@
 
       <!-- 5. Drafting Workflows -->
       <section class="card">
-        <header class="card-header" role="button" tabindex="0">
+        <header class="card-header" role="button" tabindex="0" aria-expanded="true">
           <h3>Draft Workflows</h3>
           <span class="chevron">▼</span>
         </header>
@@ -221,15 +221,15 @@
   <section id="panel-console" class="tab-panel" role="tabpanel" aria-labelledby="tabBtn-console" hidden>
     <div class="console-toolbar">
       <div class="console-status-group">
-        <span id="consoleStatus" class="console-status-indicator">● Idle</span>
+        <span id="consoleStatus" class="console-status-indicator" role="status" aria-live="polite">● Idle</span>
       </div>
       <div class="console-actions">
-        <button id="btnOpenTerminal" class="btn sec small" title="Open VS Code Terminal">💻 Terminal</button>
+        <button id="btnOpenTerminal" class="btn sec small" title="Open VS Code Terminal" aria-label="Open VS Code Terminal">💻 Terminal</button>
         <label class="checkbox-label" title="Keep view scrolled to bottom">
           <input type="checkbox" id="chkAutoScroll" checked /> Auto-scroll
         </label>
-        <button id="btnClearLog" class="btn sec small">Clear</button>
-        <button id="btnCopyLog" class="btn sec small">Copy</button>
+        <button id="btnClearLog" class="btn sec small" aria-label="Clear console logs">Clear</button>
+        <button id="btnCopyLog" class="btn sec small" aria-label="Copy console logs">Copy</button>
       </div>
     </div>
     <div class="console-filter-bar">
@@ -246,7 +246,7 @@
   <!-- TAB 5: SETTINGS & DIAGNOSTICS -->
   <section id="panel-settings" class="tab-panel" role="tabpanel" aria-labelledby="tabBtn-settings" hidden>
     <section class="card">
-      <header class="card-header" role="button" tabindex="0">
+      <header class="card-header" role="button" tabindex="0" aria-expanded="true">
         <h3>Veto Configuration</h3>
         <span class="chevron">▼</span>
       </header>
@@ -286,7 +286,7 @@
     </section>
 
     <section class="card">
-      <header class="card-header" role="button" tabindex="0">
+      <header class="card-header" role="button" tabindex="0" aria-expanded="true">
         <h3>System & Health Diagnostics</h3>
         <span class="chevron">▼</span>
       </header>
@@ -310,7 +310,7 @@
 
 <!-- In-Place Detail Drawer -->
 <div id="drawerBackdrop" class="drawer-backdrop hidden"></div>
-<aside id="detailDrawer" class="drawer hidden" aria-hidden="true" role="dialog" aria-labelledby="drawerTitle">
+<aside id="detailDrawer" class="drawer hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
   <div class="drawer-header">
     <h3 id="drawerTitle">Details</h3>
     <button id="closeDrawer" class="icon-btn" title="Close" aria-label="Close details">✕</button>
@@ -320,7 +320,7 @@
 </aside>
 
 <!-- Resume Choice Modal -->
-<div id="resumeChoiceModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="resumeModalTitle">
+<div id="resumeChoiceModal" class="modal-backdrop hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="resumeModalTitle">
   <div class="modal">
     <h3 id="resumeModalTitle">Resume Session</h3>
     <p id="resumeSessionDesc">Choose how you want to continue this session:</p>
