@@ -296,3 +296,68 @@ test('the workflow result card header is not wired as a collapsible button', () 
   assert.equal(h.doc.querySelector('#workflowResultCard .card-body')!.classList.contains('collapsed'), false);
   assert.equal(header.hasAttribute('aria-expanded'), false);
 });
+
+test('a11y: resume modal manages focus, ARIA, Escape, and inert background', () => {
+  const h = hud();
+  h.doc.querySelector<HTMLButtonElement>('[data-tab="explorer"]')!.click();
+  const q = h.last('queryExplorer');
+  h.send({ type: 'explorerData', kind: 'sessions', items: [session('resume-a11y')], requestId: q.requestId });
+  (h.doc.querySelector('.explorer-card') as HTMLElement).click();
+  const resumeBtn = [...h.doc.querySelectorAll('#drawerActions button')].find(b => /Resume/.test(b.textContent!)) as HTMLElement;
+  resumeBtn.click();
+
+  const modal = h.$('resumeChoiceModal');
+  assert.equal(modal.classList.contains('hidden'), false);
+  assert.equal(modal.getAttribute('aria-hidden'), 'false');
+  assert.equal(modal.getAttribute('aria-modal'), 'true');
+  assert.ok(h.doc.querySelector('main')!.hasAttribute('inert'), 'background is inert while modal is open');
+
+  h.key(modal, 'Escape');
+  assert.equal(modal.classList.contains('hidden'), true);
+  assert.equal(modal.getAttribute('aria-hidden'), 'true');
+  // Drawer is still open, so background stays inert
+  assert.ok(h.doc.querySelector('main')!.hasAttribute('inert'), 'drawer keeps background inert');
+
+  // Close drawer
+  h.key(h.$('detailDrawer'), 'Escape');
+  assert.equal(h.doc.querySelector('main')!.hasAttribute('inert'), false, 'background restored when all dialogs closed');
+});
+
+test('a11y: regions, status badges, and controls define valid accessible names', () => {
+  const h = hud();
+  assert.equal(h.$('activeProgressCard').getAttribute('aria-labelledby'), 'progressTitle');
+  assert.equal(h.$('workflowResultCard').getAttribute('aria-labelledby'), 'resultActionName');
+  assert.equal(h.$('verdict').getAttribute('role'), 'status');
+  assert.equal(h.$('verdict').getAttribute('aria-label'), 'Current Council Verdict');
+  assert.equal(h.$('stale').getAttribute('role'), 'status');
+  assert.equal(h.$('stale').getAttribute('aria-label'), 'Database sync status');
+  assert.equal(h.$('consoleStatus').getAttribute('role'), 'status');
+  assert.equal(h.$('consoleStatus').getAttribute('aria-live'), 'polite');
+  assert.equal(h.$('btnOpenTerminal').getAttribute('aria-label'), 'Open VS Code Terminal');
+  assert.equal(h.$('btnClearLog').getAttribute('aria-label'), 'Clear console logs');
+  assert.equal(h.$('btnCopyLog').getAttribute('aria-label'), 'Copy console logs');
+  assert.equal(h.$('btnCopyResult').getAttribute('aria-label'), 'Copy execution result');
+  assert.equal(h.$('explorerScopeToggle').getAttribute('role'), 'radiogroup');
+  assert.equal(h.$('detailDrawer').getAttribute('aria-modal'), 'true');
+});
+
+test('theme resilience: status badges, tags, and callouts define hardened light/dark colors', () => {
+  // Light mode status ink assertions
+  assert.match(CSS, /body\.vscode-light[^{]*\.badge\.red/);
+  assert.match(CSS, /body\.vscode-light[^{]*\.badge\.deadlock/);
+  assert.match(CSS, /body\.vscode-light[^{]*\.vote\.block/);
+  assert.match(CSS, /body\.vscode-light[^{]*\.detail-callout\.recommend/);
+  assert.match(CSS, /body\.vscode-light[^{]*\.chat-turn\.assistant/);
+
+  // Dark mode fallback assertions
+  assert.match(CSS, /\.badge\.red\s*\{[^}]*#ff8585/);
+  assert.match(CSS, /\.badge\.deadlock\s*\{[^}]*#ff8585/);
+  assert.match(CSS, /\.log-tag\.info\s*\{[^}]*#58a6ff/);
+
+  // Readability / opacity assertions for inactive text
+  const tabBtnOpacity = Number(/\.tab-btn\s*\{[^}]*opacity:\s*([\d.]+)/.exec(CSS)?.[1]);
+  assert.ok(tabBtnOpacity >= 0.8, 'inactive tab opacity >= 0.8 for contrast');
+  const cardMetaOpacity = Number(/\.explorer-card-meta\s*\{[^}]*opacity:\s*([\d.]+)/.exec(CSS)?.[1]);
+  assert.ok(cardMetaOpacity >= 0.8, 'card meta opacity >= 0.8 for contrast');
+});
+
