@@ -42,7 +42,8 @@ export function querySchemaVersion(db: DatabaseSync): number {
   }
 }
 
-const SESSION_COLS = 'id, platform, active_client, last_resumed_at, connection_type, started_at, summary, project_dir, token_count';
+// Veto refreshes created_at on every save, including in-place checkpoint updates.
+const SESSION_COLS = 'id, platform, active_client, last_resumed_at, connection_type, started_at, created_at AS saved_at, summary, project_dir, token_count';
 
 export function queryLatestSession(db: DatabaseSync, projectDir?: string): VetoSession | null {
   if (!hasTable(db, 'sessions')) return null;

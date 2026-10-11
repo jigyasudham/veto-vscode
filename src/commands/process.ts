@@ -259,9 +259,26 @@ export interface SpawnOptions {
   cancellationToken?: ProcessCancellationToken;
   jobKey?: string;
   input?: string;
+  /** Complete stdout lines, including a final line without a newline. */
+  onStdoutLine?: (line: string) => void;
 }
 
 export type LogAppender = (line: string) => void;
+
+/** Some CLIs put their failure in stdout JSON instead of stderr. */
+export function processFailureDetail(stdout: string, stderr: string): string {
+  for (const line of stdout.split(/\r?\n/).reverse()) {
+    try {
+      const event = JSON.parse(line);
+      if (event?.type === 'result' && event.is_error === true) {
+        const detail = typeof event.result === 'string' ? event.result :
+          Array.isArray(event.errors) ? event.errors.filter((e: unknown) => typeof e === 'string').join('; ') : '';
+        if (detail) return detail.slice(0, 1000);
+      }
+    } catch { /* Not a structured error event. */ }
+  }
+  return stderr.trim().slice(0, 1000);
+}
 
 export function resolveInvocation(command: string, args: string[]): { command: string; args: string[] } {
   let resolved = resolveExecutable(command);
@@ -328,6 +345,8 @@ export function spawnProcess(
     proc.stdin?.on('error', () => { /* process exit handles closed stdin */ });
     proc.stdin?.end(opts.input);
     let stdout = '';
+    let stdoutPending = '';
+    proc.stdout?.setEncoding('utf8');
     let stderr = '';
     const abort = (message: string) => {
       if (isSettled) return;
@@ -338,10 +357,16 @@ export function spawnProcess(
     };
     cancellations.set(proc, () => abort('Operation cancelled by user'));
 
-    proc.stdout?.on('data', (d: Buffer) => {
+    proc.stdout?.on('data', (d: string) => {
       if (stdout.length + d.length > MAX_BUFFER) { abort('Operation output exceeded the 1 MB limit'); return; }
       if (stdout.length < MAX_BUFFER) {
         stdout += d.toString().slice(0, MAX_BUFFER - stdout.length);
+      }
+      if (opts.onStdoutLine) {
+        stdoutPending += d;
+        const lines = stdoutPending.split(/\r?\n/);
+        stdoutPending = lines.pop() ?? '';
+        for (const line of lines) opts.onStdoutLine(line);
       }
     });
 
@@ -376,13 +401,16 @@ export function spawnProcess(
 
     proc.on('close', code => {
       if (isSettled) return;
+      if (stdoutPending) opts.onStdoutLine?.(stdoutPending);
       isSettled = true;
       cleanup();
       if (code === 0) {
         resolve(stdout.trim());
       } else {
-        logAppender?.(`[${command}] exited ${code}: ${stderr.slice(0, 300)}`);
-        reject(new Error(`${command} exited with code ${code}`));
+        const detail = processFailureDetail(stdout, stderr);
+        const message = `${command} exited with code ${code}${detail ? `: ${detail}` : ''}`;
+        logAppender?.(message);
+        reject(new Error(message));
       }
     });
 

@@ -248,9 +248,11 @@ test('console resume runs as a tracked action with a request id', () => {
   (h.doc.querySelector('.explorer-card') as HTMLElement).click();
   const resumeBtn = [...h.doc.querySelectorAll('#drawerActions button')].find(b => /Resume/.test(b.textContent!)) as HTMLElement;
   resumeBtn.click();
+  (h.$('resumeConsoleProvider') as HTMLSelectElement).value = 'antigravity';
   h.$('btnResumeConsole').click();
   const msg = h.last('resume');
   assert.equal(msg.target, 'console');
+  assert.equal(msg.provider, 'antigravity');
   assert.equal(typeof msg.requestId, 'number');
   assert.equal(h.$('activeProgressCard').classList.contains('hidden'), false);
 });

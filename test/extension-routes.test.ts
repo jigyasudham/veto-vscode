@@ -9,6 +9,17 @@ import * as realProcess from '../src/commands/process';
 import { fakeVscode, loadModule, settle } from './helpers/harness';
 
 type Outcome = import('../src/commands/process').ToolOutcome;
+
+test('console resume routes the selected AI as the resuming client', async () => {
+  for (const provider of ['claude', 'gemini', 'codex', 'antigravity']) {
+    const h = setup();
+    h.route({ type: 'resume', id: 's1', platform: 'claude', target: 'console', provider, requestId: 1 });
+    await settle();
+    assert.equal(h.toolCalls[0].provider, provider);
+    assert.equal(h.toolCalls[0].input.resuming_as, provider);
+    assert.equal(h.statuses().at(-1).status, 'done');
+  }
+});
 const DEFAULT_DB = join(homedir(), '.veto', 'veto.db');
 const CLI_JS = resolve('/tools/veto/cli.js');
 const DETECTED_CLI = resolve('/npm/node_modules/@jigyasudham/veto/dist/cli.js');

@@ -1,5 +1,10 @@
 # Change Log
 
+## Unreleased
+- Active Session shows the last checkpoint save date and time in the local timezone.
+- Session resume supports Gemini, Codex, and Antigravity (agy) in the Extension Console, with a provider selector, progress, cancellation, and verified backend results.
+- Added Antigravity (agy) to terminal resume.
+
 ## 1.2.0
 ### Features & UI/UX Overhaul
 - **5-Tab Integrated Layout**: Replaced popups and redirects with five dedicated tabs: Dashboard, Explorer, Workflows, Console, and Settings. Tab state persists across panel collapses.

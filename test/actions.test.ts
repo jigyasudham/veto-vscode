@@ -3,8 +3,17 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+
+test('stdout progress preserves split lines and flushes the final unterminated line', async () => {
+  const lines: string[] = [];
+  const result = await spawnProcess(process.execPath, ['-e', 'process.stdout.write("first\\nsec"); setTimeout(() => process.stdout.write("ond"), 30)'], undefined,
+    { timeoutMs: 10000, onStdoutLine: line => lines.push(line) });
+  assert.equal(result, 'first\nsecond');
+  assert.deepEqual(lines, ['first', 'second']);
+});
 import {
   parseToolOutput,
+  processFailureDetail,
   extractToolResult,
   npmShimEntry,
   resolveExecutable,
@@ -12,6 +21,19 @@ import {
   cancelAllProcesses,
   getActiveProcessesCount,
 } from '../src/commands/process';
+
+test('CLI failures preserve Claude stdout errors without treating ordinary responses as errors', () => {
+  const error = { type: 'result', is_error: true, result: 'Failed to authenticate: OAuth session expired and could not be refreshed' };
+  assert.equal(processFailureDetail(JSON.stringify(error), ''), error.result);
+  assert.equal(processFailureDetail(JSON.stringify({ ...error, is_error: false }), 'stderr error'), 'stderr error');
+  assert.equal(processFailureDetail('plain output\nnull', ''), '');
+});
+
+test('nonzero subprocess exit includes structured stdout failure', async () => {
+  await assert.rejects(spawnProcess(process.execPath, ['-e',
+    'console.log(JSON.stringify({type:"result",is_error:true,result:"OAuth session expired"})); process.exitCode=1'], undefined,
+    { timeoutMs: 10000 }), /exited with code 1: OAuth session expired/);
+});
 
 test('F07: parseToolOutput extracts structured JSON verdicts accurately', () => {
   const greenJson = JSON.stringify({ verdict: 'GREEN', summary: 'All checks passed' });

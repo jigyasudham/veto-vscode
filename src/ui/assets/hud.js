@@ -299,6 +299,8 @@ function updateProjectsList(projects) {
 let resumeReturnFocus = null;
 function openResumeModal(sessionId, platform) {
   pendingResumeSession = { id: sessionId, platform: platform || 'claude' };
+  const provider = (platform || 'claude').toLowerCase();
+  $('resumeConsoleProvider').value = ['claude', 'gemini', 'codex', 'antigravity'].includes(provider) ? provider : provider === 'agy' ? 'antigravity' : 'claude';
   const desc = $('resumeSessionDesc');
   if (desc) desc.textContent = 'Session: ' + (sessionId.length > 24 ? sessionId.slice(0, 24) + '…' : sessionId);
   const modal = $('resumeChoiceModal');
@@ -327,10 +329,11 @@ safeOn('resumeChoiceModal', 'keydown', (e) => {
 safeOn('btnResumeConsole', 'click', () => {
   if (pendingResumeSession) {
     const { id, platform } = pendingResumeSession;
+    const provider = $('resumeConsoleProvider').value;
     closeResumeModal();
     closeDetailDrawer();
     switchTab('workflows');
-    beginAction('Resuming Session', { type: 'resume', id, platform, target: 'console' });
+    beginAction('Resuming Session', { type: 'resume', id, platform, provider, target: 'console' });
   }
 });
 safeOn('btnResumeTerminal', 'click', () => {
@@ -395,6 +398,14 @@ function renderDashboard(s) {
     scTarget.appendChild(row('Created by', ss.platform || '—'));
     scTarget.appendChild(row('Provider', ss.active_client || ss.platform || 'Unknown'));
     if (ss.started_at) scTarget.appendChild(row('Started', rel(ss.started_at)));
+    // Older SQLite timestamps omit the zone but represent UTC.
+    const savedStamp = typeof ss.saved_at === 'string' ? ss.saved_at.trim() : '';
+    const savedDate = new Date(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(savedStamp) ? savedStamp.replace(' ', 'T') + 'Z' : savedStamp);
+    const savedRow = row('Last saved', Number.isFinite(savedDate.getTime())
+      ? savedDate.toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' })
+      : 'Unknown');
+    if (Number.isFinite(savedDate.getTime())) savedRow.title = savedDate.toISOString();
+    scTarget.appendChild(savedRow);
     scTarget.appendChild(row('Saved Tokens', String(ss.token_count ?? 'Unknown'), true));
     if (ss.summary) scTarget.appendChild(row('Summary', ss.summary.slice(0, 75)));
 

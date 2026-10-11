@@ -324,6 +324,14 @@
   <div class="modal">
     <h3 id="resumeModalTitle">Resume Session</h3>
     <p id="resumeSessionDesc">Choose how you want to continue this session:</p>
+    <label for="resumeConsoleProvider">AI for Extension Console</label>
+    <select id="resumeConsoleProvider">
+      <option value="claude">Claude</option>
+      <option value="gemini">Gemini</option>
+      <option value="codex">Codex</option>
+      <option value="antigravity">Antigravity (agy)</option>
+    </select>
+    <p>Console restores the checkpoint once. Use Terminal to continue chatting.</p>
     <div class="modal-buttons">
       <button id="btnResumeConsole" data-action-button class="btn">▶ Run in Extension Console</button>
       <button id="btnResumeTerminal" class="btn sec">💻 Open in VS Code Terminal</button>
