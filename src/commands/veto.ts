@@ -46,6 +46,7 @@ const RESUME_PROVIDERS = [
   { id: 'antigravity', label: 'Antigravity (agy)', command: 'agy', interactive: true },
 ];
 
+
 /** Run `claude` as a one-shot with an argv array (no shell). Streams to the output channel. */
 export function spawnClaude(
   args: string[],
@@ -206,6 +207,7 @@ export async function resumeSessionInTerminal(sessionId: string, platform = 'cla
   }
   const savedProvider = platform.toLowerCase() === 'agy' ? 'antigravity' : platform.toLowerCase();
   const choices = RESUME_PROVIDERS.map(provider => ({ ...provider, description: provider.id === savedProvider ? 'Saved session provider' : undefined }));
+
   const selected = await vscode.window.showQuickPick(choices, { placeHolder: `Resume in ${cwd ?? 'default directory'} using?` });
   const provider = RESUME_PROVIDERS.find(provider => provider.id === selected?.id);
   if (!provider) return;
