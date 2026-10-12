@@ -2,7 +2,7 @@
   "name": "veto-vscode",
   "displayName": "Veto MCP Dashboard",
   "description": "Live dashboard for the Veto MCP server. Requires Veto 3.8.0 or later with API v1.",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "publisher": "jigyasudham",
   "engines": {
     "vscode": "^1.101.0",

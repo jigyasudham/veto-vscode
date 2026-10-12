@@ -305,6 +305,8 @@ function openResumeModal(sessionId, platform) {
   if (!modal) return;
   resumeReturnFocus = document.activeElement;
   modal.classList.remove('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+  setBackgroundInert(true);
   const first = $('btnResumeConsole');
   if (first && typeof first.focus === 'function') first.focus();
 }
@@ -313,6 +315,8 @@ function closeResumeModal() {
   const modal = $('resumeChoiceModal');
   if (!modal || modal.classList.contains('hidden')) return;
   modal.classList.add('hidden');
+  modal.setAttribute('aria-hidden', 'true');
+  if (!drawerOpen) setBackgroundInert(false);
   restoreFocus(resumeReturnFocus);
   resumeReturnFocus = null;
 }
@@ -1084,7 +1088,9 @@ function closeDetailDrawer() {
     return;
   }
   drawerOpen = false;
-  setBackgroundInert(false);
+  const modal = $('resumeChoiceModal');
+  const modalOpen = modal && !modal.classList.contains('hidden');
+  if (!modalOpen) setBackgroundInert(false);
   restoreFocus(drawerReturnFocus);
   drawerReturnFocus = null;
 }
