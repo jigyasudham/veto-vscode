@@ -60,6 +60,10 @@ export function parseApiEnvelope(raw: string, command: ApiCommand, project?: str
     if (t.state === 'ok' && (!['enabled', 'disabled', 'reconsent_required'].includes(t.capture) || typeof t.recall_permitted !== 'boolean' || !count(t.archives_in_project))) return fail('Malformed transcripts section.');
     if (l.state === 'ok' && (l.scope !== 'all_projects' || !['on', 'off', 'reconsent_required'].includes(l.sharing) || !count(l.notes) || !count(l.held))) return fail('Malformed lessons section.');
     if (trial.state === 'ok' && (trial.mode !== 'shadow' || !count(trial.qualifying) || !count(trial.target) || typeof trial.complete !== 'boolean' || typeof trial.drift !== 'boolean')) return fail('Malformed trial section.');
+    // Added in Veto 3.9.0 and optional in contract v1: checked only when present.
+    const optionalCount = (value: unknown) => value === undefined || count(value);
+    if (trial.state === 'ok' && ((trial.stop_on !== undefined && !['sessions', 'notes'].includes(trial.stop_on)) ||
+        !optionalCount(trial.trial_id) || !optionalCount(trial.notes_chosen) || !optionalCount(trial.notes_target) || !optionalCount(trial.skipped))) return fail('Malformed trial section.');
   }
   if (command.startsWith('recall')) {
     if (!['enabled', 'disabled', 'reconsent_required'].includes(data.capture) || !text(data.disclaimer)) return fail('Malformed recall response.');

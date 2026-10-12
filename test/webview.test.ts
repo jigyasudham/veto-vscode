@@ -297,6 +297,23 @@ test('the workflow result card header is not wired as a collapsible button', () 
   assert.equal(header.hasAttribute('aria-expanded'), false);
 });
 
+const backendWith = (trial: Record<string, unknown>) => ({
+  installed: true,
+  backend: { state: 'ok', generated_at: '2026-10-04T18:20:00.000Z', backend_version: '3.9.0', data: { lessons: { state: 'ok', sharing: 'on', notes: 3, held: 1 }, trial: { state: 'ok', mode: 'shadow', complete: false, drift: false, ...trial } } },
+});
+
+test('trial card counts notes when the backend stops on notes (3.9.0), sessions otherwise', () => {
+  const h = hud();
+  h.send({ type: 'snapshot', data: backendWith({ qualifying: 23, target: 12, stop_on: 'notes', notes_chosen: 4, notes_target: 12, skipped: 9 }) });
+  const text = h.$('cards').textContent;
+  assert.match(text, /Notes chosen \/ target\s*4 \/ 12/);
+  assert.match(text, /Sessions counted \/ skipped\s*23 \/ 9/);
+  assert.doesNotMatch(text, /Qualifying \/ target/);
+
+  h.send({ type: 'snapshot', data: backendWith({ qualifying: 7, target: 20 }) });
+  assert.match(h.$('cards').textContent, /Qualifying \/ target\s*7 \/ 20/);
+});
+
 test('a11y: resume modal manages focus, ARIA, Escape, and inert background', () => {
   const h = hud();
   h.doc.querySelector<HTMLButtonElement>('[data-tab="explorer"]')!.click();

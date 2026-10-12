@@ -64,3 +64,15 @@ test('API rejects wrong contract, command, scope, malformed trial and excessive 
   recall.data.hits = Array(21).fill(recall.data.hits[0]);
   assert.throws(() => parseApiEnvelope(JSON.stringify(recall),'recall search'));
 });
+
+test('a 3.9.0 trial section (stop_on notes) validates; malformed new fields are rejected', () => {
+  const snap = JSON.parse(fixture('snapshot.ok'));
+  const trial = { state: 'ok', mode: 'shadow', started_at: '2026-10-04T18:11:09.422Z', ends_at: '2026-12-13T18:11:09.422Z', qualifying: 23, target: 12,
+    complete: false, outcomes: {}, drift: false, trial_id: 2, stop_on: 'notes', notes_chosen: 4, notes_target: 12, skipped: 9 };
+  snap.data.trial = trial;
+  assert.equal(parseApiEnvelope(JSON.stringify(snap), 'snapshot', 'D:/Api Codex').data?.trial.notes_chosen, 4);
+  for (const bad of [{ stop_on: 'weeks' }, { notes_chosen: -1 }, { notes_target: 'x' }, { skipped: Number.NaN }]) {
+    const value = structuredClone(snap); Object.assign(value.data.trial, bad);
+    assert.throws(() => parseApiEnvelope(JSON.stringify(value), 'snapshot', 'D:/Api Codex'), /Malformed trial section/);
+  }
+});

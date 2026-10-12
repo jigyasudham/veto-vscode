@@ -477,7 +477,13 @@ function renderDashboard(s) {
     if (t) {
       lessons.appendTarget.appendChild(row('Trial', t.state === 'ok' ? 'shadow-only' : t.state));
       if (t.state === 'ok') {
-        lessons.appendTarget.appendChild(row('Qualifying / target', t.qualifying + ' / ' + t.target));
+        // Veto 3.9.0 stops the trial on chosen notes; older backends stop on sessions.
+        if (t.stop_on === 'notes') {
+          lessons.appendTarget.appendChild(row('Notes chosen / target', t.notes_chosen + ' / ' + t.notes_target));
+          lessons.appendTarget.appendChild(row('Sessions counted / skipped', t.qualifying + ' / ' + (t.skipped || 0)));
+        } else {
+          lessons.appendTarget.appendChild(row('Qualifying / target', t.qualifying + ' / ' + t.target));
+        }
         lessons.appendTarget.appendChild(row('Complete / drift', String(t.complete) + ' / ' + String(t.drift)));
       } else if (t.message) {
         lessons.appendTarget.appendChild(el('div', 'sub', t.message));
