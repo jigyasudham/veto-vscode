@@ -22,7 +22,7 @@ Memory    15 entries · this project   [ search… ]
 Health    0.7 MB · 10 sessions · 24 patterns
 ```
 
-- **Session** — the session matching your open workspace; created-by / active-in AI, token gauge, click **Resume** to continue it in Claude/Gemini/Codex.
+- **Session** — the session matching your open workspace; created-by / active-in AI, token gauge, click **Resume** to continue it in Claude/Gemini/Codex/Antigravity (agy). Select **AI for Extension Console**, then **Run in Extension Console** for a single restore request with progress and cancellation. For ongoing chat, choose **Open in VS Code Terminal** and pick the AI there. Each provider requires its CLI on PATH, authentication, and a configured Veto MCP connection. Console restores do not bypass tool permissions; use Terminal if approval is required. AGY uses the `agy` executable.
 - **Council** — last verdict (GREEN/YELLOW/RED) with each agent's vote and the recommendation. Buttons run a fresh **Debate**, **Review file**, or **Review PR**.
 - **Router** — the strongest learned routing patterns and their confidence — *why* Veto routes the way it does.
 - **Today** — per-platform token-budget usage.

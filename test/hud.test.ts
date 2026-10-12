@@ -3,6 +3,14 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+
+test('console resume accepts only supported provider IDs', () => {
+  for (const provider of ['claude', 'gemini', 'codex', 'antigravity']) {
+    const msg = { type: 'resume', id: 's1', platform: 'claude', target: 'console', provider };
+    assert.deepEqual(validateHudMessage(msg), msg);
+  }
+  assert.equal(validateHudMessage({ type: 'resume', id: 's1', provider: 'arbitrary-executable' }), null);
+});
 import { DatabaseSync } from 'node:sqlite';
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';

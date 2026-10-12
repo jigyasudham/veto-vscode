@@ -196,11 +196,11 @@ export function activate(context: vscode.ExtensionContext): void {
   };
 
   const runTool = async (label: string, tool: string, input: Record<string, unknown>, title: string,
-    token: vscode.CancellationToken, cwd = getActiveProjectDir()): Promise<ActionResult> => {
+    token: vscode.CancellationToken, cwd = getActiveProjectDir(), provider?: 'claude' | 'gemini' | 'codex' | 'antigravity'): Promise<ActionResult> => {
     await ensureWorkflowDatabase(cwd);
     if (token.isCancellationRequested) return fromOutcome(label, { status: 'cancelled', message: 'Cancelled.' });
     const outcome = await runStructuredTool(outputChannel, {
-      title, cwd, tool, input, cancellationToken: token,
+      title, cwd, tool, input, cancellationToken: token, ...(provider ? { provider } : {}),
       onProgress: line => appendLog(`[${label}] ${line}`, 'info'),
     });
     store.refresh(true);
@@ -430,9 +430,9 @@ export function activate(context: vscode.ExtensionContext): void {
       case 'resume': {
         if (msg.target === 'console') {
           void runHudAction('resume', msg.requestId, token => {
-            appendLog(`[Resume] Resuming session ${msg.id} via veto_continue in Console...`, 'info');
-            // The console route runs Claude, so Claude is the resuming client (F07).
-            return runTool('Resume', 'veto_continue', { session_id: msg.id, resuming_as: 'claude' }, 'Veto: resume session', token);
+            const provider = msg.provider ?? 'claude';
+            appendLog(`[Resume] Resuming session ${msg.id} using ${provider} in Console...`, 'info');
+            return runTool('Resume', 'veto_continue', { session_id: msg.id, resuming_as: provider }, 'Veto: resume session', token, getActiveProjectDir(), provider);
           });
         } else {
           vscode.commands.executeCommand('veto.continueSession', msg.id, msg.platform);

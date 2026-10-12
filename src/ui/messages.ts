@@ -3,7 +3,7 @@
 
 export type HudMessage =
   | { type: 'ready' }
-  | { type: 'resume'; id: string; platform: string; target?: 'terminal' | 'console'; requestId?: number }
+  | { type: 'resume'; id: string; platform: string; provider?: 'claude' | 'gemini' | 'codex' | 'antigravity'; target?: 'terminal' | 'console'; requestId?: number }
   | { type: 'copyId'; id: string }
   | { type: 'copyText'; text: string }
   | { type: 'searchMemory'; query: string; requestId?: number }
@@ -154,7 +154,9 @@ export function validateHudMessage(raw: unknown): HudMessage | null {
       const platform = typeof msg.platform === 'string' ? msg.platform.slice(0, 32) : 'claude';
       const target = msg.target === 'console' || msg.target === 'terminal' ? msg.target : undefined;
       const requestId = requestIdOf(msg.requestId);
-      return { type: 'resume', id: msg.id, platform, ...(target ? { target } : {}), ...(requestId !== undefined ? { requestId } : {}) };
+      if (msg.provider !== undefined && !['claude', 'gemini', 'codex', 'antigravity'].includes(msg.provider as string)) return null;
+      const provider = msg.provider as 'claude' | 'gemini' | 'codex' | 'antigravity' | undefined;
+      return { type: 'resume', id: msg.id, platform, ...(provider ? { provider } : {}), ...(target ? { target } : {}), ...(requestId !== undefined ? { requestId } : {}) };
     }
     case 'ready': {
       return { type: 'ready' };

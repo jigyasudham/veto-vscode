@@ -1,12 +1,16 @@
 # Change Log
 
 ## 1.2.1
-### Accessibility (a11y), Theme Resilience & Multi-Client Resume
+### Multi-Client Resume, Accessibility & Veto 3.9.0 Compatibility
+- **Multi-Client Extension Console Resume**: Session resume now supports Claude, Gemini, Codex, and Antigravity (agy) in the Extension Console with an AI provider selector, progress streaming, cancellation, and verified backend tool result extraction.
+- **Antigravity CLI Resume**: Added Antigravity to supported terminal resume providers in `resumeSessionInTerminal()`, allowing direct continuation of sessions via the Antigravity CLI alongside Claude, Gemini, and Codex.
+- **Active Session Last Saved Timestamp**: Active Session card displays the last checkpoint save date and time in the local timezone.
+- **Veto 3.9.0 Trial Compatibility**: The trial card adapts when Veto 3.9.0 stops the trial on notes, showing notes chosen against target and sessions counted/skipped.
 - **Screen Reader & ARIA Accessibility**: Added accessible names (`aria-labelledby`) to active progress and workflow result regions per WCAG 2.1; added `role="status"` and live regions to the verdict badge, sync status, and console status indicator; added `role="radiogroup"` to scope selectors; added accessible labels to action and copy buttons; initialized collapsible card headers with `aria-expanded="true"`.
 - **Dialog Inert Trapping**: Resume choice modal now sets `inert` across background elements when opened and restores interaction cleanly on dismiss.
 - **Theme Resilience & Contrast Hardening**: Hardened status badges (`.badge.red`, `.badge.deadlock`, `.badge.green`, `.badge.yellow`), vote chips, log tags, and callouts across light, dark, and popular third-party themes (Dracula, Nord, One Dark Pro, Solarized, GitHub). Tuned inactive tab and card metadata opacity to guarantee WCAG AA contrast (>= 4.5:1 for badges and text; >= 3:1 for inactive controls) in dark mode, light mode, and high-contrast modes.
-- **Antigravity CLI Resume**: Added Antigravity to supported terminal resume providers (`PLATFORMS`) in `resumeSessionInTerminal()`, allowing direct continuation of sessions via the Antigravity CLI alongside Claude, Gemini, and Codex.
 - **Windows Process Headroom**: Improved subprocess timeout margin in actions deduplication test to prevent CI/load flakiness.
+
 
 ## 1.2.0
 ### Features & UI/UX Overhaul

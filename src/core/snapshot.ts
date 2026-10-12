@@ -8,6 +8,7 @@ export interface VetoSession {
   last_resumed_at: string | null;
   connection_type: string;
   started_at: string;
+  saved_at?: string | null;
   summary: string | null;
   project_dir: string | null;
   token_count: number;
