@@ -1,5 +1,7 @@
-// Diagnostic reproductions for the 2026-09-28 audit. These assert observed defects,
-// not desired behavior. No real backend, user database, or AI provider is invoked.
+// ARCHIVED: Diagnostic reproductions for the historical 2026-09-28 pre-release audit.
+// These assert the pre-remediation defect states from audit-1.2.0; the actual regression
+// test suite lives in test/ (test/webview.test.ts, test/extension-routes.test.ts, etc.).
+// This script fails by design against fixed code.
 const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');

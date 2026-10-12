@@ -38,7 +38,7 @@ export {
 };
 
 const SAFE_ID = /^[A-Za-z0-9_-]+$/;
-const PLATFORMS = new Set(['claude', 'gemini', 'codex']);
+const PLATFORMS = new Set(['claude', 'gemini', 'codex', 'antigravity']);
 
 /** Run `claude` as a one-shot with an argv array (no shell). Streams to the output channel. */
 export function spawnClaude(
@@ -155,7 +155,7 @@ export async function resumeSessionInTerminal(sessionId: string, platform = 'cla
   if (typeof sessionId !== 'string' || !SAFE_ID.test(sessionId)) {
     vscode.window.showErrorMessage('Veto: invalid session ID.'); return;
   }
-  const choices = ['claude', 'gemini', 'codex'].map(value => ({ label: value, description: value === platform.toLowerCase() ? 'Saved session provider' : undefined }));
+  const choices = ['claude', 'gemini', 'codex', 'antigravity'].map(value => ({ label: value, description: value === platform.toLowerCase() ? 'Saved session provider' : undefined }));
   const selected = await vscode.window.showQuickPick(choices, { placeHolder: `Resume in ${cwd ?? 'default directory'} using?` });
   if (!selected || !PLATFORMS.has(selected.label)) return;
   const provider = selected.label;

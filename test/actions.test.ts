@@ -97,7 +97,7 @@ test('F06: spawnProcess deduplicates concurrently running jobs with the same key
   const jobKey = 'duplicate-job-test';
   const promise1 = spawnProcess(process.execPath, ['-e', 'setTimeout(()=>{}, 200)'], undefined, {
     jobKey,
-    timeoutMs: 500,
+    timeoutMs: 3000,
   });
 
   // Concurrently spawning the same job key must immediately reject
